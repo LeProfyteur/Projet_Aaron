@@ -5,7 +5,7 @@
 #include  "Components/PostProcessComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Materials/MaterialInstanceDynamic.h"
+#include "Projet_Aaron/Equipment/NightVisionEquipment.h"
 #include "Engine/Engine.h"
 #include "StateManager.h"
 
@@ -28,14 +28,16 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UStateManager* stateManager;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UPostProcessComponent* postProcess;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	//class UPostProcessComponent* postProcess;
 	
 	UPROPERTY()
 	class AActor *lastActorHit = nullptr;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool isNearClimbing = false;
+
+	ANightVisionEquipment *NightVisionEquipment;
 
 	FHitResult *hitGrab;
 	FHitResult *hitActor = nullptr;
@@ -60,7 +62,6 @@ public:
 	void MoveRight(float value);
 	
 	void StartJump();
-	void StopJump();
 	
 	void Sprint();
 	void StopSprint();
@@ -73,13 +74,12 @@ public:
 	void Climb(float value);
 
 	void RecoveryStamina(float deltaTime);
-	void NightVision();
 
 	void Action();
 	void StopAction();
 	void Analyse();
 
-	void Grab();
+	void Activate();
 
 	UFUNCTION(BlueprintCallable) void StopClimbing();
 

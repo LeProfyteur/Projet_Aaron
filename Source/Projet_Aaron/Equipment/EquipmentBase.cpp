@@ -18,7 +18,6 @@ AEquipmentBase::AEquipmentBase()
 void AEquipmentBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame

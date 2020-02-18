@@ -19,9 +19,6 @@ AFPS_Character::AFPS_Character()
 	fpsCamera->SetupAttachment(RootComponent);
 	fpsCamera->SetRelativeLocation(FVector(0.0f, 0.0f, 50.0f + BaseEyeHeight));
 	fpsCamera->bUsePawnControlRotation = true;
-
-	postProcess = CreateDefaultSubobject<UPostProcessComponent>(TEXT("NightVisionProcess"));
-	postProcess->SetupAttachment(fpsCamera);
 	
 	stateManager = CreateDefaultSubobject<UStateManager>(TEXT("StateManager"));
 	
@@ -34,8 +31,7 @@ AFPS_Character::AFPS_Character()
 void AFPS_Character::BeginPlay()
 {
 	Super::BeginPlay();
-	postProcess->Settings.AutoExposureBias = 8;
-	postProcess->Settings.SceneColorTint = FLinearColor(0.0f, 10.0f, 0.0f);
+	NightVisionEquipment = GetWorld()->SpawnActor<ANightVisionEquipment>();
 }
 
 // Called every frame
@@ -107,7 +103,7 @@ void AFPS_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &AFPS_Character::Crouching);
 	
-	PlayerInputComponent->BindAction("NightVision", IE_Pressed,this, &AFPS_Character::NightVision);
+	PlayerInputComponent->BindAction("NightVision", IE_Pressed,this, &AFPS_Character::Activate);
 	
 	PlayerInputComponent->BindAction("Action", IE_Pressed, this, &AFPS_Character::Action);
 	PlayerInputComponent->BindAction("Action", IE_Repeat, this, &AFPS_Character::Analyse);
@@ -243,20 +239,11 @@ void AFPS_Character::StopClimbing()
 	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 }
 
-void AFPS_Character::NightVision()
+void AFPS_Character::Activate()
 {
-	isNightVison = !isNightVison;
-	if(!isNightVison)
-	{
-		postProcess->Settings.bOverride_AutoExposureBias = false;
-		postProcess->Settings.bOverride_SceneColorTint = false;
-	}
-	else
-	{
-		postProcess->Settings.bOverride_AutoExposureBias = true;
-		postProcess->Settings.bOverride_SceneColorTint = true;
-	}
+	NightVisionEquipment->Activate_Implementation();
 }
+
 
 
 
