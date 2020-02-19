@@ -29,7 +29,7 @@ void AItem::Tick(float DeltaTime)
 bool AItem::UseItem_Implementation()
 {
 	UE_LOG(LogActor, Error, TEXT("UseItem : Item.CPP"));
-	return false;
+	return ItemStructure->IsConsomable;
 }
 
 UDA_ItemStructure* AItem::InteractSafe_Implementation_Implementation()

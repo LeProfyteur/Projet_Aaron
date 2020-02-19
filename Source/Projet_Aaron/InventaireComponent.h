@@ -23,10 +23,16 @@ public:
 		FString InventoryName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int NumberOfSlots;
+		int NumberOfSlots=6;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TArray<UDA_SlotStructure*> Inventory;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TArray<UDA_SlotStructure*> InventoryFlacon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TArray<UDA_SlotStructure*> InventoryConsomable;
 
 	UFUNCTION(BlueprintCallable)
 		void AddToInventory(UDA_ItemStructure* ItemToAdd);
@@ -38,6 +44,8 @@ public:
 		void PrepareInventory();
 
 	int GetIndexSlot(UDA_ItemStructure* ItemToSearch);
+	int GetIndexSlotConso(UDA_ItemStructure* ItemToSearch);
+	int GetIndexSlotSeringue(UDA_ItemStructure* ItemToSearch);
 
 
 protected:
