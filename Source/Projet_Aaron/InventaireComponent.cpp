@@ -95,7 +95,7 @@ void UInventaireComponent::AddToInventory(UDA_ItemStructure* ItemToAdd)
 				if (indexConso >= 0 && InventoryConsomable[indexConso]->Quantity< InventoryConsomable[indexConso]->ItemStructure->MaxStackSize)
 				{
 					UDA_SlotStructure* slotConso = InventoryConsomable[indexConso];
-					slotConso->Quantity++;
+					//slotConso->Quantity++;
 				}
 				else
 				{
@@ -109,7 +109,7 @@ void UInventaireComponent::AddToInventory(UDA_ItemStructure* ItemToAdd)
 				if (indexSeringue >= 0 && InventoryFlacon[indexSeringue]->Quantity < InventoryFlacon[indexSeringue]->ItemStructure->MaxStackSize)
 				{
 					UDA_SlotStructure* slotSeringue = InventoryFlacon[indexSeringue];
-					slotSeringue->Quantity++;
+					//slotSeringue->Quantity++;
 				}
 				else
 				{
