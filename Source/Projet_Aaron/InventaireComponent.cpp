@@ -134,9 +134,10 @@ void UInventaireComponent::RemoveFromInventory(UDA_SlotStructure* SlotToRemove)
 			break;
 		}
 	}
+	InventoryConsomable.RemoveSingle(SlotToRemove);
 	for (int i = 0; i < InventoryConsomable.Num(); i++)
 	{
-		if(InventoryConsomable[i]->ItemStructure->Name == SlotToRemove->ItemStructure->Name)
+		if(InventoryConsomable[i]->ItemStructure->Name == SlotToRemove->ItemStructure->Name && InventoryConsomable[i]->Quantity == SlotToRemove->Quantity)
 		{
 			InventoryConsomable.RemoveAt(i);
 			break;
@@ -145,7 +146,7 @@ void UInventaireComponent::RemoveFromInventory(UDA_SlotStructure* SlotToRemove)
 
 	for (int i = 0; i < InventoryFlacon.Num(); i++)
 	{
-		if (InventoryFlacon[i]->ItemStructure->Name == SlotToRemove->ItemStructure->Name)
+		if (InventoryFlacon[i]->ItemStructure->Name == SlotToRemove->ItemStructure->Name && InventoryFlacon[i]->Quantity == SlotToRemove->Quantity)
 		{
 			InventoryFlacon.RemoveAt(i);
 			break;
