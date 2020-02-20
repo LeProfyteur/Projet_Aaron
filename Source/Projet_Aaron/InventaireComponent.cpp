@@ -108,8 +108,8 @@ void UInventaireComponent::AddToInventory(UDA_ItemStructure* ItemToAdd)
 				int indexSeringue = GetIndexSlotSeringue(ItemToAdd);
 				if (indexSeringue >= 0 && InventoryFlacon[indexSeringue]->Quantity < InventoryFlacon[indexSeringue]->ItemStructure->MaxStackSize)
 				{
-					UDA_SlotStructure* slotConso = InventoryFlacon[indexSeringue];
-					slotConso->Quantity++;
+					UDA_SlotStructure* slotSeringue = InventoryFlacon[indexSeringue];
+					slotSeringue->Quantity++;
 				}
 				else
 				{
