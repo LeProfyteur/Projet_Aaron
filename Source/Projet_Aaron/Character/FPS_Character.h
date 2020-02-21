@@ -2,11 +2,10 @@
 
 #pragma once
 #include "Camera/CameraComponent.h"
-#include  "Components/PostProcessComponent.h"
+#include "Components/PostProcessComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Projet_Aaron/Equipment/NightVisionEquipment.h"
-#include "Projet_Aaron/Equipment/GrapnelEquipment.h"
 #include "Engine/Engine.h"
 #include "StateManager.h"
 
@@ -33,13 +32,16 @@ public:
 	//class UPostProcessComponent* postProcess;
 	
 	UPROPERTY()
-	class AActor *lastActorHit = nullptr;
+		class AActor* lastActorHit = nullptr;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool isNearClimbing = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UChildActorComponent *equipment;
+		UChildActorComponent* LeftArmEquipment;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UChildActorComponent* RightArmEquipment;
 
 	//ANightVisionEquipment *NightVisionEquipment;
 	//AGrapnelEquipment* GrapnelEquipment;
@@ -84,8 +86,11 @@ public:
 	void StopAction();
 	void Analyse();
 
-	void ActivatePressed();
-	void ActivateReleased();
+	void ActivatePressedLeft();
+	void ActivateReleasedLeft();
+
+	void ActivatePressedRight();
+	void ActivateReleasedRight();
 
 	UFUNCTION(BlueprintCallable) void StopClimbing();
 
