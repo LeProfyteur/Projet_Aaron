@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Materials/Material.h"
 #include "Components/StaticMeshComponent.h"
 #include "EquipmentInterface.h"
 #include "EquipmentBase.generated.h"
@@ -17,7 +18,7 @@ public:
 	// Sets default values for this actor's properties
 	AEquipmentBase();
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 		UStaticMeshComponent* StaticMeshComponent;
 
 protected:
@@ -29,8 +30,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		void Activate();
-		virtual void Activate_Implementation() override;
+		void Activate(bool isPressed);
+		virtual void Activate_Implementation(bool isPressed) override;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		void OnEquip();

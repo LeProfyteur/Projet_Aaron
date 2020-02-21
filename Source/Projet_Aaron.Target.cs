@@ -10,6 +10,6 @@ public class Projet_AaronTarget : TargetRules
 		Type = TargetType.Game;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
 
-		ExtraModuleNames.AddRange( new string[] { "Projet_Aaron" } );
+		ExtraModuleNames.AddRange( new string[] { "Projet_Aaron", "Engine" } );
 	}
 }
