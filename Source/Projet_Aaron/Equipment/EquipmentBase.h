@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Materials/Material.h"
 #include "Components/StaticMeshComponent.h"
 #include "EquipmentInterface.h"
 #include "EquipmentBase.generated.h"
@@ -17,7 +18,7 @@ public:
 	// Sets default values for this actor's properties
 	AEquipmentBase();
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 		UStaticMeshComponent* StaticMeshComponent;
 
 protected:

@@ -2,7 +2,6 @@
 
 
 #include "MyHUD.h"
-#include "UObject/ConstructorHelpers.h"
 #include "Engine/Engine.h"
 #include "Materials/MaterialInstanceDynamic.h"
 

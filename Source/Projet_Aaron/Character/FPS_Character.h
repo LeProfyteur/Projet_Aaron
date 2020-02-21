@@ -6,6 +6,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Projet_Aaron/Equipment/NightVisionEquipment.h"
+#include "Projet_Aaron/Equipment/GrapnelEquipment.h"
 #include "Engine/Engine.h"
 #include "StateManager.h"
 
@@ -37,7 +38,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool isNearClimbing = false;
 
-	ANightVisionEquipment *NightVisionEquipment;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UChildActorComponent *equipment;
+
+	//ANightVisionEquipment *NightVisionEquipment;
+	//AGrapnelEquipment* GrapnelEquipment;
 
 	FHitResult *hitGrab;
 	FHitResult *hitActor = nullptr;

@@ -25,13 +25,16 @@ AFPS_Character::AFPS_Character()
 	GetCharacterMovement()->MaxWalkSpeed = stateManager->speed;
 	GetCharacterMovement()->JumpZVelocity = stateManager->jumpForce;
 	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
+
+	equipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Equipment"));
+	equipment->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
 void AFPS_Character::BeginPlay()
 {
 	Super::BeginPlay();
-	NightVisionEquipment = GetWorld()->SpawnActor<ANightVisionEquipment>();
+	equipment->SetChildActorClass(AGrapnelEquipment::StaticClass());
 }
 
 // Called every frame
@@ -241,7 +244,8 @@ void AFPS_Character::StopClimbing()
 
 void AFPS_Character::Activate()
 {
-	NightVisionEquipment->Activate_Implementation();
+	if (equipment->GetChildActor()->Implements<UEquipmentInterface>())
+		IEquipmentInterface::Execute_Activate(equipment->GetChildActor());
 }
 
 
