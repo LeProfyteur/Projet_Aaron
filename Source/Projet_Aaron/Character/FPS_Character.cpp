@@ -250,26 +250,30 @@ void AFPS_Character::StopClimbing()
 
 void AFPS_Character::ActivatePressedLeft()
 {
-	if (LeftArmEquipment->GetChildActor()->Implements<UEquipmentInterface>())
-		IEquipmentInterface::Execute_Activate(LeftArmEquipment->GetChildActor(), true);
+	AActor* ChildActor = LeftArmEquipment->GetChildActor();
+	if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
+		IEquipmentInterface::Execute_Activate(ChildActor, true);
 }
 
 void AFPS_Character::ActivateReleasedLeft()
 {
-	if (LeftArmEquipment->GetChildActor()->Implements<UEquipmentInterface>())
-		IEquipmentInterface::Execute_Activate(LeftArmEquipment->GetChildActor(), false);
+	AActor* ChildActor = LeftArmEquipment->GetChildActor();
+	if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
+		IEquipmentInterface::Execute_Activate(ChildActor, false);
 }
 
 void AFPS_Character::ActivatePressedRight()
 {
-	if (RightArmEquipment->GetChildActor()->Implements<UEquipmentInterface>())
-		IEquipmentInterface::Execute_Activate(RightArmEquipment->GetChildActor(), true);
+	AActor* ChildActor = RightArmEquipment->GetChildActor();
+	if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
+		IEquipmentInterface::Execute_Activate(ChildActor, true);
 }
 
 void AFPS_Character::ActivateReleasedRight()
 {
-	if (RightArmEquipment->GetChildActor()->Implements<UEquipmentInterface>())
-		IEquipmentInterface::Execute_Activate(RightArmEquipment->GetChildActor(), false);
+	AActor* ChildActor = RightArmEquipment->GetChildActor();
+	if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
+		IEquipmentInterface::Execute_Activate(ChildActor, false);
 }
 
 
