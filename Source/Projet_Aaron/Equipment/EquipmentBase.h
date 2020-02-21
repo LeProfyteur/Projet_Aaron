@@ -30,8 +30,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		void Activate();
-		virtual void Activate_Implementation() override;
+		void Activate(bool isPressed);
+		virtual void Activate_Implementation(bool isPressed) override;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		void OnEquip();

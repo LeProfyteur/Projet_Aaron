@@ -84,7 +84,8 @@ public:
 	void StopAction();
 	void Analyse();
 
-	void Activate();
+	void ActivatePressed();
+	void ActivateReleased();
 
 	UFUNCTION(BlueprintCallable) void StopClimbing();
 

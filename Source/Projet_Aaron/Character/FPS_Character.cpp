@@ -106,7 +106,8 @@ void AFPS_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &AFPS_Character::Crouching);
 	
-	PlayerInputComponent->BindAction("NightVision", IE_Pressed,this, &AFPS_Character::Activate);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed,this, &AFPS_Character::ActivatePressed);
+	PlayerInputComponent->BindAction("Fire", IE_Released,this, &AFPS_Character::ActivateReleased);
 	
 	PlayerInputComponent->BindAction("Action", IE_Pressed, this, &AFPS_Character::Action);
 	PlayerInputComponent->BindAction("Action", IE_Repeat, this, &AFPS_Character::Analyse);
@@ -242,13 +243,17 @@ void AFPS_Character::StopClimbing()
 	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 }
 
-void AFPS_Character::Activate()
+void AFPS_Character::ActivatePressed()
 {
 	if (equipment->GetChildActor()->Implements<UEquipmentInterface>())
-		IEquipmentInterface::Execute_Activate(equipment->GetChildActor());
+		IEquipmentInterface::Execute_Activate(equipment->GetChildActor(), true);
 }
 
-
+void AFPS_Character::ActivateReleased()
+{
+	if (equipment->GetChildActor()->Implements<UEquipmentInterface>())
+		IEquipmentInterface::Execute_Activate(equipment->GetChildActor(), false);
+}
 
 
 

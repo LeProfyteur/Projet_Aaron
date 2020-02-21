@@ -52,11 +52,10 @@ void AGrapnelEquipment::BeginPlay()
 	//pointer->SetHiddenInGame(true, true);
 }
 
-void AGrapnelEquipment::Activate_Implementation()
+void AGrapnelEquipment::Activate_Implementation(bool isPressed)
 {
-	if (!isActivated)
+	if (isPressed)
 	{
-		isActivated = true;
 		if (!IsValid(myBullet) && canHook)
 		{
 			foundHookSpot = false;
@@ -65,7 +64,6 @@ void AGrapnelEquipment::Activate_Implementation()
 		}
 	} else
 	{
-		isActivated = false;
 		if(foundHookSpot)
 		{
 			DisableInput(GetWorld()->GetFirstPlayerController());
@@ -74,7 +72,7 @@ void AGrapnelEquipment::Activate_Implementation()
 			laser->SetHiddenInGame(true, true);
 			cable->SetHiddenInGame(false, false);
 			hookMeshComponent->SetHiddenInGame(true);
-			myBullet = GetWorld()->SpawnActor<AGrappleHead>(GetActorLocation() + FVector(60.0f, 0.0f, 7.0f), GetActorRotation());
+			myBullet = GetWorld()->SpawnActor<AGrappleHead>(hookMeshComponent->GetComponentLocation(), GetActorRotation());
 			myBullet->equipment = this;
 			myBullet->locationToGo = locationToGrip;
 			cable->SetAttachEndTo(myBullet, FName(), FName());

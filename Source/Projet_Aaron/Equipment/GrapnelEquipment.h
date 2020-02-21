@@ -60,7 +60,7 @@ protected:
 	FOnTimelineEvent updateFunction{};
 
 public:
-	virtual void Activate_Implementation() override;
+	virtual void Activate_Implementation(bool isPressed) override;
 	virtual void OnEquip_Implementation() override;
 	virtual void OnUnequip_Implementation() override;
 

@@ -18,7 +18,7 @@ void ANightVisionEquipment::BeginPlay()
 }
 
 
-void ANightVisionEquipment::Activate_Implementation()
+void ANightVisionEquipment::Activate_Implementation(bool isPressed)
 {
 	isActivated = !isActivated;
 	if (!isActivated)

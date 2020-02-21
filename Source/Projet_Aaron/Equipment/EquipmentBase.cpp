@@ -27,7 +27,7 @@ void AEquipmentBase::Tick(float DeltaTime)
 
 }
 
-void AEquipmentBase::Activate_Implementation()
+void AEquipmentBase::Activate_Implementation(bool isPressed)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Activated equipment"));
 }
