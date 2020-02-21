@@ -10,10 +10,9 @@
 UENUM(BlueprintType)
 enum ECategoryEnum
 {
-	CE_All UMETA(DisplayName="All Items"),
 	CE_Consomable UMETA(DisplayName="Consomable"),
 	CE_Lore UMETA(DisplayName = "Item de Lore"),
-	CE_Craft UMETA(DisplayName = "Craft Item"),
+	CE_Seringue UMETA(DisplayName = "Seringue"),
 };
 
 class AItem;
