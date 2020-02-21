@@ -64,7 +64,7 @@ void AGrapnelEquipment::Activate_Implementation(bool isPressed)
 		}
 	} else
 	{
-		if(foundHookSpot)
+		if(foundHookSpot && canHook)
 		{
 			DisableInput(GetWorld()->GetFirstPlayerController());
 			canHook = false;
