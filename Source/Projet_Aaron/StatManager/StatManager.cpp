@@ -54,6 +54,25 @@ void UStatManager::TakeDamage(float BioDamage, float TechDamage)
 	
 }
 
+void UStatManager::Heal(float BioHeal, float TechHeal)
+{
+	HealthBio += BioHeal;
+
+	if (HealthBio > HealthBioMax)
+	{
+		HealthBio = HealthBioMax;
+	}
+	
+	HealthTech += TechHeal;
+
+	if(HealthTech > HealthTechMax)
+	{
+		HealthTech = HealthTechMax;
+	}
+
+	
+}
+
 void UStatManager::Die()
 {
 	GetOwner()->Destroy();
