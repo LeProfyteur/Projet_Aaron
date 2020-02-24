@@ -21,18 +21,25 @@ AEnvironmentalScanEquipment::AEnvironmentalScanEquipment()
 
 	static ConstructorHelpers::FObjectFinder<UMaterialParameterCollection> ParamCol(TEXT("/Game/Projet_Aaron/CC/EnvironmentScanParams.EnvironmentScanParams"));
 	if(ParamCol.Succeeded())
-	{
-		UE_LOG(LogActor, Error, TEXT("param = true"));
-	}
-	else
-		UE_LOG(LogActor, Error, TEXT("param = false"));
+		ParameterCollection = ParamCol.Object;
 	
 }
 
 void AEnvironmentalScanEquipment::Activate_Implementation(bool isPressed)
 {
 	if (isPressed && timeline)
-		timeline->PlayFromStart();
+	{
+		UE_LOG(LogActor, Error, TEXT("dans le activate"));
+		//timeline->PlayFromStart();
+		TSet<UCurveBase*> mycurves;
+		timeline->GetAllCurves(mycurves);
+		
+		for(UCurveBase* curve : mycurves)
+		{
+			UE_LOG(LogActor, Error, TEXT("%s : %f"), *curve->GetName());
+		}
+		UE_LOG(LogActor, Error, TEXT("%f"), timeline->GetPlayRate());
+	}
 }
 
 void AEnvironmentalScanEquipment::OnEquip_Implementation()
@@ -52,17 +59,20 @@ void AEnvironmentalScanEquipment::Tick(float DeltaTime)
 
 void AEnvironmentalScanEquipment::UpdateTimeLineRadius(float value)
 {
-	environmentalScanMatInstance->SetScalarParameterValue(FName(TEXT("Radius")), value);
+	UE_LOG(LogActor, Error, TEXT("SA update"));
+	ParameterCollectionInstance->SetScalarParameterValue(FName(TEXT("Radius")), value);
 }
 
 void AEnvironmentalScanEquipment::UpdateTimeLineHighlight(float value)
 {
-	environmentalScanMatInstance->SetScalarParameterValue(FName(TEXT("Highlight")), value);
+	ParameterCollectionInstance->SetScalarParameterValue(FName(TEXT("Highlight")), value);
 }
 
 
 void AEnvironmentalScanEquipment::BeginPlay()
 {
+	ParameterCollectionInstance = GetWorld()->GetParameterCollectionInstance(ParameterCollection);
+	
 	timeline->SetTimelineLength(5.0f);
 	timeline->AddInterpFloat(FloatRadiusCurve, updateRadiusFunction);
 	timeline->AddInterpFloat(FloatHighlightCurve, updateHighlightFunction);

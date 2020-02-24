@@ -90,6 +90,8 @@ public:
 	void ActivatePressedRight();
 	void ActivateReleasedRight();
 
+	void ActivateHeadEquipment();
+
 	UFUNCTION(BlueprintCallable) void StopClimbing();
 
 };
