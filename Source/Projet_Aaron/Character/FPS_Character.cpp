@@ -16,6 +16,7 @@
 #include "Runtime/UMG/Public/Blueprint/UserWidget.h"
 #include "Projet_Aaron/Item/Item.h"
 #include "Components/BillboardComponent.h"
+#include "Blueprint/UserWidget.h"
 
 // Sets default values
 AFPS_Character::AFPS_Character()
@@ -55,8 +56,7 @@ void AFPS_Character::BeginPlay()
 	}else
 	{
 		UE_LOG(LogActor, Error, TEXT("Name Inventaire : undefined"));
-	}
-	
+	}	
 }
 
 // Called every frame
@@ -150,7 +150,7 @@ void AFPS_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("UseQuickItem", IE_Pressed, this, &AFPS_Character::PressedItemWheel);
 
 	PlayerInputComponent->BindAction("ItemWheel", IE_Pressed, this, &AFPS_Character::PressedItemWheel);
-	PlayerInputComponent->BindAction("ItemWheel", IE_Released, this, &AFPS_Character::RealeaseItemWheel);
+	PlayerInputComponent->BindAction("ItemWheel", IE_Released, this, &AFPS_Character::ReleaseItemWheel);
 
 }
 
@@ -324,9 +324,12 @@ void AFPS_Character::ActivateReleasedRight()
 void AFPS_Character::PressedItemWheel()
 {
 	UE_LOG(LogActor, Warning, TEXT("Item wheel Pressed"));
+	MainHudFixedSizeCPP->CreateStandartWidgetCPP();
+	//CreateStandartWidgetCPP();
+	//MainHudFixedSizeCPP->CreateStandartWidgetCPP_Implementation();
 }
 
-void AFPS_Character::RealeaseItemWheel()
+void AFPS_Character::ReleaseItemWheel()
 {
 	UE_LOG(LogActor, Warning, TEXT("Item wheel Released"));
 }

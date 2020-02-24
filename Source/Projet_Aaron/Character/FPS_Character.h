@@ -12,6 +12,7 @@
 #include "GameFramework/Character.h"
 #include "CoreMinimal.h"
 #include "Projet_Aaron/Item/UInventoryCastObject.h"
+#include "Projet_Aaron/Item/MainHudFixedSizeCPP.h"
 #include "Projet_Aaron/InventaireComponent.h"
 #include "FPS_Character.generated.h"
 
@@ -65,10 +66,17 @@ public:
 	FVector2D Alignment;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float RaycastDistanceInventory = 1000.f;
+	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 		class UUInventoryCastObject* InventoryCastObject;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		class UMainHudFixedSizeCPP* MainHudFixedSizeCPP;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TSubclassOf<class UUInventoryCastObject> InventoryCastObjectClass;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+		TSubclassOf<class UMainHudFixedSizeCPP> MainHudFixedSizeCPPClass;
 
 	bool isSprinting = false;
 	bool bPressedAlt = false;
@@ -114,7 +122,7 @@ public:
 	void ActivateReleasedRight();
 	
 	void PressedItemWheel();
-	void RealeaseItemWheel();
+	void ReleaseItemWheel();
 
 	void PressedUseQuickItem();
 
