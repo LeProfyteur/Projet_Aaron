@@ -14,7 +14,7 @@ void AMyHUD::BeginPlay()
 {
 	Super::BeginPlay();
 
-	AnalyseMat = Cast<UMaterial>(StaticLoadObject(UMaterial::StaticClass(), NULL, TEXT("/Game/CC/CircularBar.CircularBar")));
+	AnalyseMat = Cast<UMaterial>(StaticLoadObject(UMaterial::StaticClass(), nullptr, TEXT("/Game/Projet_Aaron/CC/CircularBar.CircularBar")));
 	
 	BarMatInstance = UMaterialInstanceDynamic::Create(AnalyseMat, this);
 	BarMatInstance->SetScalarParameterValue(FName(TEXT("Decimal")), 0.0f);
