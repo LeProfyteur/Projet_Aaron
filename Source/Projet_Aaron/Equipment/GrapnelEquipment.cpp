@@ -15,10 +15,7 @@ AGrapnelEquipment::AGrapnelEquipment()
 
 	ConstructorHelpers::FObjectFinder<UStaticMesh> hookArmMesh(TEXT("/Game/Projet_Aaron/CC/FirstPersonBP/Blueprints/Grappnel/Grapple_Hook2.Grapple_Hook2"));
 	if (hookArmMesh.Succeeded())
-	{
 		StaticMeshComponent->SetStaticMesh(hookArmMesh.Object);
-		UE_LOG(LogActor, Error, TEXT("%d"), StaticMeshComponent->IsCollisionEnabled());
-	}
 
 	laser = CreateDefaultSubobject<UCableComponent>(TEXT("Laser"));
 	laser->SetupAttachment(RootComponent);

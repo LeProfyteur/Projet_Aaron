@@ -63,13 +63,13 @@ void AFPS_Character::Tick(float DeltaTime)
 			if (outHit.Actor->ActorHasTag(FName(TEXT("Analysable"))))
 			{
 				actorMeshComponent->SetCustomDepthStencilValue(2);
-				if (hitActor || outHit.Actor != hitActor->Actor)
+				if (!hitActor || outHit.Actor != hitActor->Actor)
 					hitActor = new FHitResult(outHit);
 			}
 			else if(outHit.Actor->ActorHasTag(FName(TEXT("Destructable"))))
 			{
 				actorMeshComponent->SetCustomDepthStencilValue(3);
-				if (hitActor || outHit.Actor != hitActor->Actor)
+				if (!hitActor || outHit.Actor != hitActor->Actor)
 					hitActor = new FHitResult(outHit);
 			}
 			else
