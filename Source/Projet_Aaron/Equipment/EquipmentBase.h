@@ -26,9 +26,6 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		void Activate(bool isPressed);
 		virtual void Activate_Implementation(bool isPressed) override;

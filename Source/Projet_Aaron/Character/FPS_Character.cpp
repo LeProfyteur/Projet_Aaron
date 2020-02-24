@@ -26,15 +26,20 @@ AFPS_Character::AFPS_Character()
 	GetCharacterMovement()->JumpZVelocity = stateManager->jumpForce;
 	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
 
-	equipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Equipment"));
-	equipment->SetupAttachment(RootComponent);
+	RightArmEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Right Arm Equipment"));
+	RightArmEquipment->SetupAttachment(fpsCamera);
+
+	LeftArmEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Left Arm Equipment"));
+	LeftArmEquipment->SetupAttachment(fpsCamera);
+
+	HeadEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Head Equipment"));
+	HeadEquipment->SetupAttachment(fpsCamera);
 }
 
 // Called when the game starts or when spawned
 void AFPS_Character::BeginPlay()
 {
 	Super::BeginPlay();
-	equipment->SetChildActorClass(AGrapnelEquipment::StaticClass());
 }
 
 // Called every frame
@@ -106,8 +111,13 @@ void AFPS_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &AFPS_Character::Crouching);
 	
-	PlayerInputComponent->BindAction("Fire", IE_Pressed,this, &AFPS_Character::ActivatePressed);
-	PlayerInputComponent->BindAction("Fire", IE_Released,this, &AFPS_Character::ActivateReleased);
+	PlayerInputComponent->BindAction("FireLeft", IE_Pressed,this, &AFPS_Character::ActivatePressedLeft);
+	PlayerInputComponent->BindAction("FireLeft", IE_Released,this, &AFPS_Character::ActivateReleasedLeft);
+
+	PlayerInputComponent->BindAction("FireRight", IE_Pressed, this, &AFPS_Character::ActivatePressedRight);
+	PlayerInputComponent->BindAction("FireRight", IE_Released, this, &AFPS_Character::ActivateReleasedRight);
+	
+	PlayerInputComponent->BindAction("HeadAction", IE_Pressed, this, &AFPS_Character::ActivateHeadEquipment);
 	
 	PlayerInputComponent->BindAction("Action", IE_Pressed, this, &AFPS_Character::Action);
 	PlayerInputComponent->BindAction("Action", IE_Repeat, this, &AFPS_Character::Analyse);
@@ -243,16 +253,39 @@ void AFPS_Character::StopClimbing()
 	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 }
 
-void AFPS_Character::ActivatePressed()
+void AFPS_Character::ActivatePressedLeft()
 {
-	if (equipment->GetChildActor()->Implements<UEquipmentInterface>())
-		IEquipmentInterface::Execute_Activate(equipment->GetChildActor(), true);
+	AActor* ChildActor = LeftArmEquipment->GetChildActor();
+	if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
+		IEquipmentInterface::Execute_Activate(ChildActor, true);
 }
 
-void AFPS_Character::ActivateReleased()
+void AFPS_Character::ActivateReleasedLeft()
 {
-	if (equipment->GetChildActor()->Implements<UEquipmentInterface>())
-		IEquipmentInterface::Execute_Activate(equipment->GetChildActor(), false);
+	AActor* ChildActor = LeftArmEquipment->GetChildActor();
+	if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
+		IEquipmentInterface::Execute_Activate(ChildActor, false);
+}
+
+void AFPS_Character::ActivatePressedRight()
+{
+	AActor* ChildActor = RightArmEquipment->GetChildActor();
+	if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
+		IEquipmentInterface::Execute_Activate(ChildActor, true);
+}
+
+void AFPS_Character::ActivateReleasedRight()
+{
+	AActor* ChildActor = RightArmEquipment->GetChildActor();
+	if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
+		IEquipmentInterface::Execute_Activate(ChildActor, false);
+}
+
+void AFPS_Character::ActivateHeadEquipment()
+{
+	AActor* ChildActor = HeadEquipment->GetChildActor();
+	if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
+		IEquipmentInterface::Execute_Activate(ChildActor, true);
 }
 
 
