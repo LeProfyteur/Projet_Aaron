@@ -17,23 +17,23 @@ class PROJET_AARON_API UCreatureStatManager : public UStatManager
 protected:
 
 	//Life Stat
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stamina)
 		float Stamina;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stamina)
 		float StaminaMax;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stamina)
 		float StaminaRecovery;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speed)
 		float BaseSpeed;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speed)
 		float ActualSpeed;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speed)
 		float ModifSpeed;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speed)
 		float JumpForce;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stamina)
 		float JumpStaminaCost;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stamina)
 		float SprintStaminaCost;
 	
 };
