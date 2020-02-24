@@ -117,6 +117,8 @@ void AFPS_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("FireRight", IE_Pressed, this, &AFPS_Character::ActivatePressedRight);
 	PlayerInputComponent->BindAction("FireRight", IE_Released, this, &AFPS_Character::ActivateReleasedRight);
 	
+	PlayerInputComponent->BindAction("HeadAction", IE_Pressed, this, &AFPS_Character::ActivateHeadEquipment);
+	
 	PlayerInputComponent->BindAction("Action", IE_Pressed, this, &AFPS_Character::Action);
 	PlayerInputComponent->BindAction("Action", IE_Repeat, this, &AFPS_Character::Analyse);
 	PlayerInputComponent->BindAction("Action", IE_Released,this, &AFPS_Character::StopAction);
@@ -278,6 +280,14 @@ void AFPS_Character::ActivateReleasedRight()
 	if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
 		IEquipmentInterface::Execute_Activate(ChildActor, false);
 }
+
+void AFPS_Character::ActivateHeadEquipment()
+{
+	AActor* ChildActor = HeadEquipment->GetChildActor();
+	if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
+		IEquipmentInterface::Execute_Activate(ChildActor, true);
+}
+
 
 
 

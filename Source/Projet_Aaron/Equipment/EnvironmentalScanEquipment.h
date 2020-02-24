@@ -2,9 +2,12 @@
 
 #pragma once
 
+#include "Curves/CurveBase.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Materials/Material.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "Materials/MaterialParameterCollection.h"
+#include "Materials/MaterialParameterCollectionInstance.h"
 #include "CoreMinimal.h"
 #include "EquipmentBase.h"
 #include "EnvironmentalScanEquipment.generated.h"
@@ -49,8 +52,8 @@ public :
 	virtual void Tick(float DeltaTime) override;
 
 protected:
-	FOnTimelineFloat updateRadiusFunction{};
-	FOnTimelineFloat updateHighlightFunction{};
+	FOnTimelineFloat updateRadiusFunction;
+	FOnTimelineFloat updateHighlightFunction;
 
 	virtual void BeginPlay() override;
 	void UpdateTimeLineRadius(float value);
