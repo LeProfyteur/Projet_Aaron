@@ -35,5 +35,12 @@ protected:
 		float JumpStaminaCost;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stamina)
 		float SprintStaminaCost;
+
+public:
+
+	UFUNCTION(BlueprintCallable, Category = "Stamina")
+	bool ConsumeStamina(float value);
+	UFUNCTION(BlueprintCallable, Category = "Stamina")
+	void RecoveryStamina(float value);
 	
 };
