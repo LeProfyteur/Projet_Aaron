@@ -12,6 +12,7 @@
 #include "GameFramework/Character.h"
 #include "CoreMinimal.h"
 #include "Projet_Aaron/Item/UInventoryCastObject.h"
+#include "Projet_Aaron/InventaireComponent.h"
 #include "FPS_Character.generated.h"
 
 UCLASS()
@@ -43,6 +44,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UChildActorComponent* RightArmEquipment;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		class UInventaireComponent* InventaireComponent;
 
 	//ANightVisionEquipment *NightVisionEquipment;
 	//AGrapnelEquipment* GrapnelEquipment;

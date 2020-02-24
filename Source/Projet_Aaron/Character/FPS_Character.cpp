@@ -15,6 +15,7 @@
 #include "Runtime/UMG/Public/IUMGModule.h"
 #include "Runtime/UMG/Public/Blueprint/UserWidget.h"
 #include "Projet_Aaron/Item/Item.h"
+#include "Components/BillboardComponent.h"
 
 // Sets default values
 AFPS_Character::AFPS_Character()
@@ -38,6 +39,9 @@ AFPS_Character::AFPS_Character()
 
 	LeftArmEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Left Arm Equipment"));
 	LeftArmEquipment->SetupAttachment(fpsCamera);
+
+	InventaireComponent = CreateDefaultSubobject<UInventaireComponent>(TEXT("InventaireComponent"));
+	InventaireComponent->PrepareInventory();
 }
 
 // Called when the game starts or when spawned
@@ -45,8 +49,14 @@ void AFPS_Character::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//InventoryCastObject = CreateWidget<UUInventoryCastObject>(this, InventoryCastObjectClass);
-	//InventoryCastObject->AddToViewport();
+	if(IsValid(InventaireComponent))
+	{
+		UE_LOG(LogActor, Warning, TEXT("Name Inventaire : %s"), *InventaireComponent->InventoryName);
+	}else
+	{
+		UE_LOG(LogActor, Error, TEXT("Name Inventaire : undefined"));
+	}
+	
 }
 
 // Called every frame
@@ -66,39 +76,37 @@ void AFPS_Character::Tick(float DeltaTime)
 	
 	if(GetWorld()->LineTraceSingleByChannel(outHit, vStart, vEnd, ECC_Visibility, collisionParams))
 	{
-		if(outHit.bBlockingHit)
+		UStaticMeshComponent* actorMeshComponent = outHit.Actor->FindComponentByClass<UStaticMeshComponent>();
+		if (outHit.Actor->ActorHasTag(FName(TEXT("Item"))))
 		{
-			UStaticMeshComponent* actorMeshComponent = outHit.Actor->FindComponentByClass<UStaticMeshComponent>();
-			if (outHit.Actor->ActorHasTag(FName(TEXT("Analysable"))))
-			{
-				actorMeshComponent->SetCustomDepthStencilValue(2);
-				if (hitActor && outHit.Actor != hitActor->Actor)
-					hitActor = new FHitResult(outHit);
-			}
-			else if(outHit.Actor->ActorHasTag(FName(TEXT("Destructable"))))
-			{
-				actorMeshComponent->SetCustomDepthStencilValue(3);
-				if (hitActor && outHit.Actor != hitActor->Actor)
-					hitActor = new FHitResult(outHit);
-			}
-			else if (outHit.Actor->ActorHasTag(FName(TEXT("Item"))))
-			{
-				AItem* item = Cast<AItem>(outHit.Actor);
-				InventoryCastObject->nameTextItem = item->ItemStructure->Name + " [F]";
-				if (hitActor && outHit.Actor != hitActor->Actor)
-					hitActor = new FHitResult(outHit);
-			}
-			else
-			{
-				if (hitActor)
-				{
-					actorMeshComponent = hitActor->Actor->FindComponentByClass<UStaticMeshComponent>();
-					actorMeshComponent->SetCustomDepthStencilValue(1);
-					hitActor = nullptr;
-				}
-				InventoryCastObject->nameTextItem = "";
-			}
+			AItem* item = Cast<AItem>(outHit.Actor);
+			InventoryCastObject->nameTextItem = item->ItemStructure->Name + " [F]";
+			if (!hitActor || outHit.Actor != hitActor->Actor)
+				hitActor = new FHitResult(outHit);
 		}
+		else if(outHit.Actor->ActorHasTag(FName(TEXT("Destructable"))))
+		{
+			actorMeshComponent->SetCustomDepthStencilValue(3);
+			if (!hitActor || outHit.Actor != hitActor->Actor)
+				hitActor = new FHitResult(outHit);
+		}
+		else if (outHit.Actor->ActorHasTag(FName(TEXT("Analysable"))))
+		{
+			actorMeshComponent->SetCustomDepthStencilValue(2);
+			if (!hitActor || outHit.Actor != hitActor->Actor)
+				hitActor = new FHitResult(outHit);
+		}
+		else
+		{
+			if (hitActor)
+			{
+				actorMeshComponent = hitActor->Actor->FindComponentByClass<UStaticMeshComponent>();
+				actorMeshComponent->SetCustomDepthStencilValue(1);
+				hitActor = nullptr;
+			}
+			InventoryCastObject->nameTextItem = "";
+		}
+		
 	} else if(hitActor)
 	{
 		UStaticMeshComponent* actorMeshComponent = hitActor->Actor->FindComponentByClass<UStaticMeshComponent>();
@@ -236,19 +244,20 @@ void AFPS_Character::Action()
 	UE_LOG(LogActor, Error, TEXT("Salut"));
 	if(hitActor)
 	{
-		UE_LOG(LogActor, Error, TEXT("Salut actor"));
 		 if (hitActor->Actor->ActorHasTag(FName(TEXT("Destructable"))))
 		 {
 			hitActor->Actor->Destroy();
 			hitActor = nullptr;
 		 }else if (hitActor->Actor->ActorHasTag(FName(TEXT("Item"))))
 		 {
-			 UE_LOG(LogActor, Warning, TEXT("ImplementInteractInterface"));
-
-			 //if(hitActor->GetActor()->Implements<UInteract_Interface>())
-			 //{
-				// //IInteract_Interface::Execute_Interact(hitActor->GetActor());
-			 //}
+			 if(hitActor->GetActor()->Implements<UInteract_Interface>())
+			 {
+				 UE_LOG(LogActor, Warning, TEXT("ImplementInteractInterface : %s"),*hitActor->GetActor()->GetName());
+				 //hitActor->GetActor()->Destroy();
+				 auto Item = IInteract_Interface::Execute_Interact(hitActor->GetActor());
+				 InventaireComponent->AddToInventory(Item);
+				 hitActor = nullptr;
+			 }
 		 }
 	}
 }
