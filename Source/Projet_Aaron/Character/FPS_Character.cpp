@@ -83,9 +83,8 @@ void AFPS_Character::Tick(float DeltaTime)
 			}
 			else if (outHit.Actor->ActorHasTag(FName(TEXT("Item"))))
 			{
-				UE_LOG(LogActor, Error, TEXT("Item"));
 				AItem* item = Cast<AItem>(outHit.Actor);
-				InventoryCastObject->nameTextItem = item->ItemStructure->Name;
+				InventoryCastObject->nameTextItem = item->ItemStructure->Name + " [F]";
 				if (hitActor && outHit.Actor != hitActor->Actor)
 					hitActor = new FHitResult(outHit);
 			}
