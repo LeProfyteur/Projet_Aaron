@@ -5,7 +5,7 @@
 #include "Components/PostProcessComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Projet_Aaron/Equipment/NightVisionEquipment.h"
+#include "Projet_Aaron/Equipment/EquipmentInterface.h"
 #include "Engine/Engine.h"
 #include "StateManager.h"
 
@@ -43,16 +43,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UChildActorComponent* RightArmEquipment;
 
-	//ANightVisionEquipment *NightVisionEquipment;
-	//AGrapnelEquipment* GrapnelEquipment;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UChildActorComponent* HeadEquipment;
 
-	FHitResult *hitGrab;
+	FHitResult *hitGrab = nullptr;
 	FHitResult *hitActor = nullptr;
 
 	bool isSprinting = false;
 	bool bPressedAlt = false;
-	bool isNightVison = false;
-	bool canGrab = true;
 
 protected:
 	// Called when the game starts or when spawned
@@ -91,6 +89,8 @@ public:
 
 	void ActivatePressedRight();
 	void ActivateReleasedRight();
+
+	void ActivateHeadEquipment();
 
 	UFUNCTION(BlueprintCallable) void StopClimbing();
 

@@ -8,7 +8,6 @@
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "UObject/ConstructorHelpers.h"
-#include "Projet_Aaron/Equipment/GrapnelEquipment.h"
 #include "GrappleHead.generated.h"
 
 UCLASS()
@@ -32,7 +31,7 @@ public:
 	UPROPERTY(VisibleAnywhere)
 		UProjectileMovementComponent* projectileMovement;
 
-	class AGrapnelEquipment* equipment;
+	class AActor* equipment;
 
 protected:
 	// Called when the game starts or when spawned
