@@ -8,6 +8,13 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Engine/Engine.h"
 #include "MyHUD.h"
+//UMG
+#include "Runtime/UMG/Public/UMG.h"
+#include "Runtime/UMG/Public/UMGStyle.h"
+#include "Runtime/UMG/Public/Slate/SObjectWidget.h"
+#include "Runtime/UMG/Public/IUMGModule.h"
+#include "Runtime/UMG/Public/Blueprint/UserWidget.h"
+#include "Projet_Aaron/Item/Item.h"
 
 // Sets default values
 AFPS_Character::AFPS_Character()
@@ -37,6 +44,9 @@ AFPS_Character::AFPS_Character()
 void AFPS_Character::BeginPlay()
 {
 	Super::BeginPlay();
+
+	//InventoryCastObject = CreateWidget<UUInventoryCastObject>(this, InventoryCastObjectClass);
+	//InventoryCastObject->AddToViewport();
 }
 
 // Called every frame
@@ -49,8 +59,10 @@ void AFPS_Character::Tick(float DeltaTime)
 
 	FHitResult outHit;
 	FVector vStart = fpsCamera->GetComponentLocation();
-	FVector vEnd = vStart + fpsCamera->GetForwardVector() * 1000.0f;
+	FVector vEnd = vStart + fpsCamera->GetForwardVector() * RaycastDistanceInventory;
 	FCollisionQueryParams collisionParams;
+
+	//DrawDebugLine(GetWorld(), vStart, vEnd, FColor::Red, false, 1, 0, 1);
 	
 	if(GetWorld()->LineTraceSingleByChannel(outHit, vStart, vEnd, ECC_Visibility, collisionParams))
 	{
@@ -60,13 +72,21 @@ void AFPS_Character::Tick(float DeltaTime)
 			if (outHit.Actor->ActorHasTag(FName(TEXT("Analysable"))))
 			{
 				actorMeshComponent->SetCustomDepthStencilValue(2);
-				if (hitActor || outHit.Actor != hitActor->Actor)
+				if (hitActor && outHit.Actor != hitActor->Actor)
 					hitActor = new FHitResult(outHit);
 			}
 			else if(outHit.Actor->ActorHasTag(FName(TEXT("Destructable"))))
 			{
 				actorMeshComponent->SetCustomDepthStencilValue(3);
-				if (hitActor || outHit.Actor != hitActor->Actor)
+				if (hitActor && outHit.Actor != hitActor->Actor)
+					hitActor = new FHitResult(outHit);
+			}
+			else if (outHit.Actor->ActorHasTag(FName(TEXT("Item"))))
+			{
+				UE_LOG(LogActor, Error, TEXT("Item"));
+				AItem* item = Cast<AItem>(outHit.Actor);
+				InventoryCastObject->nameTextItem = item->ItemStructure->Name;
+				if (hitActor && outHit.Actor != hitActor->Actor)
 					hitActor = new FHitResult(outHit);
 			}
 			else
@@ -77,6 +97,7 @@ void AFPS_Character::Tick(float DeltaTime)
 					actorMeshComponent->SetCustomDepthStencilValue(1);
 					hitActor = nullptr;
 				}
+				InventoryCastObject->nameTextItem = "";
 			}
 		}
 	} else if(hitActor)
@@ -84,6 +105,7 @@ void AFPS_Character::Tick(float DeltaTime)
 		UStaticMeshComponent* actorMeshComponent = hitActor->Actor->FindComponentByClass<UStaticMeshComponent>();
 		actorMeshComponent->SetCustomDepthStencilValue(1);
 		hitActor = nullptr;
+		InventoryCastObject->nameTextItem = "";
 	}
 }
 
@@ -215,10 +237,19 @@ void AFPS_Character::Action()
 	UE_LOG(LogActor, Error, TEXT("Salut"));
 	if(hitActor)
 	{
+		UE_LOG(LogActor, Error, TEXT("Salut actor"));
 		 if (hitActor->Actor->ActorHasTag(FName(TEXT("Destructable"))))
 		 {
 			hitActor->Actor->Destroy();
 			hitActor = nullptr;
+		 }else if (hitActor->Actor->ActorHasTag(FName(TEXT("Item"))))
+		 {
+			 UE_LOG(LogActor, Warning, TEXT("ImplementInteractInterface"));
+
+			 //if(hitActor->GetActor()->Implements<UInteract_Interface>())
+			 //{
+				// //IInteract_Interface::Execute_Interact(hitActor->GetActor());
+			 //}
 		 }
 	}
 }
@@ -276,16 +307,10 @@ void AFPS_Character::ActivateReleasedRight()
 		IEquipmentInterface::Execute_Activate(ChildActor, false);
 }
 
+void AFPS_Character::PressedItemWheel()
+{
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
+void AFPS_Character::RealeaseItemWheel()
+{
+}

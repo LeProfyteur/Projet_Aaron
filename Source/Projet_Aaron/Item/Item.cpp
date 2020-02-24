@@ -10,6 +10,8 @@ AItem::AItem()
 	PrimaryActorTick.bCanEverTick = false;
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+
+	Tags.Add(FName(TEXT("Item")));
 }
 
 // Called when the game starts or when spawned

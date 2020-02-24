@@ -11,6 +11,7 @@
 
 #include "GameFramework/Character.h"
 #include "CoreMinimal.h"
+#include "Projet_Aaron/Item/UInventoryCastObject.h"
 #include "FPS_Character.generated.h"
 
 UCLASS()
@@ -46,8 +47,24 @@ public:
 	//ANightVisionEquipment *NightVisionEquipment;
 	//AGrapnelEquipment* GrapnelEquipment;
 
+	//UPROPERTY(BlueprintReadOnly)
+	FHitResult* hitActor = nullptr;
 	FHitResult *hitGrab;
-	FHitResult *hitActor = nullptr;
+
+	
+
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FAnchors AnchorsCastWidget;*/
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FAnchors AnchorsInventoryWindow;*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector2D Alignment;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float RaycastDistanceInventory = 1000.f;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+		class UUInventoryCastObject* InventoryCastObject;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+		TSubclassOf<class UUInventoryCastObject> InventoryCastObjectClass;
 
 	bool isSprinting = false;
 	bool bPressedAlt = false;
@@ -91,6 +108,8 @@ public:
 
 	void ActivatePressedRight();
 	void ActivateReleasedRight();
+	void PressedItemWheel();
+	void RealeaseItemWheel();
 
 	UFUNCTION(BlueprintCallable) void StopClimbing();
 
