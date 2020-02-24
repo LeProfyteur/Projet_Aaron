@@ -13,7 +13,7 @@ AGrapnelEquipment::AGrapnelEquipment()
 	timeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("TimeLine"));
 	updateFunction.BindUFunction(this, FName("TimelineCallback"));
 
-	ConstructorHelpers::FObjectFinder<UStaticMesh> hookArmMesh(TEXT("/Game/CC/FirstPersonBP/Blueprints/Grappnel/Grapple_Hook2.Grapple_Hook2"));
+	ConstructorHelpers::FObjectFinder<UStaticMesh> hookArmMesh(TEXT("/Game/Projet_Aaron/CC/FirstPersonBP/Blueprints/Grappnel/Grapple_Hook2.Grapple_Hook2"));
 	if (hookArmMesh.Succeeded())
 	{
 		StaticMeshComponent->SetStaticMesh(hookArmMesh.Object);
@@ -34,7 +34,7 @@ AGrapnelEquipment::AGrapnelEquipment()
 	hookMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Hook Mesh"));
 	hookMeshComponent->SetupAttachment(cable);
 	hookMeshComponent->SetRelativeLocation(FVector(60.0f, 0.0f, 7.0f), NULL);
-	ConstructorHelpers::FObjectFinder<UStaticMesh> hookMesh(TEXT("/Game/CC/FirstPersonBP/Blueprints/Grappnel/Hook.Hook"));
+	ConstructorHelpers::FObjectFinder<UStaticMesh> hookMesh(TEXT("/Game/Projet_Aaron/CC/FirstPersonBP/Blueprints/Grappnel/Hook.Hook"));
 	if (hookMesh.Succeeded())
 		hookMeshComponent->SetStaticMesh(hookMesh.Object);
 }
@@ -49,7 +49,7 @@ void AGrapnelEquipment::BeginPlay()
 
 	SetActorTickEnabled(false);
 
-	//pointer->SetHiddenInGame(true, true);
+	cable->SetHiddenInGame(true, false);
 }
 
 void AGrapnelEquipment::Activate_Implementation(bool isPressed)
@@ -121,7 +121,7 @@ void AGrapnelEquipment::TimelineCallback()
 				{
 					locationToGrip = outHit.Location + v;
 					foundHookSpot = true;
-					UMaterialInstance*mat = Cast<UMaterialInstance>(StaticLoadObject(UMaterialInstance::StaticClass(), NULL, TEXT("/Game/CC/FirstPersonBP/Blueprints/Grappnel/Hook_Green.Hook_Green")));
+					UMaterialInstance*mat = Cast<UMaterialInstance>(StaticLoadObject(UMaterialInstance::StaticClass(), NULL, TEXT("/Game/Projet_Aaron/CC/FirstPersonBP/Blueprints/Grappnel/Hook_Green.Hook_Green")));
 					laser->SetMaterial(0, mat);
 					updatePointerLocation();
 					break;
@@ -130,7 +130,7 @@ void AGrapnelEquipment::TimelineCallback()
 		}
 		else
 		{
-			UMaterialInstance* mat = Cast<UMaterialInstance>(StaticLoadObject(UMaterialInstance::StaticClass(), NULL, TEXT("/Game/CC/FirstPersonBP/Blueprints/Grappnel/Hook_Red.Hook_Red")));
+			UMaterialInstance* mat = Cast<UMaterialInstance>(StaticLoadObject(UMaterialInstance::StaticClass(), NULL, TEXT("/Game/Projet_Aaron/CC/FirstPersonBP/Blueprints/Grappnel/Hook_Red.Hook_Red")));
 			laser->SetMaterial(0, mat);
 			
 			if (haveHit)

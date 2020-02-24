@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "Components/TimelineComponent.h"
 #include "EquipmentInterface.generated.h"
 
 // This class does not need to be modified.

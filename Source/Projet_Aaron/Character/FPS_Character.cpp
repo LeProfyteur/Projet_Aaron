@@ -31,6 +31,9 @@ AFPS_Character::AFPS_Character()
 
 	LeftArmEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Left Arm Equipment"));
 	LeftArmEquipment->SetupAttachment(fpsCamera);
+
+	HeadEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Head Equipment"));
+	HeadEquipment->SetupAttachment(fpsCamera);
 }
 
 // Called when the game starts or when spawned
