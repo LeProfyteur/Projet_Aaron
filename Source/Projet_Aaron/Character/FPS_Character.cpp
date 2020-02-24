@@ -146,6 +146,12 @@ void AFPS_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("Action", IE_Pressed, this, &AFPS_Character::Action);
 	PlayerInputComponent->BindAction("Action", IE_Repeat, this, &AFPS_Character::Analyse);
 	PlayerInputComponent->BindAction("Action", IE_Released,this, &AFPS_Character::StopAction);
+
+	PlayerInputComponent->BindAction("UseQuickItem", IE_Pressed, this, &AFPS_Character::PressedItemWheel);
+
+	PlayerInputComponent->BindAction("ItemWheel", IE_Pressed, this, &AFPS_Character::PressedItemWheel);
+	PlayerInputComponent->BindAction("ItemWheel", IE_Released, this, &AFPS_Character::RealeaseItemWheel);
+
 }
 
 void AFPS_Character::MoveForward(float value)
@@ -317,8 +323,15 @@ void AFPS_Character::ActivateReleasedRight()
 
 void AFPS_Character::PressedItemWheel()
 {
+	UE_LOG(LogActor, Warning, TEXT("Item wheel Pressed"));
 }
 
 void AFPS_Character::RealeaseItemWheel()
 {
+	UE_LOG(LogActor, Warning, TEXT("Item wheel Released"));
+}
+
+void AFPS_Character::PressedUseQuickItem()
+{
+	UE_LOG(LogActor, Warning, TEXT("Use Quick Item"));
 }

@@ -112,8 +112,11 @@ public:
 
 	void ActivatePressedRight();
 	void ActivateReleasedRight();
+	
 	void PressedItemWheel();
 	void RealeaseItemWheel();
+
+	void PressedUseQuickItem();
 
 	UFUNCTION(BlueprintCallable) void StopClimbing();
 
