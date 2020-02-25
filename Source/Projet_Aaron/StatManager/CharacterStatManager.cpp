@@ -3,3 +3,9 @@
 
 #include "CharacterStatManager.h"
 
+UCharacterStatManager::UCharacterStatManager() : Super()
+{
+	
+}
+
+

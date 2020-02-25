@@ -21,4 +21,21 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
 		float DodgeForce;
+
+public:
+
+	/*Contructors*/
+	UCharacterStatManager();
+
+	/*Getters*/
+	UFUNCTION(BlueprintCallable)
+		float GetDodgeStaminaCost() const { return DodgeStaminaCost; }
+	UFUNCTION(BlueprintCallable)
+		float GetDodgeForce() const { return DodgeForce; }
+
+	/*Setters*/
+	UFUNCTION(BlueprintCallable)
+		void SetDodgeStaminaCost(float NewDodgeStaminaCost) { DodgeStaminaCost = NewDodgeStaminaCost; }
+	UFUNCTION(BlueprintCallable)
+		void SetDodgeForce(float NewDodgeForce) { DodgeForce = NewDodgeForce; }
 };
