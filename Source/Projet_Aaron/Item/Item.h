@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Projet_Aaron/Interact_Interface.h"
+#include "ObjectInteractionInterface.h"
 #include "Item.generated.h"
 
 UCLASS()
-class PROJET_AARON_API AItem : public AActor, public IInteract_Interface
+class PROJET_AARON_API AItem : public AActor, public IObjectInteractionInterface
 {
 	GENERATED_BODY()
 
@@ -38,9 +38,11 @@ public:
 		bool UseItem();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		UDA_ItemStructure* Interact_Implementation() override;
+		void Interact(bool IsPressed, UDA_ItemStructure *ItemStruct);
+		virtual void Interact_Implementation(bool IsPressed, UDA_ItemStructure* ItemStruct) override;
 
 	UFUNCTION(BlueprintNativeEvent)
-		UDA_ItemStructure* InteractSafe_Implementation() override;
+		FString GetLabel();
+		virtual FString GetLabel_Implementation() override;
 
 };

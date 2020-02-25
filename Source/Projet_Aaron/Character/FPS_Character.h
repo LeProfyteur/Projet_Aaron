@@ -2,10 +2,12 @@
 
 #pragma once
 #include "Camera/CameraComponent.h"
-#include "Components/PostProcessComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Projet_Aaron/Item/ObjectInteractionInterface.h"
+#include "Projet_Aaron/Equipment/EquipmentInterface.h"
 #include "Engine/Engine.h"
-#include "StateManager.h"
+#include "Projet_Aaron/StatManager/CharacterStatManager.h"
 
 #include "GameFramework/Character.h"
 #include "CoreMinimal.h"
@@ -25,19 +27,13 @@ public:
 	AFPS_Character();
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly)
-	class UCameraComponent* fpsCamera;
+	class UCameraComponent* FpsCamera;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class UStateManager* stateManager;
-	
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	//class UPostProcessComponent* postProcess;
-	
-	UPROPERTY()
-		class AActor* lastActorHit = nullptr;
+	class UCharacterStatManager* StatManager;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool isNearClimbing = false;
+	bool IsNearClimbing = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UChildActorComponent* LeftArmEquipment;
@@ -46,13 +42,13 @@ public:
 		UChildActorComponent* RightArmEquipment;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UChildActorComponent* HeadEquipment;
+        
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		class UInventaireComponent* InventaireComponent;
 
-	//ANightVisionEquipment *NightVisionEquipment;
-	//AGrapnelEquipment* GrapnelEquipment;
-
 	//UPROPERTY(BlueprintReadOnly)
-	FHitResult* hitActor = nullptr;
+	FHitResult* HitActor = nullptr;
 	FHitResult *hitGrab;
 
 	
@@ -80,14 +76,15 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 		TSubclassOf<class UMainHudFixedSizeCPP> MainHudFixedSizeCPPClass;
 
-	bool isSprinting = false;
+	bool IsSprinting = false;
 	bool bPressedAlt = false;
-	bool isNightVison = false;
-	bool canGrab = true;
 
-protected:
-	// Called when the game starts or when spawned
+	float RightAxisMovement;
+	float ForwardAxisMovement;
+	
 	virtual void BeginPlay() override;
+	void CharacterMove();
+	
 
 public:	
 	// Called every frame
@@ -111,8 +108,6 @@ public:
 	void Dodge(FVector direction);
 	void Climb(float value);
 
-	void RecoveryStamina(float deltaTime);
-
 	void Action();
 	void StopAction();
 	void Analyse();
@@ -125,6 +120,8 @@ public:
 	
 	void PressedItemWheel();
 	void ReleaseItemWheel();
+
+	void ActivateHeadEquipment();
 
 	UFUNCTION(BlueprintCallable)
 	void UseMyItem(UDA_SlotStructure* ChosenSlot);

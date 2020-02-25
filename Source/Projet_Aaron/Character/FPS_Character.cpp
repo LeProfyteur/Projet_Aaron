@@ -20,22 +20,25 @@ AFPS_Character::AFPS_Character()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	fpsCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FPS_Camera"));
-	fpsCamera->SetupAttachment(RootComponent);
-	fpsCamera->SetRelativeLocation(FVector(0.0f, 0.0f, 50.0f + BaseEyeHeight));
-	fpsCamera->bUsePawnControlRotation = true;
+	FpsCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FPS_Camera"));
+	FpsCamera->SetupAttachment(RootComponent);
+	FpsCamera->SetRelativeLocation(FVector(0.0f, 0.0f, 50.0f + BaseEyeHeight));
+	FpsCamera->bUsePawnControlRotation = true;
 	
-	stateManager = CreateDefaultSubobject<UStateManager>(TEXT("StateManager"));
+	StatManager = CreateDefaultSubobject<UCharacterStatManager>(TEXT("StateManager"));
 	
-	GetCharacterMovement()->MaxWalkSpeed = stateManager->speed;
-	GetCharacterMovement()->JumpZVelocity = stateManager->jumpForce;
+	GetCharacterMovement()->MaxWalkSpeed = StatManager->GetActualSpeed();
+	GetCharacterMovement()->JumpZVelocity = StatManager->GetJumpForce();
 	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
 
 	RightArmEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Right Arm Equipment"));
-	RightArmEquipment->SetupAttachment(fpsCamera);
+	RightArmEquipment->SetupAttachment(FpsCamera);
 
 	LeftArmEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Left Arm Equipment"));
-	LeftArmEquipment->SetupAttachment(fpsCamera);
+	LeftArmEquipment->SetupAttachment(FpsCamera);
+
+	HeadEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Head Equipment"));
+	HeadEquipment->SetupAttachment(FpsCamera);
 
 	InventaireComponent = CreateDefaultSubobject<UInventaireComponent>(TEXT("InventaireComponent"));
 	InventaireComponent->PrepareInventory();
@@ -59,56 +62,34 @@ void AFPS_Character::BeginPlay()
 void AFPS_Character::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	CharacterMove();
 
-	if (stateManager->stamina < stateManager->maxStamina)
-		RecoveryStamina(DeltaTime);
+	StatManager->RecoveryStamina(DeltaTime);
 
-	FHitResult outHit;
-	FVector vStart = fpsCamera->GetComponentLocation();
-	FVector vEnd = vStart + fpsCamera->GetForwardVector() * RaycastDistanceInventory;
+	FHitResult OutHit;
+	FVector Start = FpsCamera->GetComponentLocation();
+	FVector End = Start + FpsCamera->GetForwardVector() * RaycastDistanceInventory;
 	FCollisionQueryParams collisionParams;
 
 	//DrawDebugLine(GetWorld(), vStart, vEnd, FColor::Red, false, 1, 0, 1);
 	
-	if(GetWorld()->LineTraceSingleByChannel(outHit, vStart, vEnd, ECC_Visibility, collisionParams))
+	if(GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECC_Visibility, collisionParams))
 	{
-		UStaticMeshComponent* actorMeshComponent = outHit.Actor->FindComponentByClass<UStaticMeshComponent>();
-		if (outHit.Actor->ActorHasTag(FName(TEXT("Item"))))
+		UStaticMeshComponent* actorMeshComponent = OutHit.Actor->FindComponentByClass<UStaticMeshComponent>();
+		if(OutHit.GetActor()->Implements<UObjectInteractionInterface>())
 		{
-			AItem* item = Cast<AItem>(outHit.Actor);
-			InventoryCastObject->nameTextItem = item->ItemStructure->Name + " [F]";
-			if (!hitActor || outHit.Actor != hitActor->Actor)
-				hitActor = new FHitResult(outHit);
+            
+			UE_LOG(LogActor, Warning, TEXT("%s"), *IObjectInteractionInterface::Execute_GetLabel(OutHit.GetActor()));
+			if (!HitActor || OutHit.Actor != HitActor->Actor)
+				HitActor = new FHitResult(OutHit);
+			
+			//InventoryCastObject->nameTextItem = item->ItemStructure->Name + " [F]";
 		}
-		else if(outHit.Actor->ActorHasTag(FName(TEXT("Destructable"))))
-		{
-			actorMeshComponent->SetCustomDepthStencilValue(3);
-			if (!hitActor || outHit.Actor != hitActor->Actor)
-				hitActor = new FHitResult(outHit);
-		}
-		else if (outHit.Actor->ActorHasTag(FName(TEXT("Analysable"))))
-		{
-			actorMeshComponent->SetCustomDepthStencilValue(2);
-			if (!hitActor || outHit.Actor != hitActor->Actor)
-				hitActor = new FHitResult(outHit);
-		}
-		else
-		{
-			if (hitActor)
-			{
-				actorMeshComponent = hitActor->Actor->FindComponentByClass<UStaticMeshComponent>();
-				actorMeshComponent->SetCustomDepthStencilValue(1);
-				hitActor = nullptr;
-			}
-			InventoryCastObject->nameTextItem = "";
-		}
-		
-	} else if(hitActor)
+	} else if(HitActor)
 	{
-		UStaticMeshComponent* actorMeshComponent = hitActor->Actor->FindComponentByClass<UStaticMeshComponent>();
+		UStaticMeshComponent* actorMeshComponent = HitActor->Actor->FindComponentByClass<UStaticMeshComponent>();
 		actorMeshComponent->SetCustomDepthStencilValue(1);
-		hitActor = nullptr;
-		InventoryCastObject->nameTextItem = "";
+		HitActor = nullptr;
 	}
 }
 
@@ -139,8 +120,9 @@ void AFPS_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("FireRight", IE_Pressed, this, &AFPS_Character::ActivatePressedRight);
 	PlayerInputComponent->BindAction("FireRight", IE_Released, this, &AFPS_Character::ActivateReleasedRight);
 	
+	PlayerInputComponent->BindAction("HeadAction", IE_Pressed, this, &AFPS_Character::ActivateHeadEquipment);
+	
 	PlayerInputComponent->BindAction("Action", IE_Pressed, this, &AFPS_Character::Action);
-	PlayerInputComponent->BindAction("Action", IE_Repeat, this, &AFPS_Character::Analyse);
 	PlayerInputComponent->BindAction("Action", IE_Released,this, &AFPS_Character::StopAction);
 
 	PlayerInputComponent->BindAction("UseQuickItem", IE_Pressed, this, &AFPS_Character::PressedUseQuickItem);
@@ -150,69 +132,67 @@ void AFPS_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 }
 
-void AFPS_Character::MoveForward(float value)
+void AFPS_Character::CharacterMove()
 {
-	FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::X);
+	FVector Direction = GetActorForwardVector() * ForwardAxisMovement + GetActorRightVector() * RightAxisMovement;
 	if (bPressedAlt)
 	{
-		Dodge(Direction * value);
+		Dodge(Direction);
 	}
-	else if (isNearClimbing)
+	else if (IsNearClimbing)
 	{
-		Climb(value);
+		//Climb(value);
 	}
 	else
 	{
-		AddMovementInput(Direction, value);
+		AddMovementInput(GetActorForwardVector(), ForwardAxisMovement);
+		AddMovementInput(GetActorRightVector(), RightAxisMovement);
 	}
 
-	if (isSprinting)
+	if (IsSprinting && !StatManager->ConsumeStamina(StatManager->GetSprintStaminaCost()))
 	{
-		if (stateManager->stamina - stateManager->sprintCostStamina >= 0)
-			stateManager->stamina -= stateManager->sprintCostStamina;
-		else
-			StopSprint();
+		StopSprint();
 	}
+}
+
+
+void AFPS_Character::MoveForward(float value)
+{
+	ForwardAxisMovement = value;
 }
 
 void AFPS_Character::MoveRight(float value)
 {
-	FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::Y);
-	if (bPressedAlt)
-	{
-		Dodge(Direction * value);
-	}
-	else
-	{
-		AddMovementInput(Direction, value);
-	}
+	RightAxisMovement = value;
 }
 
 void AFPS_Character::StartJump()
 {
-	if(!GetCharacterMovement()->IsFalling() && stateManager->stamina >= 5.0f)
+	if(!GetCharacterMovement()->IsFalling() && StatManager->ConsumeStamina(StatManager->GetJumpStaminaCost()))
 	{
-		stateManager->stamina -= 5.0f;
 		Jump();
 	}
 }
 
 void AFPS_Character::Sprint()
 {
-	GetCharacterMovement()->MaxWalkSpeed *= stateManager->sprintSpeedScalar;
-	isSprinting = true;
+	StatManager->SetActualSpeed(StatManager->GetSprintSpeed());
+	IsSprinting = true;
 }
 
 void AFPS_Character::StopSprint()
 {
-	GetCharacterMovement()->MaxWalkSpeed = stateManager->speed;
-	isSprinting = false;
+	StatManager->ResetSpeed();
+	IsSprinting = false;
 }
 
 void AFPS_Character::Dodge(FVector direction)
 {
-	if(!GetCharacterMovement()->IsFalling())
-		GetCharacterMovement()->AddImpulse(direction * 1000.0f, true);
+	if(!GetCharacterMovement()->IsFalling() && StatManager->ConsumeStamina(StatManager->GetDodgeStaminaCost()))
+	{
+		LaunchCharacter(direction * StatManager->GetDodgeForce(), true, false);
+		bPressedAlt = false;
+	}
 }
 
 void AFPS_Character::StartAlt()
@@ -233,49 +213,24 @@ void AFPS_Character::Crouching()
 		UnCrouch();
 }
 
-void AFPS_Character::RecoveryStamina(float deltaTime)
-{
-	stateManager->stamina += stateManager->recorveryStamina * deltaTime;
-
-	if (stateManager->stamina > stateManager->maxStamina)
-		stateManager->stamina = stateManager->maxStamina;
-}
-
 void AFPS_Character::Action()
 {
-	UE_LOG(LogActor, Error, TEXT("Salut"));
-	if(hitActor)
+	if (HitActor && HitActor->GetActor()->Implements<UObjectInteractionInterface>())
 	{
-		 if (hitActor->Actor->ActorHasTag(FName(TEXT("Destructable"))))
-		 {
-			hitActor->Actor->Destroy();
-			hitActor = nullptr;
-		 }else if (hitActor->Actor->ActorHasTag(FName(TEXT("Item"))))
-		 {
-			 if(hitActor->GetActor()->Implements<UInteract_Interface>())
-			 {
-				 UE_LOG(LogActor, Warning, TEXT("ImplementInteractInterface : %s"),*hitActor->GetActor()->GetName());
-				 //hitActor->GetActor()->Destroy();
-				 auto Item = IInteract_Interface::Execute_Interact(hitActor->GetActor());
+				 /*auto Item = IInteract_Interface::Execute_Interact(hitActor->GetActor());
 				 InventaireComponent->AddToInventory(Item);
-				 hitActor = nullptr;
-			 }
-		 }
+				 hitActor = nullptr;*/
+		IObjectInteractionInterface::Execute_Interact(HitActor->GetActor(), true, nullptr);
+		HitActor = nullptr;
 	}
 }
 
 void AFPS_Character::StopAction()
 {
-	Cast<AMyHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->ResetCircleRadius();
-}
-
-
-void AFPS_Character::Analyse()
-{
-	AMyHUD* myHUD = Cast<AMyHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
-	float val = 0;
-	myHUD->BarMatInstance->GetScalarParameterValue(FName(TEXT("Decimal")), val);
-	myHUD->UpdateCircleRadius(val + 0.01f);
+	if (HitActor && HitActor->GetActor()->Implements<UObjectInteractionInterface>())
+	{
+		IObjectInteractionInterface::Execute_Interact(HitActor->GetActor(), false, nullptr);
+	}
 }
 
 void AFPS_Character::Climb(float value)
@@ -317,6 +272,12 @@ void AFPS_Character::ActivateReleasedRight()
 		IEquipmentInterface::Execute_Activate(ChildActor, false);
 }
 
+void AFPS_Character::ActivateHeadEquipment()
+{
+	AActor* ChildActor = HeadEquipment->GetChildActor();
+	if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
+		IEquipmentInterface::Execute_Activate(ChildActor, true);
+}
 void AFPS_Character::PressedItemWheel()
 {
 	UE_LOG(LogActor, Warning, TEXT("Item wheel Pressed"));
