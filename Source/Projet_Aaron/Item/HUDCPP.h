@@ -5,21 +5,18 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Projet_Aaron/DA_SlotStructure.h"
-#include "MainHudFixedSizeCPP.generated.h"
+#include "HUDCPP.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJET_AARON_API UMainHudFixedSizeCPP : public UUserWidget
+class PROJET_AARON_API UHUDCPP : public UUserWidget
 {
 	GENERATED_BODY()
 
 public:
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UDA_SlotStructure* ChosenSlot;
-	UFUNCTION(BlueprintImplementableEvent)
-		void CreateStandartWidgetCPP();
+		UDA_SlotStructure* ItemSelected;
 	
 };

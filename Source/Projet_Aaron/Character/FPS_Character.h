@@ -11,6 +11,7 @@
 #include "CoreMinimal.h"
 #include "Projet_Aaron/Item/UInventoryCastObject.h"
 #include "Projet_Aaron/Item/MainHudFixedSizeCPP.h"
+#include "Projet_Aaron/Item/HUDCPP.h"
 #include "Projet_Aaron/InventaireComponent.h"
 #include "FPS_Character.generated.h"
 
@@ -72,6 +73,9 @@ public:
 		class UMainHudFixedSizeCPP* MainHudFixedSizeCPP;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		class UHUDCPP* HudCPP;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TSubclassOf<class UUInventoryCastObject> InventoryCastObjectClass;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 		TSubclassOf<class UMainHudFixedSizeCPP> MainHudFixedSizeCPPClass;
@@ -122,6 +126,8 @@ public:
 	void PressedItemWheel();
 	void ReleaseItemWheel();
 
+	UFUNCTION(BlueprintCallable)
+	void UseMyItem(UDA_SlotStructure* ChosenSlot);
 	void PressedUseQuickItem();
 
 	UFUNCTION(BlueprintCallable) void StopClimbing();

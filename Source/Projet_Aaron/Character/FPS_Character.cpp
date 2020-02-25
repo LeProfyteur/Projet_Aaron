@@ -12,7 +12,6 @@
 #include "Runtime/UMG/Public/UMG.h"
 #include "Runtime/UMG/Public/Blueprint/UserWidget.h"
 #include "Projet_Aaron/Item/Item.h"
-#include "WidgetLayoutLibrary.generated.h"
 #include "Projet_Aaron/Equipment/EquipmentInterface.h"
 
 // Sets default values
@@ -144,7 +143,7 @@ void AFPS_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("Action", IE_Repeat, this, &AFPS_Character::Analyse);
 	PlayerInputComponent->BindAction("Action", IE_Released,this, &AFPS_Character::StopAction);
 
-	PlayerInputComponent->BindAction("UseQuickItem", IE_Pressed, this, &AFPS_Character::PressedItemWheel);
+	PlayerInputComponent->BindAction("UseQuickItem", IE_Pressed, this, &AFPS_Character::PressedUseQuickItem);
 
 	PlayerInputComponent->BindAction("ItemWheel", IE_Pressed, this, &AFPS_Character::PressedItemWheel);
 	PlayerInputComponent->BindAction("ItemWheel", IE_Released, this, &AFPS_Character::ReleaseItemWheel);
@@ -349,9 +348,44 @@ void AFPS_Character::ReleaseItemWheel()
 	PlayerController->bShowMouseCursor = false;
 
 	//ChosenSlot
+	//HudCPP.itemMainHudFixedSizeCPP->ChosenSlot
+	HudCPP->ItemSelected = MainHudFixedSizeCPP->ChosenSlot;
+}
+
+void AFPS_Character::UseMyItem(UDA_SlotStructure* ChosenSlot)
+{
+	if(IsValid(ChosenSlot) && IsValid(ChosenSlot->ItemStructure))
+	{
+		if(ChosenSlot->ItemStructure->IsConsomable)
+		{
+			FTransform* transform = new FTransform();
+			transform->SetScale3D(FVector(0., 0., 0.));
+			AItem* item = (AItem*)GetWorld()->SpawnActor(ChosenSlot->ItemStructure->Class.Get(), transform,FActorSpawnParameters());
+			bool bItemUsed=item->UseItem();
+			item->Destroy();
+			if(bItemUsed)
+			{
+				//Log de slotitem . display name
+				if(ChosenSlot->Quantity==1)
+				{
+					//remove slot
+					ChosenSlot->Quantity = 0;
+					InventaireComponent->RemoveFromInventory(ChosenSlot);
+				}else
+				{
+					ChosenSlot->Quantity--;
+				}
+			}
+		}
+	}
 }
 
 void AFPS_Character::PressedUseQuickItem()
 {
 	UE_LOG(LogActor, Warning, TEXT("Use Quick Item"));
+
+	if(IsValid(MainHudFixedSizeCPP->ChosenSlot) && MainHudFixedSizeCPP->ChosenSlot->Quantity>0)
+	{
+		UseMyItem(MainHudFixedSizeCPP->ChosenSlot);
+	}
 }
