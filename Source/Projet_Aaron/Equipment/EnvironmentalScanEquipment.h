@@ -44,6 +44,15 @@ public :
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		UMaterialParameterCollection* ParameterCollection;
+
+	UFUNCTION()
+		void UpdateRadius(float value);
+
+	UFUNCTION()
+		void UpdateHighlight(float value);
+
+	UFUNCTION()
+		void FinishTimeline();
 	
 	virtual void Activate_Implementation(bool isPressed) override;
 	virtual void OnEquip_Implementation() override;
@@ -52,11 +61,10 @@ public :
 	virtual void Tick(float DeltaTime) override;
 
 protected:
-	FOnTimelineFloat updateRadiusFunction;
-	FOnTimelineFloat updateHighlightFunction;
+	FOnTimelineFloat updateRadiusFunction{};
+	FOnTimelineFloat updateHighlightFunction{};
+	FOnTimelineEvent FinishTimeLIneFunction{};
 
 	virtual void BeginPlay() override;
-	void UpdateTimeLineRadius(float value);
-	void UpdateTimeLineHighlight(float value);
 	
 };

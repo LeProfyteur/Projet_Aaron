@@ -15,10 +15,7 @@ AGrapnelEquipment::AGrapnelEquipment()
 
 	ConstructorHelpers::FObjectFinder<UStaticMesh> hookArmMesh(TEXT("/Game/Projet_Aaron/CC/FirstPersonBP/Blueprints/Grappnel/Grapple_Hook2.Grapple_Hook2"));
 	if (hookArmMesh.Succeeded())
-	{
 		StaticMeshComponent->SetStaticMesh(hookArmMesh.Object);
-		UE_LOG(LogActor, Error, TEXT("%d"), StaticMeshComponent->IsCollisionEnabled());
-	}
 
 	laser = CreateDefaultSubobject<UCableComponent>(TEXT("Laser"));
 	laser->SetupAttachment(RootComponent);
@@ -105,7 +102,7 @@ void AGrapnelEquipment::TimelineCallback()
 	{
 		vStart = StaticMeshComponent->GetComponentLocation();
 		AFPS_Character *c = Cast<AFPS_Character>(GetParentActor());
-		vEnd = vStart + c->fpsCamera->GetForwardVector() * Distance;
+		vEnd = vStart + c->FpsCamera->GetForwardVector() * Distance;
 		
 		bool haveHit = GetWorld()->LineTraceSingleByChannel(outHit, vStart, vEnd, ECC_Visibility, collisionParams);
 		if (haveHit && outHit.Actor->GetClass()->ImplementsInterface(UHookInterface::StaticClass()))

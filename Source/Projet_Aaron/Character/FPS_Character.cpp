@@ -15,25 +15,25 @@ AFPS_Character::AFPS_Character()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	fpsCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FPS_Camera"));
-	fpsCamera->SetupAttachment(RootComponent);
-	fpsCamera->SetRelativeLocation(FVector(0.0f, 0.0f, 50.0f + BaseEyeHeight));
-	fpsCamera->bUsePawnControlRotation = true;
+	FpsCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FPS_Camera"));
+	FpsCamera->SetupAttachment(RootComponent);
+	FpsCamera->SetRelativeLocation(FVector(0.0f, 0.0f, 50.0f + BaseEyeHeight));
+	FpsCamera->bUsePawnControlRotation = true;
 	
-	stateManager = CreateDefaultSubobject<UStateManager>(TEXT("StateManager"));
+	StatManager = CreateDefaultSubobject<UCharacterStatManager>(TEXT("StateManager"));
 	
-	GetCharacterMovement()->MaxWalkSpeed = stateManager->speed;
-	GetCharacterMovement()->JumpZVelocity = stateManager->jumpForce;
+	GetCharacterMovement()->MaxWalkSpeed = StatManager->GetActualSpeed();
+	GetCharacterMovement()->JumpZVelocity = StatManager->GetJumpForce();
 	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
 
 	RightArmEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Right Arm Equipment"));
-	RightArmEquipment->SetupAttachment(fpsCamera);
+	RightArmEquipment->SetupAttachment(FpsCamera);
 
 	LeftArmEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Left Arm Equipment"));
-	LeftArmEquipment->SetupAttachment(fpsCamera);
+	LeftArmEquipment->SetupAttachment(FpsCamera);
 
 	HeadEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Head Equipment"));
-	HeadEquipment->SetupAttachment(fpsCamera);
+	HeadEquipment->SetupAttachment(FpsCamera);
 }
 
 // Called when the game starts or when spawned
@@ -46,47 +46,44 @@ void AFPS_Character::BeginPlay()
 void AFPS_Character::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	CharacterMove();
 
-	if (stateManager->stamina < stateManager->maxStamina)
-		RecoveryStamina(DeltaTime);
+	StatManager->RecoveryStamina(DeltaTime);
 
-	FHitResult outHit;
-	FVector vStart = fpsCamera->GetComponentLocation();
-	FVector vEnd = vStart + fpsCamera->GetForwardVector() * 1000.0f;
+	FHitResult OutHit;
+	FVector Start = FpsCamera->GetComponentLocation();
+	FVector End = Start + FpsCamera->GetForwardVector() * 1000.0f;
 	FCollisionQueryParams collisionParams;
 	
-	if(GetWorld()->LineTraceSingleByChannel(outHit, vStart, vEnd, ECC_Visibility, collisionParams))
+	if(GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECC_Visibility, collisionParams))
 	{
-		if(outHit.bBlockingHit)
+		UStaticMeshComponent* actorMeshComponent = OutHit.Actor->FindComponentByClass<UStaticMeshComponent>();
+		if (OutHit.Actor->ActorHasTag(FName(TEXT("Analysable"))))
 		{
-			UStaticMeshComponent* actorMeshComponent = outHit.Actor->FindComponentByClass<UStaticMeshComponent>();
-			if (outHit.Actor->ActorHasTag(FName(TEXT("Analysable"))))
+			actorMeshComponent->SetCustomDepthStencilValue(2);
+			if (!HitActor || OutHit.Actor != HitActor->Actor)
+				HitActor = new FHitResult(OutHit);
+		}
+		else if(OutHit.Actor->ActorHasTag(FName(TEXT("Destructable"))))
+		{
+			actorMeshComponent->SetCustomDepthStencilValue(3);
+			if (!HitActor || OutHit.Actor != HitActor->Actor)
+				HitActor = new FHitResult(OutHit);
+		}
+		else
+		{
+			if (HitActor)
 			{
-				actorMeshComponent->SetCustomDepthStencilValue(2);
-				if (hitActor || outHit.Actor != hitActor->Actor)
-					hitActor = new FHitResult(outHit);
-			}
-			else if(outHit.Actor->ActorHasTag(FName(TEXT("Destructable"))))
-			{
-				actorMeshComponent->SetCustomDepthStencilValue(3);
-				if (hitActor || outHit.Actor != hitActor->Actor)
-					hitActor = new FHitResult(outHit);
-			}
-			else
-			{
-				if (hitActor)
-				{
-					actorMeshComponent = hitActor->Actor->FindComponentByClass<UStaticMeshComponent>();
-					actorMeshComponent->SetCustomDepthStencilValue(1);
-					hitActor = nullptr;
-				}
+				actorMeshComponent = HitActor->Actor->FindComponentByClass<UStaticMeshComponent>();
+				actorMeshComponent->SetCustomDepthStencilValue(1);
+				HitActor = nullptr;
 			}
 		}
-	} else if(hitActor)
+	} else if(HitActor)
 	{
-		UStaticMeshComponent* actorMeshComponent = hitActor->Actor->FindComponentByClass<UStaticMeshComponent>();
+		UStaticMeshComponent* actorMeshComponent = HitActor->Actor->FindComponentByClass<UStaticMeshComponent>();
 		actorMeshComponent->SetCustomDepthStencilValue(1);
-		hitActor = nullptr;
+		HitActor = nullptr;
 	}
 }
 
@@ -124,69 +121,67 @@ void AFPS_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("Action", IE_Released,this, &AFPS_Character::StopAction);
 }
 
-void AFPS_Character::MoveForward(float value)
+void AFPS_Character::CharacterMove()
 {
-	FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::X);
+	FVector Direction = GetActorForwardVector() * ForwardAxisMovement + GetActorRightVector() * RightAxisMovement;
 	if (bPressedAlt)
 	{
-		Dodge(Direction * value);
+		Dodge(Direction);
 	}
-	else if (isNearClimbing)
+	else if (IsNearClimbing)
 	{
-		Climb(value);
+		//Climb(value);
 	}
 	else
 	{
-		AddMovementInput(Direction, value);
+		AddMovementInput(GetActorForwardVector(), ForwardAxisMovement);
+		AddMovementInput(GetActorRightVector(), RightAxisMovement);
 	}
 
-	if (isSprinting)
+	if (IsSprinting && !StatManager->ConsumeStamina(StatManager->GetSprintStaminaCost()))
 	{
-		if (stateManager->stamina - stateManager->sprintCostStamina >= 0)
-			stateManager->stamina -= stateManager->sprintCostStamina;
-		else
-			StopSprint();
+		StopSprint();
 	}
+}
+
+
+void AFPS_Character::MoveForward(float value)
+{
+	ForwardAxisMovement = value;
 }
 
 void AFPS_Character::MoveRight(float value)
 {
-	FVector Direction = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::Y);
-	if (bPressedAlt)
-	{
-		Dodge(Direction * value);
-	}
-	else
-	{
-		AddMovementInput(Direction, value);
-	}
+	RightAxisMovement = value;
 }
 
 void AFPS_Character::StartJump()
 {
-	if(!GetCharacterMovement()->IsFalling() && stateManager->stamina >= 5.0f)
+	if(!GetCharacterMovement()->IsFalling() && StatManager->ConsumeStamina(StatManager->GetJumpStaminaCost()))
 	{
-		stateManager->stamina -= 5.0f;
 		Jump();
 	}
 }
 
 void AFPS_Character::Sprint()
 {
-	GetCharacterMovement()->MaxWalkSpeed *= stateManager->sprintSpeedScalar;
-	isSprinting = true;
+	StatManager->SetActualSpeed(StatManager->GetSprintSpeed());
+	IsSprinting = true;
 }
 
 void AFPS_Character::StopSprint()
 {
-	GetCharacterMovement()->MaxWalkSpeed = stateManager->speed;
-	isSprinting = false;
+	StatManager->ResetSpeed();
+	IsSprinting = false;
 }
 
 void AFPS_Character::Dodge(FVector direction)
 {
-	if(!GetCharacterMovement()->IsFalling())
-		GetCharacterMovement()->AddImpulse(direction * 1000.0f, true);
+	if(!GetCharacterMovement()->IsFalling() && StatManager->ConsumeStamina(StatManager->GetDodgeStaminaCost()))
+	{
+		LaunchCharacter(direction * StatManager->GetDodgeForce(), true, false);
+		bPressedAlt = false;
+	}
 }
 
 void AFPS_Character::StartAlt()
@@ -207,23 +202,14 @@ void AFPS_Character::Crouching()
 		UnCrouch();
 }
 
-void AFPS_Character::RecoveryStamina(float deltaTime)
-{
-	stateManager->stamina += stateManager->recorveryStamina * deltaTime;
-
-	if (stateManager->stamina > stateManager->maxStamina)
-		stateManager->stamina = stateManager->maxStamina;
-}
-
 void AFPS_Character::Action()
 {
-	UE_LOG(LogActor, Error, TEXT("Salut"));
-	if(hitActor)
+	if(HitActor)
 	{
-		 if (hitActor->Actor->ActorHasTag(FName(TEXT("Destructable"))))
+		 if (HitActor->Actor->ActorHasTag(FName(TEXT("Destructable"))))
 		 {
-			hitActor->Actor->Destroy();
-			hitActor = nullptr;
+			HitActor->Actor->Destroy();
+			HitActor = nullptr;
 		 }
 	}
 }
