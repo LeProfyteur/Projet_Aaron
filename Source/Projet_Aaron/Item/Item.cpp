@@ -32,16 +32,14 @@ bool AItem::UseItem_Implementation()
 	return ItemStructure->IsConsomable;
 }
 
-UDA_ItemStructure* AItem::InteractSafe_Implementation_Implementation()
+FString AItem::GetLabel_Implementation()
 {
-	UDA_ItemStructure* item = ItemStructure;
-	return item;
+	return ItemStructure->Name;
 }
 
-UDA_ItemStructure* AItem::Interact_Implementation_Implementation()
+void AItem::Interact_Implementation(bool IsPressed, UDA_ItemStructure* ItemStruct)
 {
-	UDA_ItemStructure* item = ItemStructure;
+	ItemStruct = ItemStructure;
 	Destroy();
-	return item;
 }
 

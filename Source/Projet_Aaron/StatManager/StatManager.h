@@ -26,11 +26,11 @@ protected:
 	UPROPERTY(BlueprintReadWrite, Category = Health)
 	float HealthBio;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
-	float HealthBioMax;
+	float HealthBioMax = 100.0f;
 	UPROPERTY(BlueprintReadWrite, Category = Health)
 	float HealthTech;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
-	float HealthTechMax;
+	float HealthTechMax = 100.0f;
 	
 public:	
 
