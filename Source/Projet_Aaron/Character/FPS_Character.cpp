@@ -46,7 +46,11 @@ void AFPS_Character::BeginPlay()
 void AFPS_Character::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	CharacterMove();
+
+	if (IsClimbing)
+		CharacterClimb(DeltaTime);
+	else
+		CharacterMove();
 
 	StatManager->RecoveryStamina(DeltaTime);
 
@@ -112,10 +116,6 @@ void AFPS_Character::CharacterMove()
 	{
 		Dodge(Direction);
 	}
-	else if (IsNearClimbing)
-	{
-		//Climb(value);
-	}
 	else
 	{
 		AddMovementInput(GetActorForwardVector(), ForwardAxisMovement);
@@ -128,6 +128,36 @@ void AFPS_Character::CharacterMove()
 	}
 }
 
+void AFPS_Character::CharacterClimb(float DeltaTime)
+{
+	FVector LerpPosition = FMath::VInterpTo(GetActorLocation(), ClimbPosition, DeltaTime, 10.0f); //NOMBRE MYSTIQUE
+	SetActorLocation(LerpPosition);
+}
+
+void AFPS_Character::UpdateClimbingPosition()
+{
+	FVector TargetPosition = FVector::ZeroVector;
+
+	if (IsLeftHandGripping && IsRightHandGripping)
+		TargetPosition = (LeftHandPosition + RightHandPosition) / 2.0f;
+	else if (IsLeftHandGripping)
+		TargetPosition = LeftHandPosition;
+	else if (IsRightHandGripping)
+		TargetPosition = RightHandPosition;
+	else
+	{
+		GetCharacterMovement()->GravityScale = 1.0f;
+		IsClimbing = false;
+	}
+
+	if (IsClimbing)
+	{
+		TargetPosition = TargetPosition - FVector(0.0f, 0.0f, 70.0f); //NOMBRE MYSTIQUE
+		GetCharacterMovement()->GravityScale = 0.0f;
+		GetCharacterMovement()->StopMovementImmediately();
+		ClimbPosition = TargetPosition;
+	}
+}
 
 void AFPS_Character::MoveForward(float value)
 {
@@ -141,7 +171,7 @@ void AFPS_Character::MoveRight(float value)
 
 void AFPS_Character::StartJump()
 {
-	if(!GetCharacterMovement()->IsFalling() && StatManager->ConsumeStamina(StatManager->GetJumpStaminaCost()))
+	if(!GetCharacterMovement()->IsFalling() && StatManager->ConsumeStamina(StatManager->GetJumpStaminaCost()) && !IsClimbing)
 	{
 		Jump();
 	}
@@ -214,52 +244,84 @@ void AFPS_Character::StopClimbing()
 	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 }
 
+//Left arm button pressed
 void AFPS_Character::ActivatePressedLeft()
 {
-	AActor* ChildActor = LeftArmEquipment->GetChildActor();
-	if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
-		IEquipmentInterface::Execute_Activate(ChildActor, true);
+	//Check if in range of climbing
+	FHitResult HitResult;
+	FVector Start = FpsCamera->GetComponentLocation();
+	FVector End = Start + FpsCamera->GetForwardVector() * 200.0f; // NOMBRE MYSTIQUE
+	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility);
+
+	//Update character state if a climbable wall is hit
+	if (HitResult.IsValidBlockingHit() && HitResult.Actor->ActorHasTag("PrisePC"))
+	{
+		IsClimbing = true;
+		IsLeftHandGripping = true;
+		LeftHandPosition = HitResult.Actor->GetActorLocation();
+		UpdateClimbingPosition();
+	}
+	else
+	{
+		AActor* ChildActor = LeftArmEquipment->GetChildActor();
+		if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
+			IEquipmentInterface::Execute_Activate(ChildActor, true);
+	}
 }
 
+//Left arm button released
 void AFPS_Character::ActivateReleasedLeft()
 {
+	IsLeftHandGripping = false;
+	LeftHandPosition = FVector::ZeroVector;
+	UpdateClimbingPosition();
+	
 	AActor* ChildActor = LeftArmEquipment->GetChildActor();
 	if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
 		IEquipmentInterface::Execute_Activate(ChildActor, false);
 }
 
+//Right arm button pressed
 void AFPS_Character::ActivatePressedRight()
 {
-	AActor* ChildActor = RightArmEquipment->GetChildActor();
-	if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
-		IEquipmentInterface::Execute_Activate(ChildActor, true);
+	//Check if in range of climbing
+	FHitResult HitResult;
+	FVector Start = FpsCamera->GetComponentLocation();
+	FVector End = Start + FpsCamera->GetForwardVector() * 200.0f; // NOMBRE MYSTIQUE
+	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility);
+
+	//Update character state if a climbable wall is hit
+	if (HitResult.IsValidBlockingHit() && HitResult.Actor->ActorHasTag("PrisePC"))
+	{
+		IsClimbing = true;
+		IsRightHandGripping = true;
+		RightHandPosition = HitResult.Actor->GetActorLocation();
+		UpdateClimbingPosition();
+	}
+	else
+	{
+		AActor* ChildActor = RightArmEquipment->GetChildActor();
+		if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
+			IEquipmentInterface::Execute_Activate(ChildActor, true);
+	}
 }
 
+//Right arm button released
 void AFPS_Character::ActivateReleasedRight()
 {
+	IsRightHandGripping = false;
+	RightHandPosition = FVector::ZeroVector;
+	UpdateClimbingPosition();
+	
 	AActor* ChildActor = RightArmEquipment->GetChildActor();
 	if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
 		IEquipmentInterface::Execute_Activate(ChildActor, false);
 }
 
+//Head button pressed
 void AFPS_Character::ActivateHeadEquipment()
 {
 	AActor* ChildActor = HeadEquipment->GetChildActor();
 	if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
 		IEquipmentInterface::Execute_Activate(ChildActor, true);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
