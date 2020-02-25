@@ -21,23 +21,23 @@ protected:
 	UPROPERTY(BlueprintReadWrite, Category = Stamina)
 		float Stamina;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stamina)
-		float StaminaMax;
+		float StaminaMax = 100.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stamina)
-		float StaminaRecovery;
+		float StaminaRecovery = 5.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speed)
-		float BaseSpeed;
+		float BaseSpeed = 600.0f;
 	UPROPERTY(BlueprintReadWrite, Category = Speed)
 		float ActualSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speed)
-		float JumpForce;
+		float JumpForce = 600.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stamina)
-		float JumpStaminaCost;
+		float JumpStaminaCost = 5.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stamina)
-		float SprintStaminaCost;
+		float SprintStaminaCost = 0.1f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speed)
-		float SprintSpeed;
+		float SprintSpeed = 1200.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speed)
-		float CrouchSpeed;
+		float CrouchSpeed = 300.0f;
 
 	virtual void BeginPlay() override;
 

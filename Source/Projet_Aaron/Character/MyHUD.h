@@ -23,8 +23,8 @@ public:
     virtual void Tick(float DeltaSeconds) override;
     virtual void DrawHUD() override;
 
-    void UpdateCircleRadius(float value);
-    void ResetCircleRadius();
+    UFUNCTION(BlueprintCallable) void UpdateCircleRadius(float RadiusBar);
+    UFUNCTION(BlueprintCallable) void ResetCircleRadius();
 
     UPROPERTY(EditAnywhere) UMaterial* AnalyseMat;
     UPROPERTY(EditAnywhere) UMaterialInstanceDynamic* BarMatInstance;
