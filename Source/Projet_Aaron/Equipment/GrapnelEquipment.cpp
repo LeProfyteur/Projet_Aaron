@@ -102,7 +102,7 @@ void AGrapnelEquipment::TimelineCallback()
 	{
 		vStart = StaticMeshComponent->GetComponentLocation();
 		AFPS_Character *c = Cast<AFPS_Character>(GetParentActor());
-		vEnd = vStart + c->fpsCamera->GetForwardVector() * Distance;
+		vEnd = vStart + c->FpsCamera->GetForwardVector() * Distance;
 		
 		bool haveHit = GetWorld()->LineTraceSingleByChannel(outHit, vStart, vEnd, ECC_Visibility, collisionParams);
 		if (haveHit && outHit.Actor->GetClass()->ImplementsInterface(UHookInterface::StaticClass()))
