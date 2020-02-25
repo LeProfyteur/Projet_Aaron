@@ -2,12 +2,11 @@
 
 #pragma once
 #include "Camera/CameraComponent.h"
-#include "Components/PostProcessComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Projet_Aaron/Equipment/EquipmentInterface.h"
 #include "Engine/Engine.h"
-#include "StateManager.h"
+#include "Projet_Aaron/StatManager/CharacterStatManager.h"
 
 #include "GameFramework/Character.h"
 #include "CoreMinimal.h"
@@ -23,19 +22,13 @@ public:
 	AFPS_Character();
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly)
-	class UCameraComponent* fpsCamera;
+	class UCameraComponent* FpsCamera;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class UStateManager* stateManager;
-	
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	//class UPostProcessComponent* postProcess;
-	
-	UPROPERTY()
-		class AActor* lastActorHit = nullptr;
+	class UCharacterStatManager* StatManager;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool isNearClimbing = false;
+	bool IsNearClimbing = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UChildActorComponent* LeftArmEquipment;
@@ -46,15 +39,20 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UChildActorComponent* HeadEquipment;
 
-	FHitResult *hitGrab = nullptr;
-	FHitResult *hitActor = nullptr;
+protected:
 
-	bool isSprinting = false;
+	FHitResult* HitGrab = nullptr;
+	FHitResult* HitActor = nullptr;
+
+	bool IsSprinting = false;
 	bool bPressedAlt = false;
 
-protected:
-	// Called when the game starts or when spawned
+	float RightAxisMovement;
+	float ForwardAxisMovement;
+	
 	virtual void BeginPlay() override;
+	void CharacterMove();
+	
 
 public:	
 	// Called every frame
@@ -77,8 +75,6 @@ public:
 	void Crouching();
 	void Dodge(FVector direction);
 	void Climb(float value);
-
-	void RecoveryStamina(float deltaTime);
 
 	void Action();
 	void StopAction();

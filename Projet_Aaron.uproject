@@ -18,6 +18,10 @@
 		{
 			"Name": "EditorScriptingUtilities",
 			"Enabled": true
+		},
+		{
+			"Name": "Designer",
+			"Enabled": false
 		}
 	]
 }
