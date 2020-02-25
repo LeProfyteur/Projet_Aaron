@@ -4,8 +4,6 @@
 #include "Camera/CameraComponent.h"
 #include "Components/PostProcessComponent.h"
 #include "Components/StaticMeshComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "Projet_Aaron/Equipment/NightVisionEquipment.h"
 #include "Engine/Engine.h"
 #include "StateManager.h"
 

@@ -10,13 +10,10 @@
 #include "MyHUD.h"
 //UMG
 #include "Runtime/UMG/Public/UMG.h"
-#include "Runtime/UMG/Public/UMGStyle.h"
-#include "Runtime/UMG/Public/Slate/SObjectWidget.h"
-#include "Runtime/UMG/Public/IUMGModule.h"
 #include "Runtime/UMG/Public/Blueprint/UserWidget.h"
 #include "Projet_Aaron/Item/Item.h"
-#include "Components/BillboardComponent.h"
-#include "Blueprint/UserWidget.h"
+#include "WidgetLayoutLibrary.generated.h"
+#include "Projet_Aaron/Equipment/EquipmentInterface.h"
 
 // Sets default values
 AFPS_Character::AFPS_Character()
@@ -324,14 +321,34 @@ void AFPS_Character::ActivateReleasedRight()
 void AFPS_Character::PressedItemWheel()
 {
 	UE_LOG(LogActor, Warning, TEXT("Item wheel Pressed"));
+	MainHudFixedSizeCPP->AddToViewport();
 	MainHudFixedSizeCPP->CreateStandartWidgetCPP();
-	//CreateStandartWidgetCPP();
-	//MainHudFixedSizeCPP->CreateStandartWidgetCPP_Implementation();
+
+	//Open Radial Bar
+	auto PlayerController = GetWorld()->GetFirstPlayerController();
+	
+	FInputModeGameAndUI InputModeData;
+	InputModeData.SetWidgetToFocus(MainHudFixedSizeCPP->TakeWidget());
+	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+	PlayerController->SetInputMode(InputModeData);
+	PlayerController->SetIgnoreLookInput(true);
+	PlayerController->bShowMouseCursor = true;
+	const FVector2D ViewportSize = FVector2D(GEngine->GameViewport->Viewport->GetSizeXY());
+	PlayerController->SetMouseLocation(ViewportSize.X / 2.f, ViewportSize.Y / 2.f);
 }
 
 void AFPS_Character::ReleaseItemWheel()
 {
 	UE_LOG(LogActor, Warning, TEXT("Item wheel Released"));
+	MainHudFixedSizeCPP->RemoveFromParent();
+
+	//CloseRadialBar
+	auto PlayerController = GetWorld()->GetFirstPlayerController();
+	PlayerController->SetIgnoreLookInput(false);
+	PlayerController->SetInputMode(FInputModeGameOnly());
+	PlayerController->bShowMouseCursor = false;
+
+	//ChosenSlot
 }
 
 void AFPS_Character::PressedUseQuickItem()
