@@ -8,6 +8,11 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Engine/Engine.h"
 #include "MyHUD.h"
+//UMG
+#include "Runtime/UMG/Public/UMG.h"
+#include "Runtime/UMG/Public/Blueprint/UserWidget.h"
+#include "Projet_Aaron/Item/Item.h"
+#include "Projet_Aaron/Equipment/EquipmentInterface.h"
 
 // Sets default values
 AFPS_Character::AFPS_Character()
@@ -34,18 +39,30 @@ AFPS_Character::AFPS_Character()
 
 	HeadEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Head Equipment"));
 	HeadEquipment->SetupAttachment(FpsCamera);
+
+	InventaireComponent = CreateDefaultSubobject<UInventaireComponent>(TEXT("InventaireComponent"));
+	InventaireComponent->PrepareInventory();
 }
 
 // Called when the game starts or when spawned
 void AFPS_Character::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if(IsValid(InventaireComponent))
+	{
+		UE_LOG(LogActor, Warning, TEXT("Name Inventaire : %s"), *InventaireComponent->InventoryName);
+	}else
+	{
+		UE_LOG(LogActor, Error, TEXT("Name Inventaire : undefined"));
+	}	
 }
 
 // Called every frame
 void AFPS_Character::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	CharacterMove();
 
 	if (IsClimbing)
 		CharacterClimb(DeltaTime);
@@ -56,22 +73,31 @@ void AFPS_Character::Tick(float DeltaTime)
 
 	FHitResult OutHit;
 	FVector Start = FpsCamera->GetComponentLocation();
-	FVector End = Start + FpsCamera->GetForwardVector() * 1000.0f;
+	FVector End = Start + FpsCamera->GetForwardVector() * RaycastDistanceInventory;
 	FCollisionQueryParams collisionParams;
+
+	//DrawDebugLine(GetWorld(), vStart, vEnd, FColor::Red, false, 1, 0, 1);
 	
 	if(GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECC_Visibility, collisionParams))
 	{
 		UStaticMeshComponent* actorMeshComponent = OutHit.Actor->FindComponentByClass<UStaticMeshComponent>();
 		if(OutHit.GetActor()->Implements<UObjectInteractionInterface>())
 		{
-			UE_LOG(LogActor, Warning, TEXT("%s"), *IObjectInteractionInterface::Execute_GetLabel(OutHit.GetActor()));
+            
+			//UE_LOG(LogActor, Warning, TEXT("%s"), *IObjectInteractionInterface::Execute_GetLabel(OutHit.GetActor()));
 			if (!HitActor || OutHit.Actor != HitActor->Actor)
 				HitActor = new FHitResult(OutHit);
+			
+			InventoryCastObject->nameTextItem = IObjectInteractionInterface::Execute_GetLabel(OutHit.GetActor()) + " [F]";
+		}else
+		{
+			InventoryCastObject->nameTextItem = "";
 		}
 	} else if(HitActor)
 	{
 		UStaticMeshComponent* actorMeshComponent = HitActor->Actor->FindComponentByClass<UStaticMeshComponent>();
 		actorMeshComponent->SetCustomDepthStencilValue(1);
+		InventoryCastObject->nameTextItem = "";
 		HitActor = nullptr;
 	}
 }
@@ -107,6 +133,12 @@ void AFPS_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	
 	PlayerInputComponent->BindAction("Action", IE_Pressed, this, &AFPS_Character::Action);
 	PlayerInputComponent->BindAction("Action", IE_Released,this, &AFPS_Character::StopAction);
+
+	PlayerInputComponent->BindAction("UseQuickItem", IE_Pressed, this, &AFPS_Character::PressedUseQuickItem);
+
+	PlayerInputComponent->BindAction("ItemWheel", IE_Pressed, this, &AFPS_Character::PressedItemWheel);
+	PlayerInputComponent->BindAction("ItemWheel", IE_Released, this, &AFPS_Character::ReleaseItemWheel);
+
 }
 
 void AFPS_Character::CharacterMove()
@@ -220,7 +252,16 @@ void AFPS_Character::Action()
 {
 	if (HitActor && HitActor->GetActor()->Implements<UObjectInteractionInterface>())
 	{
-		IObjectInteractionInterface::Execute_Interact(HitActor->GetActor(), true, nullptr);
+		UDA_ItemStructure* ItemStructure = NewObject<UDA_ItemStructure>(UDA_ItemStructure::StaticClass());
+		IObjectInteractionInterface::Execute_Interact(HitActor->GetActor(), true, ItemStructure);
+		if(IsValid(ItemStructure))
+		{
+			UE_LOG(LogActor, Warning, TEXT("Add to inventory : %s"), *ItemStructure->Name);
+			InventaireComponent->AddToInventory(ItemStructure);
+		}else
+		{
+			UE_LOG(LogActor, Error, TEXT("Error add to inventory"));
+		}
 		HitActor = nullptr;
 	}
 }
@@ -323,4 +364,78 @@ void AFPS_Character::ActivateHeadEquipment()
 	AActor* ChildActor = HeadEquipment->GetChildActor();
 	if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
 		IEquipmentInterface::Execute_Activate(ChildActor, true);
+}
+
+void AFPS_Character::PressedItemWheel()
+{
+	UE_LOG(LogActor, Warning, TEXT("Item wheel Pressed"));
+	MainHudFixedSizeCPP->AddToViewport();
+	MainHudFixedSizeCPP->CreateStandartWidgetCPP();
+
+	//Open Radial Bar
+	auto PlayerController = GetWorld()->GetFirstPlayerController();
+
+	FInputModeGameAndUI InputModeData;
+	InputModeData.SetWidgetToFocus(MainHudFixedSizeCPP->TakeWidget());
+	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+	PlayerController->SetInputMode(InputModeData);
+	PlayerController->SetIgnoreLookInput(true);
+	PlayerController->bShowMouseCursor = true;
+	const FVector2D ViewportSize = FVector2D(GEngine->GameViewport->Viewport->GetSizeXY());
+	PlayerController->SetMouseLocation(ViewportSize.X / 2.f, ViewportSize.Y / 2.f);
+}
+
+void AFPS_Character::ReleaseItemWheel()
+{
+	UE_LOG(LogActor, Warning, TEXT("Item wheel Released"));
+	MainHudFixedSizeCPP->RemoveFromParent();
+
+	//CloseRadialBar
+	auto PlayerController = GetWorld()->GetFirstPlayerController();
+	PlayerController->SetIgnoreLookInput(false);
+	PlayerController->SetInputMode(FInputModeGameOnly());
+	PlayerController->bShowMouseCursor = false;
+
+	//ChosenSlot
+	//HudCPP.itemMainHudFixedSizeCPP->ChosenSlot
+	HudCPP->ItemSelected = MainHudFixedSizeCPP->ChosenSlot;
+}
+
+void AFPS_Character::UseMyItem(UDA_SlotStructure* ChosenSlot)
+{
+	if (IsValid(ChosenSlot) && IsValid(ChosenSlot->ItemStructure))
+	{
+		if (ChosenSlot->ItemStructure->IsConsomable)
+		{
+			FTransform* transform = new FTransform();
+			transform->SetScale3D(FVector(0., 0., 0.));
+			AItem* item = (AItem*)GetWorld()->SpawnActor(ChosenSlot->ItemStructure->Class.Get(), transform, FActorSpawnParameters());
+			bool bItemUsed = item->UseItem();
+			item->Destroy();
+			if (bItemUsed)
+			{
+				//Log de slotitem . display name
+				if (ChosenSlot->Quantity == 1)
+				{
+					//remove slot
+					ChosenSlot->Quantity = 0;
+					InventaireComponent->RemoveFromInventory(ChosenSlot);
+				}
+				else
+				{
+					ChosenSlot->Quantity--;
+				}
+			}
+		}
+	}
+}
+
+void AFPS_Character::PressedUseQuickItem()
+{
+	UE_LOG(LogActor, Warning, TEXT("Use Quick Item"));
+
+	if (IsValid(MainHudFixedSizeCPP->ChosenSlot) && MainHudFixedSizeCPP->ChosenSlot->Quantity > 0)
+	{
+		UseMyItem(MainHudFixedSizeCPP->ChosenSlot);
+	}
 }

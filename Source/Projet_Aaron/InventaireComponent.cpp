@@ -156,7 +156,9 @@ void UInventaireComponent::RemoveFromInventory(UDA_SlotStructure* SlotToRemove)
 
 void UInventaireComponent::PrepareInventory()
 {
+	NumberOfSlots = 6;
 	Inventory.Reserve(NumberOfSlots);
+	InventoryName = "Backpack";
 	UE_LOG(LogActor, Warning, TEXT("InventorySetup"));
 }
 
