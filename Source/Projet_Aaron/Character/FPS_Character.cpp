@@ -79,16 +79,20 @@ void AFPS_Character::Tick(float DeltaTime)
 		if(OutHit.GetActor()->Implements<UObjectInteractionInterface>())
 		{
             
-			UE_LOG(LogActor, Warning, TEXT("%s"), *IObjectInteractionInterface::Execute_GetLabel(OutHit.GetActor()));
+			//UE_LOG(LogActor, Warning, TEXT("%s"), *IObjectInteractionInterface::Execute_GetLabel(OutHit.GetActor()));
 			if (!HitActor || OutHit.Actor != HitActor->Actor)
 				HitActor = new FHitResult(OutHit);
 			
-			//InventoryCastObject->nameTextItem = item->ItemStructure->Name + " [F]";
+			InventoryCastObject->nameTextItem = IObjectInteractionInterface::Execute_GetLabel(OutHit.GetActor()) + " [F]";
+		}else
+		{
+			InventoryCastObject->nameTextItem = "";
 		}
 	} else if(HitActor)
 	{
 		UStaticMeshComponent* actorMeshComponent = HitActor->Actor->FindComponentByClass<UStaticMeshComponent>();
 		actorMeshComponent->SetCustomDepthStencilValue(1);
+		InventoryCastObject->nameTextItem = "";
 		HitActor = nullptr;
 	}
 }
@@ -217,10 +221,16 @@ void AFPS_Character::Action()
 {
 	if (HitActor && HitActor->GetActor()->Implements<UObjectInteractionInterface>())
 	{
-				 /*auto Item = IInteract_Interface::Execute_Interact(hitActor->GetActor());
-				 InventaireComponent->AddToInventory(Item);
-				 hitActor = nullptr;*/
-		IObjectInteractionInterface::Execute_Interact(HitActor->GetActor(), true, nullptr);
+		UDA_ItemStructure* ItemStructure = NewObject<UDA_ItemStructure>(UDA_ItemStructure::StaticClass());
+		IObjectInteractionInterface::Execute_Interact(HitActor->GetActor(), true, ItemStructure);
+		if(IsValid(ItemStructure))
+		{
+			UE_LOG(LogActor, Warning, TEXT("Add to inventory : %s"), *ItemStructure->Name);
+			InventaireComponent->AddToInventory(ItemStructure);
+		}else
+		{
+			UE_LOG(LogActor, Error, TEXT("Error add to inventory"));
+		}
 		HitActor = nullptr;
 	}
 }

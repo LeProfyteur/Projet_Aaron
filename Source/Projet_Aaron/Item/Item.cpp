@@ -41,7 +41,18 @@ FString AItem::GetLabel_Implementation()
 
 void AItem::Interact_Implementation(bool IsPressed, UDA_ItemStructure* ItemStruct)
 {
-	ItemStruct = ItemStructure;
+	//Copy
+	ItemStruct->Name = ItemStructure->Name;
+	ItemStruct->IsConsomable = ItemStructure->IsConsomable;
+	ItemStruct->IsStackable = ItemStructure->IsStackable;
+	ItemStruct->Category = ItemStructure->Category;
+	ItemStruct->Class = ItemStructure->Class;
+	ItemStruct->Description = ItemStructure->Description;
+	ItemStruct->MaxStackSize = ItemStructure->MaxStackSize;
+	ItemStruct->Thumbnail = ItemStructure->Thumbnail;
+
 	Destroy();
+
+	UE_LOG(LogActor, Warning, TEXT("Return itemStructure from AItem : %s"),*ItemStruct->Name);
 }
 
