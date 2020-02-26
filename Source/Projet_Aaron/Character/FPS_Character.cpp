@@ -272,13 +272,18 @@ void AFPS_Character::ActivatePressedLeft()
 //Left arm button released
 void AFPS_Character::ActivateReleasedLeft()
 {
-	IsLeftHandGripping = false;
-	LeftHandPosition = FVector::ZeroVector;
-	UpdateClimbingPosition();
-	
-	AActor* ChildActor = LeftArmEquipment->GetChildActor();
-	if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
-		IEquipmentInterface::Execute_Activate(ChildActor, false);
+	if (IsLeftHandGripping)
+	{
+		IsLeftHandGripping = false;
+		LeftHandPosition = FVector::ZeroVector;
+		UpdateClimbingPosition();
+	}
+	else
+	{
+		AActor* ChildActor = LeftArmEquipment->GetChildActor();
+		if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
+			IEquipmentInterface::Execute_Activate(ChildActor, false);
+	}
 }
 
 //Right arm button pressed
@@ -309,13 +314,18 @@ void AFPS_Character::ActivatePressedRight()
 //Right arm button released
 void AFPS_Character::ActivateReleasedRight()
 {
-	IsRightHandGripping = false;
-	RightHandPosition = FVector::ZeroVector;
-	UpdateClimbingPosition();
-	
-	AActor* ChildActor = RightArmEquipment->GetChildActor();
-	if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
-		IEquipmentInterface::Execute_Activate(ChildActor, false);
+	if (IsRightHandGripping)
+	{
+		IsRightHandGripping = false;
+		RightHandPosition = FVector::ZeroVector;
+		UpdateClimbingPosition();
+	}
+	else
+	{
+		AActor* ChildActor = RightArmEquipment->GetChildActor();
+		if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
+			IEquipmentInterface::Execute_Activate(ChildActor, false);
+	}
 }
 
 //Head button pressed
