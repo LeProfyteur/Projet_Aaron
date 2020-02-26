@@ -62,7 +62,7 @@ void AFPS_Character::BeginPlay()
 void AFPS_Character::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	CharacterMove();
+	//CharacterMove();
 
 	if (IsClimbing)
 		CharacterClimb(DeltaTime);
