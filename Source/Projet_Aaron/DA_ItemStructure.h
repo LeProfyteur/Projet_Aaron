@@ -23,7 +23,6 @@ class PROJET_AARON_API UDA_ItemStructure : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FString Name;
 
@@ -47,4 +46,5 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 		TEnumAsByte<ECategoryEnum> Category;
+	
 };
