@@ -66,7 +66,7 @@ public:
 	
 	//Called when you take damage
 	UFUNCTION(BlueprintCallable, Category = "Damage")
-	void TakeDamage(float BioDamage, float TechDamage);
+	virtual void TakeDamage(float BioDamage, float TechDamage);
 
 	UFUNCTION(BlueprintCallable, Category = "Damage")
 	void Heal(float BioHeal, float TechHeal);
