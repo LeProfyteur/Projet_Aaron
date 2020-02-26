@@ -19,6 +19,9 @@ void AMyHUD::BeginPlay()
 	BarMatInstance = UMaterialInstanceDynamic::Create(AnalyseMat, this);
 	BarMatInstance->SetScalarParameterValue(FName(TEXT("Decimal")), 0.0f);
 	BarMatInstance->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor(0.7f, 200.0f, 0.34f));
+
+	SetActorTickEnabled(false);
+	UE_LOG(LogActor, Error, TEXT("%d"), IsActorTickEnabled());
 }
 
 void AMyHUD::Tick(float DeltaSeconds)
@@ -36,15 +39,14 @@ void AMyHUD::DrawHUD()
 	DrawMaterialSimple(BarMatInstance, viewportSize.X / 2.0f, viewportSize.Y / 2.0f, 50.0f, 50.0f);
 }
 
-void AMyHUD::UpdateCircleRadius(float value)
+void AMyHUD::UpdateCircleRadius(float RadiusBar)
 {
-	if (value > 1)
-		value = 1.0f;
-	BarMatInstance->SetScalarParameterValue(FName(TEXT("Decimal")), value);
+	BarMatInstance->SetScalarParameterValue(FName("Decimal"), RadiusBar);
 }
 
 void AMyHUD::ResetCircleRadius()
 {
+	SetActorTickEnabled(false);
 	BarMatInstance->SetScalarParameterValue(FName(TEXT("Decimal")), 0.0f);
 }
 

@@ -58,26 +58,11 @@ void AFPS_Character::Tick(float DeltaTime)
 	if(GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECC_Visibility, collisionParams))
 	{
 		UStaticMeshComponent* actorMeshComponent = OutHit.Actor->FindComponentByClass<UStaticMeshComponent>();
-		if (OutHit.Actor->ActorHasTag(FName(TEXT("Analysable"))))
+		if(OutHit.GetActor()->Implements<UObjectInteractionInterface>())
 		{
-			actorMeshComponent->SetCustomDepthStencilValue(2);
+			UE_LOG(LogActor, Warning, TEXT("%s"), *IObjectInteractionInterface::Execute_GetLabel(OutHit.GetActor()));
 			if (!HitActor || OutHit.Actor != HitActor->Actor)
 				HitActor = new FHitResult(OutHit);
-		}
-		else if(OutHit.Actor->ActorHasTag(FName(TEXT("Destructable"))))
-		{
-			actorMeshComponent->SetCustomDepthStencilValue(3);
-			if (!HitActor || OutHit.Actor != HitActor->Actor)
-				HitActor = new FHitResult(OutHit);
-		}
-		else
-		{
-			if (HitActor)
-			{
-				actorMeshComponent = HitActor->Actor->FindComponentByClass<UStaticMeshComponent>();
-				actorMeshComponent->SetCustomDepthStencilValue(1);
-				HitActor = nullptr;
-			}
 		}
 	} else if(HitActor)
 	{
@@ -117,7 +102,6 @@ void AFPS_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("HeadAction", IE_Pressed, this, &AFPS_Character::ActivateHeadEquipment);
 	
 	PlayerInputComponent->BindAction("Action", IE_Pressed, this, &AFPS_Character::Action);
-	PlayerInputComponent->BindAction("Action", IE_Repeat, this, &AFPS_Character::Analyse);
 	PlayerInputComponent->BindAction("Action", IE_Released,this, &AFPS_Character::StopAction);
 }
 
@@ -204,28 +188,19 @@ void AFPS_Character::Crouching()
 
 void AFPS_Character::Action()
 {
-	if(HitActor)
+	if (HitActor && HitActor->GetActor()->Implements<UObjectInteractionInterface>())
 	{
-		 if (HitActor->Actor->ActorHasTag(FName(TEXT("Destructable"))))
-		 {
-			HitActor->Actor->Destroy();
-			HitActor = nullptr;
-		 }
+		IObjectInteractionInterface::Execute_Interact(HitActor->GetActor(), true, nullptr);
+		HitActor = nullptr;
 	}
 }
 
 void AFPS_Character::StopAction()
 {
-	Cast<AMyHUD>(GetWorld()->GetFirstPlayerController()->GetHUD())->ResetCircleRadius();
-}
-
-
-void AFPS_Character::Analyse()
-{
-	AMyHUD* myHUD = Cast<AMyHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
-	float val = 0;
-	myHUD->BarMatInstance->GetScalarParameterValue(FName(TEXT("Decimal")), val);
-	myHUD->UpdateCircleRadius(val + 0.01f);
+	if (HitActor && HitActor->GetActor()->Implements<UObjectInteractionInterface>())
+	{
+		IObjectInteractionInterface::Execute_Interact(HitActor->GetActor(), false, nullptr);
+	}
 }
 
 void AFPS_Character::Climb(float value)

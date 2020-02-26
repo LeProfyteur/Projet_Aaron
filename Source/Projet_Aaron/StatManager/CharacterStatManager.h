@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "Materials/MaterialParameterCollection.h"
+#include "Materials/MaterialParameterCollectionInstance.h"
 #include "CoreMinimal.h"
 #include "CreatureStatManager.h"
 #include "CharacterStatManager.generated.h"
@@ -17,10 +19,18 @@ class PROJET_AARON_API UCharacterStatManager : public UCreatureStatManager
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
-		float DodgeStaminaCost;
+		float DodgeStaminaCost = 5.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
-		float DodgeForce;
+		float DodgeForce = 2500.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		UMaterialParameterCollectionInstance* ParameterCollectionInstance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		UMaterialParameterCollection* ParameterCollection;
+
+	virtual void BeginPlay() override;
 
 public:
 
@@ -38,4 +48,6 @@ public:
 		void SetDodgeStaminaCost(float NewDodgeStaminaCost) { DodgeStaminaCost = NewDodgeStaminaCost; }
 	UFUNCTION(BlueprintCallable)
 		void SetDodgeForce(float NewDodgeForce) { DodgeForce = NewDodgeForce; }
+
+		void TakeDamage(float BioDamage, float TechDamage);
 };

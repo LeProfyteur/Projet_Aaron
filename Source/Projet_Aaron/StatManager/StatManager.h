@@ -26,11 +26,11 @@ protected:
 	UPROPERTY(BlueprintReadWrite, Category = Health)
 	float HealthBio;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
-	float HealthBioMax;
+	float HealthBioMax = 100.0f;
 	UPROPERTY(BlueprintReadWrite, Category = Health)
 	float HealthTech;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
-	float HealthTechMax;
+	float HealthTechMax = 100.0f;
 	
 public:	
 
@@ -43,6 +43,16 @@ public:
 		float GetHealthTech() const { return HealthTech; }
 	UFUNCTION(BlueprintCallable)
 		float GetHealthTechMax() const { return HealthTechMax; }
+	UFUNCTION(BlueprintCallable)
+		float GetHealthBioRate() const { return HealthBio / HealthBioMax; }
+	UFUNCTION(BlueprintCallable)
+		FString GetHealthBioRateText() const;
+	UFUNCTION(BlueprintCallable)
+		float GetHealthTechRate() const { return HealthTech / HealthTechMax; }
+	UFUNCTION(BlueprintCallable)
+		FString GetHealthTechRateText() const;
+	
+
 
 	/*Setters*/
 	UFUNCTION(BlueprintCallable)
