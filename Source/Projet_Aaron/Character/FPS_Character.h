@@ -92,8 +92,6 @@ public:
 
 	void ActivateHeadEquipment();
 
-	UFUNCTION(BlueprintCallable) void StopClimbing();
-
 protected :
 	void CharacterClimb(float DeltaTime);
 	void UpdateClimbingPosition();
