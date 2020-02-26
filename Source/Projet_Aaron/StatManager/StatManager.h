@@ -43,6 +43,16 @@ public:
 		float GetHealthTech() const { return HealthTech; }
 	UFUNCTION(BlueprintCallable)
 		float GetHealthTechMax() const { return HealthTechMax; }
+	UFUNCTION(BlueprintCallable)
+		float GetHealthBioRate() const { return HealthBio / HealthBioMax; }
+	UFUNCTION(BlueprintCallable)
+		FString GetHealthBioRateText() const;
+	UFUNCTION(BlueprintCallable)
+		float GetHealthTechRate() const { return HealthTech / HealthTechMax; }
+	UFUNCTION(BlueprintCallable)
+		FString GetHealthTechRateText() const;
+	
+
 
 	/*Setters*/
 	UFUNCTION(BlueprintCallable)

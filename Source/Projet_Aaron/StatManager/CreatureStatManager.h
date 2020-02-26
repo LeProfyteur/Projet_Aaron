@@ -67,6 +67,10 @@ public:
 		float GetSprintSpeed() const { return SprintSpeed; }
 	UFUNCTION(BlueprintCallable)
 		float GetCrouchSpeed() const { return SprintStaminaCost; }
+	UFUNCTION(BlueprintCallable)
+		float GetStaminaRate() const { return Stamina / StaminaMax; }
+	UFUNCTION(BlueprintCallable)
+		FString  GetStaminaRateText() const;
 
 	/*Setters*/
 	UFUNCTION(BlueprintCallable)
