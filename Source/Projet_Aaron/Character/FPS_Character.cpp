@@ -233,17 +233,6 @@ void AFPS_Character::StopAction()
 	}
 }
 
-void AFPS_Character::Climb(float value)
-{
-	GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-	AddMovementInput(GetActorUpVector(), value);
-}
-
-void AFPS_Character::StopClimbing()
-{
-	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-}
-
 //Left arm button pressed
 void AFPS_Character::ActivatePressedLeft()
 {

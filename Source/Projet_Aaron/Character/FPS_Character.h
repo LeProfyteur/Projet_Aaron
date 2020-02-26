@@ -79,7 +79,6 @@ public:
 
 	void Crouching();
 	void Dodge(FVector direction);
-	void Climb(float value);
 
 	void Action();
 	void StopAction();
