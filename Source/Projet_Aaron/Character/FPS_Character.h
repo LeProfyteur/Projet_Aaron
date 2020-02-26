@@ -4,6 +4,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Projet_Aaron/Item/ObjectInteractionInterface.h"
 #include "Projet_Aaron/Equipment/EquipmentInterface.h"
 #include "Engine/Engine.h"
 #include "Projet_Aaron/StatManager/CharacterStatManager.h"
@@ -26,9 +27,6 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UCharacterStatManager* StatManager;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool IsNearClimbing = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UChildActorComponent* LeftArmEquipment;
@@ -45,7 +43,14 @@ protected:
 	FHitResult* HitActor = nullptr;
 
 	bool IsSprinting = false;
+	bool IsClimbing = false;
+	bool IsLeftHandGripping = false;
+	bool IsRightHandGripping = false;
 	bool bPressedAlt = false;
+
+	FVector ClimbPosition = FVector::ZeroVector;
+	FVector LeftHandPosition = FVector::ZeroVector;
+	FVector RightHandPosition = FVector::ZeroVector;
 
 	float RightAxisMovement;
 	float ForwardAxisMovement;
@@ -74,7 +79,6 @@ public:
 
 	void Crouching();
 	void Dodge(FVector direction);
-	void Climb(float value);
 
 	void Action();
 	void StopAction();
@@ -90,4 +94,7 @@ public:
 
 	UFUNCTION(BlueprintCallable) void StopClimbing();
 
+protected :
+	void CharacterClimb(float DeltaTime);
+	void UpdateClimbingPosition();
 };
