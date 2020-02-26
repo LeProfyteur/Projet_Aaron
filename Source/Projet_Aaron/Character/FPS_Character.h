@@ -31,9 +31,6 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class UCharacterStatManager* StatManager;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool IsNearClimbing = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UChildActorComponent* LeftArmEquipment;
@@ -43,14 +40,18 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UChildActorComponent* HeadEquipment;
-        
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		class UInventaireComponent* InventaireComponent;
 
-	//UPROPERTY(BlueprintReadOnly)
-	FHitResult* HitActor = nullptr;
-	FHitResult *hitGrab;
+protected:
 
+	FHitResult* HitGrab = nullptr;
+	FHitResult* HitActor = nullptr;
+
+	bool IsSprinting = false;
+	bool IsClimbing = false;
+	bool IsLeftHandGripping = false;
+	bool IsRightHandGripping = false;
 	
 
 	/*UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -76,8 +77,11 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 		TSubclassOf<class UMainHudFixedSizeCPP> MainHudFixedSizeCPPClass;
 
-	bool IsSprinting = false;
 	bool bPressedAlt = false;
+
+	FVector ClimbPosition = FVector::ZeroVector;
+	FVector LeftHandPosition = FVector::ZeroVector;
+	FVector RightHandPosition = FVector::ZeroVector;
 
 	float RightAxisMovement;
 	float ForwardAxisMovement;
@@ -106,7 +110,6 @@ public:
 
 	void Crouching();
 	void Dodge(FVector direction);
-	void Climb(float value);
 
 	void Action();
 	void StopAction();
@@ -127,6 +130,7 @@ public:
 	void UseMyItem(UDA_SlotStructure* ChosenSlot);
 	void PressedUseQuickItem();
 
-	UFUNCTION(BlueprintCallable) void StopClimbing();
-
+protected :
+	void CharacterClimb(float DeltaTime);
+	void UpdateClimbingPosition();
 };

@@ -20,6 +20,18 @@ void UStatManager::BeginPlay()
 	HealthTech = HealthTechMax;
 }
 
+FString UStatManager::GetHealthBioRateText() const
+{
+	TArray<FStringFormatArg> StringArgs {static_cast<int>(HealthBio), static_cast<int>(HealthBioMax)};
+	return FString::Format(TEXT("{0} / {1}"), StringArgs);
+}
+
+FString UStatManager::GetHealthTechRateText() const
+{
+	TArray<FStringFormatArg> StringArgs{ static_cast<int>(HealthTech), static_cast<int>(HealthTechMax) };
+	return FString::Format(TEXT("{0} / {1}"), StringArgs);
+}
+
 void UStatManager::TakeDamage(float BioDamage, float TechDamage)
 {
 	HealthBio -= BioDamage;

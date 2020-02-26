@@ -64,6 +64,11 @@ void AFPS_Character::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	CharacterMove();
 
+	if (IsClimbing)
+		CharacterClimb(DeltaTime);
+	else
+		CharacterMove();
+
 	StatManager->RecoveryStamina(DeltaTime);
 
 	FHitResult OutHit;
@@ -143,10 +148,6 @@ void AFPS_Character::CharacterMove()
 	{
 		Dodge(Direction);
 	}
-	else if (IsNearClimbing)
-	{
-		//Climb(value);
-	}
 	else
 	{
 		AddMovementInput(GetActorForwardVector(), ForwardAxisMovement);
@@ -159,6 +160,36 @@ void AFPS_Character::CharacterMove()
 	}
 }
 
+void AFPS_Character::CharacterClimb(float DeltaTime)
+{
+	FVector LerpPosition = FMath::VInterpTo(GetActorLocation(), ClimbPosition, DeltaTime, 10.0f); //NOMBRE MYSTIQUE
+	SetActorLocation(LerpPosition);
+}
+
+void AFPS_Character::UpdateClimbingPosition()
+{
+	FVector TargetPosition = FVector::ZeroVector;
+
+	if (IsLeftHandGripping && IsRightHandGripping)
+		TargetPosition = (LeftHandPosition + RightHandPosition) / 2.0f;
+	else if (IsLeftHandGripping)
+		TargetPosition = LeftHandPosition;
+	else if (IsRightHandGripping)
+		TargetPosition = RightHandPosition;
+	else
+	{
+		GetCharacterMovement()->GravityScale = 1.0f;
+		IsClimbing = false;
+	}
+
+	if (IsClimbing)
+	{
+		TargetPosition = TargetPosition - FVector(0.0f, 0.0f, 70.0f); //NOMBRE MYSTIQUE
+		GetCharacterMovement()->GravityScale = 0.0f;
+		GetCharacterMovement()->StopMovementImmediately();
+		ClimbPosition = TargetPosition;
+	}
+}
 
 void AFPS_Character::MoveForward(float value)
 {
@@ -172,7 +203,7 @@ void AFPS_Character::MoveRight(float value)
 
 void AFPS_Character::StartJump()
 {
-	if(!GetCharacterMovement()->IsFalling() && StatManager->ConsumeStamina(StatManager->GetJumpStaminaCost()))
+	if(!GetCharacterMovement()->IsFalling() && StatManager->ConsumeStamina(StatManager->GetJumpStaminaCost()) && !IsClimbing)
 	{
 		Jump();
 	}
@@ -243,51 +274,98 @@ void AFPS_Character::StopAction()
 	}
 }
 
-void AFPS_Character::Climb(float value)
-{
-	GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-	AddMovementInput(GetActorUpVector(), value);
-}
-
-void AFPS_Character::StopClimbing()
-{
-	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-}
-
+//Left arm button pressed
 void AFPS_Character::ActivatePressedLeft()
 {
-	AActor* ChildActor = LeftArmEquipment->GetChildActor();
-	if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
-		IEquipmentInterface::Execute_Activate(ChildActor, true);
+	//Check if in range of climbing
+	FHitResult HitResult;
+	FVector Start = FpsCamera->GetComponentLocation();
+	FVector End = Start + FpsCamera->GetForwardVector() * 200.0f; // NOMBRE MYSTIQUE
+	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility);
+
+	//Update character state if a climbable wall is hit
+	if (HitResult.IsValidBlockingHit() && HitResult.Actor->ActorHasTag("PrisePC"))
+	{
+		IsClimbing = true;
+		IsLeftHandGripping = true;
+		LeftHandPosition = HitResult.Actor->GetActorLocation();
+		UpdateClimbingPosition();
+	}
+	else
+	{
+		AActor* ChildActor = LeftArmEquipment->GetChildActor();
+		if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
+			IEquipmentInterface::Execute_Activate(ChildActor, true);
+	}
 }
 
+//Left arm button released
 void AFPS_Character::ActivateReleasedLeft()
 {
-	AActor* ChildActor = LeftArmEquipment->GetChildActor();
-	if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
-		IEquipmentInterface::Execute_Activate(ChildActor, false);
+	if (IsLeftHandGripping)
+	{
+		IsLeftHandGripping = false;
+		LeftHandPosition = FVector::ZeroVector;
+		UpdateClimbingPosition();
+	}
+	else
+	{
+		AActor* ChildActor = LeftArmEquipment->GetChildActor();
+		if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
+			IEquipmentInterface::Execute_Activate(ChildActor, false);
+	}
 }
 
+//Right arm button pressed
 void AFPS_Character::ActivatePressedRight()
 {
-	AActor* ChildActor = RightArmEquipment->GetChildActor();
-	if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
-		IEquipmentInterface::Execute_Activate(ChildActor, true);
+	//Check if in range of climbing
+	FHitResult HitResult;
+	FVector Start = FpsCamera->GetComponentLocation();
+	FVector End = Start + FpsCamera->GetForwardVector() * 200.0f; // NOMBRE MYSTIQUE
+	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility);
+
+	//Update character state if a climbable wall is hit
+	if (HitResult.IsValidBlockingHit() && HitResult.Actor->ActorHasTag("PrisePC"))
+	{
+		IsClimbing = true;
+		IsRightHandGripping = true;
+		RightHandPosition = HitResult.Actor->GetActorLocation();
+		UpdateClimbingPosition();
+	}
+	else
+	{
+		AActor* ChildActor = RightArmEquipment->GetChildActor();
+		if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
+			IEquipmentInterface::Execute_Activate(ChildActor, true);
+	}
 }
 
+//Right arm button released
 void AFPS_Character::ActivateReleasedRight()
 {
-	AActor* ChildActor = RightArmEquipment->GetChildActor();
-	if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
-		IEquipmentInterface::Execute_Activate(ChildActor, false);
+	if (IsRightHandGripping)
+	{
+		IsRightHandGripping = false;
+		RightHandPosition = FVector::ZeroVector;
+		UpdateClimbingPosition();
+	}
+	else
+	{
+		AActor* ChildActor = RightArmEquipment->GetChildActor();
+		if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
+			IEquipmentInterface::Execute_Activate(ChildActor, false);
+	}
 }
 
+//Head button pressed
 void AFPS_Character::ActivateHeadEquipment()
 {
 	AActor* ChildActor = HeadEquipment->GetChildActor();
 	if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
 		IEquipmentInterface::Execute_Activate(ChildActor, true);
 }
+
 void AFPS_Character::PressedItemWheel()
 {
 	UE_LOG(LogActor, Warning, TEXT("Item wheel Pressed"));
@@ -296,7 +374,7 @@ void AFPS_Character::PressedItemWheel()
 
 	//Open Radial Bar
 	auto PlayerController = GetWorld()->GetFirstPlayerController();
-	
+
 	FInputModeGameAndUI InputModeData;
 	InputModeData.SetWidgetToFocus(MainHudFixedSizeCPP->TakeWidget());
 	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
@@ -325,24 +403,25 @@ void AFPS_Character::ReleaseItemWheel()
 
 void AFPS_Character::UseMyItem(UDA_SlotStructure* ChosenSlot)
 {
-	if(IsValid(ChosenSlot) && IsValid(ChosenSlot->ItemStructure))
+	if (IsValid(ChosenSlot) && IsValid(ChosenSlot->ItemStructure))
 	{
-		if(ChosenSlot->ItemStructure->IsConsomable)
+		if (ChosenSlot->ItemStructure->IsConsomable)
 		{
 			FTransform* transform = new FTransform();
 			transform->SetScale3D(FVector(0., 0., 0.));
-			AItem* item = (AItem*)GetWorld()->SpawnActor(ChosenSlot->ItemStructure->Class.Get(), transform,FActorSpawnParameters());
-			bool bItemUsed=item->UseItem();
+			AItem* item = (AItem*)GetWorld()->SpawnActor(ChosenSlot->ItemStructure->Class.Get(), transform, FActorSpawnParameters());
+			bool bItemUsed = item->UseItem();
 			item->Destroy();
-			if(bItemUsed)
+			if (bItemUsed)
 			{
 				//Log de slotitem . display name
-				if(ChosenSlot->Quantity==1)
+				if (ChosenSlot->Quantity == 1)
 				{
 					//remove slot
 					ChosenSlot->Quantity = 0;
 					InventaireComponent->RemoveFromInventory(ChosenSlot);
-				}else
+				}
+				else
 				{
 					ChosenSlot->Quantity--;
 				}
@@ -355,7 +434,7 @@ void AFPS_Character::PressedUseQuickItem()
 {
 	UE_LOG(LogActor, Warning, TEXT("Use Quick Item"));
 
-	if(IsValid(MainHudFixedSizeCPP->ChosenSlot) && MainHudFixedSizeCPP->ChosenSlot->Quantity>0)
+	if (IsValid(MainHudFixedSizeCPP->ChosenSlot) && MainHudFixedSizeCPP->ChosenSlot->Quantity > 0)
 	{
 		UseMyItem(MainHudFixedSizeCPP->ChosenSlot);
 	}

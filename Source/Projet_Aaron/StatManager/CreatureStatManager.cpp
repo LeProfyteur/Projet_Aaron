@@ -49,6 +49,12 @@ void UCreatureStatManager::RecoveryStamina(float DeltaTime)
 	}
 }
 
+FString UCreatureStatManager::GetStaminaRateText() const
+{
+	TArray<FStringFormatArg> StringArgs{ static_cast<int>(Stamina), static_cast<int>(StaminaMax) };
+	return FString::Format(TEXT("{0} / {1}"), StringArgs);
+}
+
 void UCreatureStatManager::SetActualSpeed(const float NewSpeed)
 {
 	ActualSpeed = NewSpeed;
