@@ -23,19 +23,47 @@ protected:
 	virtual void BeginPlay() override;
 
 	//Life Stat
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
+	UPROPERTY(BlueprintReadWrite, Category = Health)
 	float HealthBio;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
-	float HealthBioMax;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
+	float HealthBioMax = 100.0f;
+	UPROPERTY(BlueprintReadWrite, Category = Health)
 	float HealthTech;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
-	float HealthTechMax;
+	float HealthTechMax = 100.0f;
 	
 public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	/*Getters*/
+	UFUNCTION(BlueprintCallable)
+		float GetHealthBio() const { return HealthBio; }
+	UFUNCTION(BlueprintCallable)
+		float GetHealthBioMax() const { return HealthBioMax; }
+	UFUNCTION(BlueprintCallable)
+		float GetHealthTech() const { return HealthTech; }
+	UFUNCTION(BlueprintCallable)
+		float GetHealthTechMax() const { return HealthTechMax; }
+	UFUNCTION(BlueprintCallable)
+		float GetHealthBioRate() const { return HealthBio / HealthBioMax; }
+	UFUNCTION(BlueprintCallable)
+		FString GetHealthBioRateText() const;
+	UFUNCTION(BlueprintCallable)
+		float GetHealthTechRate() const { return HealthTech / HealthTechMax; }
+	UFUNCTION(BlueprintCallable)
+		FString GetHealthTechRateText() const;
+	
+
+
+	/*Setters*/
+	UFUNCTION(BlueprintCallable)
+		void SetHealthBio(float NewHealthBio) { HealthBio = NewHealthBio; }
+	UFUNCTION(BlueprintCallable)
+		void SetHealthBioMax(float NewHealthBioMax) { HealthBioMax = NewHealthBioMax; }
+	UFUNCTION(BlueprintCallable)
+		void SetHealthTech(float NewHealthTech) { HealthTech = NewHealthTech; }
+	UFUNCTION(BlueprintCallable)
+		void SetHealthTechMax(float NewHealthTechMax) { HealthBio = NewHealthTechMax; }
+	
 	//Called when you take damage
 	UFUNCTION(BlueprintCallable, Category = "Damage")
 	void TakeDamage(float BioDamage, float TechDamage);

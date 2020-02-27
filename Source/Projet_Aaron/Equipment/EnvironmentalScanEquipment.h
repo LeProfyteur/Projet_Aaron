@@ -2,9 +2,12 @@
 
 #pragma once
 
+#include "Curves/CurveBase.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Materials/Material.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "Materials/MaterialParameterCollection.h"
+#include "Materials/MaterialParameterCollectionInstance.h"
 #include "CoreMinimal.h"
 #include "EquipmentBase.h"
 #include "EnvironmentalScanEquipment.generated.h"
@@ -41,6 +44,15 @@ public :
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		UMaterialParameterCollection* ParameterCollection;
+
+	UFUNCTION()
+		void UpdateRadius(float value);
+
+	UFUNCTION()
+		void UpdateHighlight(float value);
+
+	UFUNCTION()
+		void FinishTimeline();
 	
 	virtual void Activate_Implementation(bool isPressed) override;
 	virtual void OnEquip_Implementation() override;
@@ -51,9 +63,8 @@ public :
 protected:
 	FOnTimelineFloat updateRadiusFunction{};
 	FOnTimelineFloat updateHighlightFunction{};
+	FOnTimelineEvent FinishTimeLIneFunction{};
 
 	virtual void BeginPlay() override;
-	void UpdateTimeLineRadius(float value);
-	void UpdateTimeLineHighlight(float value);
 	
 };

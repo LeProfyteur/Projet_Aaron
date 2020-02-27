@@ -2,15 +2,19 @@
 
 #pragma once
 #include "Camera/CameraComponent.h"
-#include "Components/PostProcessComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Projet_Aaron/Item/ObjectInteractionInterface.h"
 #include "Projet_Aaron/Equipment/EquipmentInterface.h"
 #include "Engine/Engine.h"
-#include "StateManager.h"
+#include "Projet_Aaron/StatManager/CharacterStatManager.h"
 
 #include "GameFramework/Character.h"
 #include "CoreMinimal.h"
+#include "Projet_Aaron/Item/UInventoryCastObject.h"
+#include "Projet_Aaron/Item/MainHudFixedSizeCPP.h"
+#include "Projet_Aaron/Item/HUDCPP.h"
+#include "Projet_Aaron/InventaireComponent.h"
 #include "FPS_Character.generated.h"
 
 UCLASS()
@@ -23,19 +27,10 @@ public:
 	AFPS_Character();
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly)
-	class UCameraComponent* fpsCamera;
+	class UCameraComponent* FpsCamera;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	class UStateManager* stateManager;
-	
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	//class UPostProcessComponent* postProcess;
-	
-	UPROPERTY()
-		class AActor* lastActorHit = nullptr;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool isNearClimbing = false;
+	class UCharacterStatManager* StatManager;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UChildActorComponent* LeftArmEquipment;
@@ -45,16 +40,55 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UChildActorComponent* HeadEquipment;
-
-	FHitResult *hitGrab = nullptr;
-	FHitResult *hitActor = nullptr;
-
-	bool isSprinting = false;
-	bool bPressedAlt = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		class UInventaireComponent* InventaireComponent;
 
 protected:
-	// Called when the game starts or when spawned
+
+	FHitResult* HitGrab = nullptr;
+	FHitResult* HitActor = nullptr;
+
+	bool IsSprinting = false;
+	bool IsClimbing = false;
+	bool IsLeftHandGripping = false;
+	bool IsRightHandGripping = false;
+	
+
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FAnchors AnchorsCastWidget;*/
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FAnchors AnchorsInventoryWindow;*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector2D Alignment;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float RaycastDistanceInventory = 1000.f;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+		class UUInventoryCastObject* InventoryCastObject;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		class UMainHudFixedSizeCPP* MainHudFixedSizeCPP;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		class UHUDCPP* HudCPP;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TSubclassOf<class UUInventoryCastObject> InventoryCastObjectClass;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+		TSubclassOf<class UMainHudFixedSizeCPP> MainHudFixedSizeCPPClass;
+
+	bool bPressedAlt = false;
+
+	FVector ClimbPosition = FVector::ZeroVector;
+	FVector LeftHandPosition = FVector::ZeroVector;
+	FVector RightHandPosition = FVector::ZeroVector;
+
+	float RightAxisMovement;
+	float ForwardAxisMovement;
+	
 	virtual void BeginPlay() override;
+	void CharacterMove();
+	
 
 public:	
 	// Called every frame
@@ -76,9 +110,6 @@ public:
 
 	void Crouching();
 	void Dodge(FVector direction);
-	void Climb(float value);
-
-	void RecoveryStamina(float deltaTime);
 
 	void Action();
 	void StopAction();
@@ -89,7 +120,20 @@ public:
 
 	void ActivatePressedRight();
 	void ActivateReleasedRight();
+	
+	void PressedItemWheel();
+	void ReleaseItemWheel();
 
-	UFUNCTION(BlueprintCallable) void StopClimbing();
+	void ActivateHeadEquipment();
 
+	UFUNCTION(BlueprintCallable)
+	void UseMyItem(UDA_SlotStructure* ChosenSlot);
+	void PressedUseQuickItem();
+
+	UFUNCTION(BlueprintCallable)
+		void ResetAdrenalineBoost();
+
+protected :
+	void CharacterClimb(float DeltaTime);
+	void UpdateClimbingPosition();
 };

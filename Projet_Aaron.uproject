@@ -10,7 +10,8 @@
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
 				"Engine",
-                "AIModule"
+				"AIModule",
+				"UMG"
 			]
 		}
 	],
@@ -18,6 +19,10 @@
 		{
 			"Name": "EditorScriptingUtilities",
 			"Enabled": true
+		},
+		{
+			"Name": "Designer",
+			"Enabled": false
 		}
 	]
 }
