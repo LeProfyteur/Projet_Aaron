@@ -62,7 +62,6 @@ void AFPS_Character::BeginPlay()
 void AFPS_Character::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	CharacterMove();
 
 	if (IsClimbing)
 		CharacterClimb(DeltaTime);
@@ -162,9 +161,29 @@ void AFPS_Character::CharacterMove()
 
 void AFPS_Character::CharacterClimb(float DeltaTime)
 {
-	FVector LerpPosition = FMath::VInterpTo(GetActorLocation(), ClimbPosition, DeltaTime, 10.0f); //NOMBRE MYSTIQUE
+	//FVector LerpPosition = FMath::VInterpTo(GetActorLocation(), ClimbPosition, DeltaTime, 10.0f); //NOMBRE MYSTIQUE
+	FVector LerpPosition = FMath::Lerp(GetActorLocation(), ClimbPosition, 0.1); //NOMBRE MYSTIQUE
 	SetActorLocation(LerpPosition);
 }
+
+bool AFPS_Character::SearchClimbPoint(FVector& ClimbPoint)
+{
+	//Check if in range of climbing
+	FHitResult HitResult;
+	FVector Start = FpsCamera->GetComponentLocation();
+	FVector End = Start + FpsCamera->GetForwardVector() * 200.0f; // NOMBRE MYSTIQUE
+	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility);
+
+	//Update character state if a climbable wall is hit
+	if (HitResult.IsValidBlockingHit() && HitResult.Actor->ActorHasTag("Grip"))
+	{
+		ClimbPoint = HitResult.Actor->GetRootComponent()->GetComponentLocation();
+		return true;
+	}
+	else
+		return false;
+}
+
 
 void AFPS_Character::UpdateClimbingPosition()
 {
@@ -178,14 +197,14 @@ void AFPS_Character::UpdateClimbingPosition()
 		TargetPosition = RightHandPosition;
 	else
 	{
-		GetCharacterMovement()->GravityScale = 1.0f;
+		GetCharacterMovement()->SetActive(true);
 		IsClimbing = false;
 	}
 
 	if (IsClimbing)
 	{
 		TargetPosition = TargetPosition - FVector(0.0f, 0.0f, 70.0f); //NOMBRE MYSTIQUE
-		GetCharacterMovement()->GravityScale = 0.0f;
+		GetCharacterMovement()->SetActive(false);
 		GetCharacterMovement()->StopMovementImmediately();
 		ClimbPosition = TargetPosition;
 	}
@@ -277,19 +296,12 @@ void AFPS_Character::StopAction()
 //Left arm button pressed
 void AFPS_Character::ActivatePressedLeft()
 {
-	//Check if in range of climbing
-	FHitResult HitResult;
-	FVector Start = FpsCamera->GetComponentLocation();
-	FVector End = Start + FpsCamera->GetForwardVector() * 200.0f; // NOMBRE MYSTIQUE
-	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility);
-
-	//Update character state if a climbable wall is hit
-	if (HitResult.IsValidBlockingHit() && HitResult.Actor->ActorHasTag("PrisePC"))
-	{
-		IsClimbing = true;
-		IsLeftHandGripping = true;
-		LeftHandPosition = HitResult.Actor->GetActorLocation();
-		UpdateClimbingPosition();
+	FVector ClimbPoint;
+	if (SearchClimbPoint(ClimbPoint)) {
+			IsClimbing = true;
+			IsLeftHandGripping = true;
+			LeftHandPosition = ClimbPoint;
+			UpdateClimbingPosition();
 	}
 	else
 	{
@@ -319,18 +331,11 @@ void AFPS_Character::ActivateReleasedLeft()
 //Right arm button pressed
 void AFPS_Character::ActivatePressedRight()
 {
-	//Check if in range of climbing
-	FHitResult HitResult;
-	FVector Start = FpsCamera->GetComponentLocation();
-	FVector End = Start + FpsCamera->GetForwardVector() * 200.0f; // NOMBRE MYSTIQUE
-	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility);
-
-	//Update character state if a climbable wall is hit
-	if (HitResult.IsValidBlockingHit() && HitResult.Actor->ActorHasTag("PrisePC"))
-	{
+	FVector ClimbPoint;
+	if (SearchClimbPoint(ClimbPoint)) {
 		IsClimbing = true;
 		IsRightHandGripping = true;
-		RightHandPosition = HitResult.Actor->GetActorLocation();
+		RightHandPosition = ClimbPoint;
 		UpdateClimbingPosition();
 	}
 	else
@@ -438,4 +443,9 @@ void AFPS_Character::PressedUseQuickItem()
 	{
 		UseMyItem(MainHudFixedSizeCPP->ChosenSlot);
 	}
+}
+
+void AFPS_Character::ResetAdrenalineBoost()
+{
+	StatManager->ResetSpeed();
 }

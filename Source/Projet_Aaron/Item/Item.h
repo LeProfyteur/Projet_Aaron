@@ -7,6 +7,8 @@
 #include "ObjectInteractionInterface.h"
 #include "Item.generated.h"
 
+enum ESyringeType;
+
 UCLASS()
 class PROJET_AARON_API AItem : public AActor, public IObjectInteractionInterface
 {
