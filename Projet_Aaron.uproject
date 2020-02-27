@@ -3,7 +3,23 @@
 	"EngineAssociation": "4.24",
 	"Category": "",
 	"Description": "",
+	"Modules": [
+		{
+			"Name": "Projet_Aaron",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine",
+				"AIModule",
+				"UMG"
+			]
+		}
+	],
 	"Plugins": [
+		{
+			"Name": "EditorScriptingUtilities",
+			"Enabled": true
+		},
 		{
 			"Name": "Designer",
 			"Enabled": false
