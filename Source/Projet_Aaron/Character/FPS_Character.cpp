@@ -439,3 +439,8 @@ void AFPS_Character::PressedUseQuickItem()
 		UseMyItem(MainHudFixedSizeCPP->ChosenSlot);
 	}
 }
+
+void AFPS_Character::ResetAdrenalineBoost()
+{
+	StatManager->ResetSpeed();
+}

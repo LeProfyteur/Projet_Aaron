@@ -130,6 +130,9 @@ public:
 	void UseMyItem(UDA_SlotStructure* ChosenSlot);
 	void PressedUseQuickItem();
 
+	UFUNCTION(BlueprintCallable)
+		void ResetAdrenalineBoost();
+
 protected :
 	void CharacterClimb(float DeltaTime);
 	void UpdateClimbingPosition();
