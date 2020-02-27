@@ -11,6 +11,10 @@
 
 #include "GameFramework/Character.h"
 #include "CoreMinimal.h"
+#include "Projet_Aaron/Item/UInventoryCastObject.h"
+#include "Projet_Aaron/Item/MainHudFixedSizeCPP.h"
+#include "Projet_Aaron/Item/HUDCPP.h"
+#include "Projet_Aaron/InventaireComponent.h"
 #include "FPS_Character.generated.h"
 
 UCLASS()
@@ -36,6 +40,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UChildActorComponent* HeadEquipment;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		class UInventaireComponent* InventaireComponent;
 
 protected:
 
@@ -46,6 +52,31 @@ protected:
 	bool IsClimbing = false;
 	bool IsLeftHandGripping = false;
 	bool IsRightHandGripping = false;
+	
+
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FAnchors AnchorsCastWidget;*/
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FAnchors AnchorsInventoryWindow;*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector2D Alignment;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float RaycastDistanceInventory = 1000.f;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+		class UUInventoryCastObject* InventoryCastObject;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		class UMainHudFixedSizeCPP* MainHudFixedSizeCPP;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		class UHUDCPP* HudCPP;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TSubclassOf<class UUInventoryCastObject> InventoryCastObjectClass;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+		TSubclassOf<class UMainHudFixedSizeCPP> MainHudFixedSizeCPPClass;
+
 	bool bPressedAlt = false;
 
 	FVector ClimbPosition = FVector::ZeroVector;
@@ -89,10 +120,15 @@ public:
 
 	void ActivatePressedRight();
 	void ActivateReleasedRight();
+	
+	void PressedItemWheel();
+	void ReleaseItemWheel();
 
 	void ActivateHeadEquipment();
 
-	UFUNCTION(BlueprintCallable) void StopClimbing();
+	UFUNCTION(BlueprintCallable)
+	void UseMyItem(UDA_SlotStructure* ChosenSlot);
+	void PressedUseQuickItem();
 
 protected :
 	void CharacterClimb(float DeltaTime);
