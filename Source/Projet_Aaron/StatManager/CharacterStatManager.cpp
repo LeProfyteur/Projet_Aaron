@@ -24,6 +24,7 @@ void UCharacterStatManager::TakeDamage(float BioDamage, float TechDamage)
 	float rateHealth = HealthBio / HealthBioMax;
 	if(rateHealth <= 0.5f)
 	{
+		UE_LOG(LogActor, Error, TEXT("%f"), 1.0f - rateHealth);
 		ParameterCollectionInstance->SetScalarParameterValue(FName(TEXT("Damage")), 1.0f - rateHealth);
 	}
 }

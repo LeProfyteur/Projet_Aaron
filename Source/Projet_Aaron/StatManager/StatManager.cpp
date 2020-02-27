@@ -37,6 +37,8 @@ void UStatManager::TakeDamage(float BioDamage, float TechDamage)
 	HealthBio -= BioDamage;
 	HealthTech -= TechDamage;
 
+	UE_LOG(LogActor, Error, TEXT("TAMERE"));
+
 	if(HealthTech <= 0)
 	{
 		HealthTech = 0;
