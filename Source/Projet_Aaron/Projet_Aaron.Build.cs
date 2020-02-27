@@ -8,7 +8,7 @@ public class Projet_Aaron : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "CableComponent", "UMG" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "HeadMountedDisplay", "InputCore", "CableComponent", "UMG" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
