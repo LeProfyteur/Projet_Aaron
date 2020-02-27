@@ -3,6 +3,7 @@
 #pragma once
 #include "Camera/CameraComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/SceneComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Projet_Aaron/Item/ObjectInteractionInterface.h"
 #include "Projet_Aaron/Equipment/EquipmentInterface.h"
@@ -136,4 +137,5 @@ public:
 protected :
 	void CharacterClimb(float DeltaTime);
 	void UpdateClimbingPosition();
+	bool SearchClimbPoint(FVector& ClimbPoint);
 };
