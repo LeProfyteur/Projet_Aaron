@@ -3,6 +3,7 @@
 #pragma once
 #include "Camera/CameraComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/SceneComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Projet_Aaron/Item/ObjectInteractionInterface.h"
 #include "Projet_Aaron/Equipment/EquipmentInterface.h"
@@ -130,7 +131,11 @@ public:
 	void UseMyItem(UDA_SlotStructure* ChosenSlot);
 	void PressedUseQuickItem();
 
+	UFUNCTION(BlueprintCallable)
+		void ResetAdrenalineBoost();
+
 protected :
 	void CharacterClimb(float DeltaTime);
 	void UpdateClimbingPosition();
+	bool SearchClimbPoint(FVector& ClimbPoint);
 };
