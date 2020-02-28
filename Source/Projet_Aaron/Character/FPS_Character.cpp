@@ -70,6 +70,17 @@ void AFPS_Character::Tick(float DeltaTime)
 
 	StatManager->RecoveryStamina(DeltaTime);
 
+	//itemWheel
+	if(CurrentTimePressedItemWheel>0.f)
+	{
+		CurrentTimePressedItemWheel += DeltaTime;
+		if (!WheelDisplayed && CurrentTimePressedItemWheel >= HoldingTimeItemWheel)
+		{
+			DisplayWheel();
+			WheelDisplayed = true;
+		}
+	}
+
 	FHitResult OutHit;
 	FVector Start = FpsCamera->GetComponentLocation();
 	FVector End = Start + FpsCamera->GetForwardVector() * RaycastDistanceInventory;
@@ -133,9 +144,9 @@ void AFPS_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("Action", IE_Pressed, this, &AFPS_Character::Action);
 	PlayerInputComponent->BindAction("Action", IE_Released,this, &AFPS_Character::StopAction);
 
-	PlayerInputComponent->BindAction("UseQuickItem", IE_Pressed, this, &AFPS_Character::PressedUseQuickItem);
-
+	//PlayerInputComponent->BindAction("UseQuickItem", IE_Pressed, this, &AFPS_Character::PressedUseQuickItem);
 	PlayerInputComponent->BindAction("ItemWheel", IE_Pressed, this, &AFPS_Character::PressedItemWheel);
+	PlayerInputComponent->BindAction("ItemWheel", IE_Repeat, this, &AFPS_Character::RepeatItemWheel);
 	PlayerInputComponent->BindAction("ItemWheel", IE_Released, this, &AFPS_Character::ReleaseItemWheel);
 
 }
@@ -373,6 +384,47 @@ void AFPS_Character::ActivateHeadEquipment()
 void AFPS_Character::PressedItemWheel()
 {
 	UE_LOG(LogActor, Warning, TEXT("Item wheel Pressed"));
+	CurrentTimePressedItemWheel += GetWorld()->GetDeltaSeconds();
+	//UE_LOG(LogActor, Warning, TEXT("Item wheel Pressed : %f"),CurrentTimePressedItemWheel);
+}
+
+void AFPS_Character::RepeatItemWheel()
+{
+	UE_LOG(LogActor, Warning, TEXT("Item wheel Repeat"));
+}
+
+
+void AFPS_Character::ReleaseItemWheel()
+{
+	UE_LOG(LogActor, Warning, TEXT("Item wheel Released"));
+	
+
+	if(WheelDisplayed)
+	{
+		//reset wheel
+		MainHudFixedSizeCPP->RemoveFromParent();
+
+		//CloseRadialBar
+		auto PlayerController = GetWorld()->GetFirstPlayerController();
+		PlayerController->SetIgnoreLookInput(false);
+		PlayerController->SetInputMode(FInputModeGameOnly());
+		PlayerController->bShowMouseCursor = false;
+
+		//ChosenSlot
+		HudCPP->ItemSelected = MainHudFixedSizeCPP->ChosenSlot;
+	}else
+	{
+		PressedUseQuickItem();
+	}
+
+	//reset var
+	CurrentTimePressedItemWheel = 0.f;
+	WheelDisplayed = false;
+
+}
+
+void AFPS_Character::DisplayWheel()
+{
 	MainHudFixedSizeCPP->AddToViewport();
 	MainHudFixedSizeCPP->CreateStandartWidgetCPP();
 
@@ -387,22 +439,6 @@ void AFPS_Character::PressedItemWheel()
 	PlayerController->bShowMouseCursor = true;
 	const FVector2D ViewportSize = FVector2D(GEngine->GameViewport->Viewport->GetSizeXY());
 	PlayerController->SetMouseLocation(ViewportSize.X / 2.f, ViewportSize.Y / 2.f);
-}
-
-void AFPS_Character::ReleaseItemWheel()
-{
-	UE_LOG(LogActor, Warning, TEXT("Item wheel Released"));
-	MainHudFixedSizeCPP->RemoveFromParent();
-
-	//CloseRadialBar
-	auto PlayerController = GetWorld()->GetFirstPlayerController();
-	PlayerController->SetIgnoreLookInput(false);
-	PlayerController->SetInputMode(FInputModeGameOnly());
-	PlayerController->bShowMouseCursor = false;
-
-	//ChosenSlot
-	//HudCPP.itemMainHudFixedSizeCPP->ChosenSlot
-	HudCPP->ItemSelected = MainHudFixedSizeCPP->ChosenSlot;
 }
 
 void AFPS_Character::UseMyItem(UDA_SlotStructure* ChosenSlot)
