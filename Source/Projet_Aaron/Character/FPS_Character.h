@@ -42,8 +42,15 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UChildActorComponent* HeadEquipment;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		class UInventaireComponent* InventaireComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Climbing")
+		float ClimbLerpSpeed = 0.1f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Climbing")
+		float ClimbRange = 400.0f;
 
 protected:
 
