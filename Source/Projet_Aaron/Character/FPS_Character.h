@@ -9,6 +9,7 @@
 #include "Projet_Aaron/Equipment/EquipmentInterface.h"
 #include "Engine/Engine.h"
 #include "Projet_Aaron/StatManager/CharacterStatManager.h"
+#include "Projet_Aaron/Mechanisms/ClimbableInterface.h"
 
 #include "GameFramework/Character.h"
 #include "CoreMinimal.h"

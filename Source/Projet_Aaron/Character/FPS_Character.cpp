@@ -175,9 +175,9 @@ bool AFPS_Character::SearchClimbPoint(FVector& ClimbPoint)
 	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility);
 
 	//Update character state if a climbable wall is hit
-	if (HitResult.IsValidBlockingHit() && HitResult.Actor->ActorHasTag("Grip"))
+	if (HitResult.IsValidBlockingHit() && HitResult.GetActor()->Implements<UClimbableInterface>())
 	{
-		ClimbPoint = HitResult.Actor->GetRootComponent()->GetComponentLocation();
+		IClimbableInterface::Execute_GetGripPoint(HitResult.GetActor(), ClimbPoint);
 		return true;
 	}
 	else
