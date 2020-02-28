@@ -131,7 +131,9 @@ public:
 	void ActivateReleasedRight();
 	
 	void PressedItemWheel();
+	void RepeatItemWheel();
 	void ReleaseItemWheel();
+	void DisplayWheel();
 
 	void ActivateHeadEquipment();
 
@@ -142,8 +144,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void ResetAdrenalineBoost();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float HoldingTimeItemWheel=0.2f;
+
 protected :
 	void CharacterClimb(float DeltaTime);
 	void UpdateClimbingPosition();
 	bool SearchClimbPoint(FVector& ClimbPoint);
+
+	float CurrentTimePressedItemWheel=0.f;
+	bool WheelDisplayed = false;
 };
