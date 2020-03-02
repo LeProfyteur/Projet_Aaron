@@ -482,5 +482,5 @@ void AFPS_Character::PressedUseQuickItem()
 
 void AFPS_Character::ResetAdrenalineBoost()
 {
-	StatManager->ResetSpeed();
+	StatManager->SetbAdrenalineBoost(false);
 }

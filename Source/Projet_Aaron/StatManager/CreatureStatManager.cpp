@@ -26,6 +26,10 @@ void UCreatureStatManager::BeginPlay()
  */
 bool UCreatureStatManager::ConsumeStamina(float value)
 {
+	if(bAdrenalineBoost)
+	{
+		return true;
+	}
 	if (Stamina - value < 0)
 	{
 		return false;
