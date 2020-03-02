@@ -10,7 +10,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class PROJET_AARON_API UCreatureStatManager : public UStatManager
 {
 	GENERATED_BODY()
