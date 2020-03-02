@@ -139,7 +139,7 @@ void AFPS_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("FireRight", IE_Pressed, this, &AFPS_Character::ActivatePressedRight);
 	PlayerInputComponent->BindAction("FireRight", IE_Released, this, &AFPS_Character::ActivateReleasedRight);
 	
-	PlayerInputComponent->BindAction("HeadAction", IE_Pressed, this, &AFPS_Character::ActivateHeadEquipment);
+	//PlayerInputComponent->BindAction("HeadAction", IE_Pressed, this, &AFPS_Character::ActivateHeadEquipment);
 	
 	PlayerInputComponent->BindAction("Action", IE_Pressed, this, &AFPS_Character::Action);
 	PlayerInputComponent->BindAction("Action", IE_Released,this, &AFPS_Character::StopAction);
