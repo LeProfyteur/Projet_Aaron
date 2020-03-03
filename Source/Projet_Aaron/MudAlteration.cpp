@@ -15,8 +15,11 @@ UMudAlteration::UMudAlteration()
 void UMudAlteration::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	GetOwner()->FindComponentByClass<UAIPerceptionStimuliSourceComponent>()->UnregisterFromSense(UAISense_Smell::StaticClass());
+
+	if (GetOwner()->FindComponentByClass<UAIPerceptionStimuliSourceComponent>())
+	{
+		GetOwner()->FindComponentByClass<UAIPerceptionStimuliSourceComponent>()->UnregisterFromSense(UAISense_Smell::StaticClass());
+	}
 }
 
 void UMudAlteration::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -27,7 +30,10 @@ void UMudAlteration::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 
 void UMudAlteration::OnComponentDestroyed(bool bDestroyingHierarchy)
 {
-	UE_LOG(LogTemp, Warning, TEXT("je meurs"));
+	if(GetOwner()->FindComponentByClass<UAIPerceptionStimuliSourceComponent>())
+	{
+		GetOwner()->FindComponentByClass<UAIPerceptionStimuliSourceComponent>()->RegisterForSense(UAISense_Smell::StaticClass());
+	}
 }
 
 

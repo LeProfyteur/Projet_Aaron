@@ -54,18 +54,11 @@ void UShapeAlteration::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 	if (TimeMutation <= 0) 
 	{
-		UE_LOG(LogTemp, Warning, TEXT("jsuis bien ajouter fdp"));
-		
 		DestroyComponent();
-		
 	}
 	
 }
 
-void UShapeAlteration::OnComponentDestroyed(bool bDestroyingHierarchy)
-{
-	
-}
 
 
 
