@@ -282,7 +282,7 @@ void AFPS_Character::Action()
 	if (HitActor && HitActor->GetActor()->Implements<UObjectInteractionInterface>())
 	{
 		UDA_ItemStructure* ItemStructure = NewObject<UDA_ItemStructure>(UDA_ItemStructure::StaticClass());
-		IObjectInteractionInterface::Execute_Interact(HitActor->GetActor(), true, ItemStructure);
+		IObjectInteractionInterface::Execute_Interact(HitActor->GetActor(), true, ItemStructure, this);
 		if(IsValid(ItemStructure))
 		{
 			UE_LOG(LogActor, Warning, TEXT("Add to inventory : %s"), *ItemStructure->Name);
@@ -299,7 +299,7 @@ void AFPS_Character::StopAction()
 {
 	if (HitActor && HitActor->GetActor()->Implements<UObjectInteractionInterface>())
 	{
-		IObjectInteractionInterface::Execute_Interact(HitActor->GetActor(), false, nullptr);
+		IObjectInteractionInterface::Execute_Interact(HitActor->GetActor(), false, nullptr,this);
 	}
 }
 
