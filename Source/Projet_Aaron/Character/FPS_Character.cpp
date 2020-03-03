@@ -280,7 +280,7 @@ void AFPS_Character::Action()
 	{
 		UDA_ItemStructure* ItemStructure = NewObject<UDA_ItemStructure>(UDA_ItemStructure::StaticClass());
 		IObjectInteractionInterface::Execute_Interact(HitActor->GetActor(), true, ItemStructure, this);
-		if(IsValid(ItemStructure))
+		if(ItemStructure->Name!="")
 		{
 			UE_LOG(LogActor, Warning, TEXT("Add to inventory : %s"), *ItemStructure->Name);
 			InventaireComponent->AddToInventory(ItemStructure);
