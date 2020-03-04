@@ -15,6 +15,8 @@ class PROJET_AARON_API UCreatureStatManager : public UStatManager
 {
 	GENERATED_BODY()
 
+		// Ajoutez les stats de nage (normal et rapide) + Ajouter une marche lente 
+
 protected:
 
 	//Life Stat
