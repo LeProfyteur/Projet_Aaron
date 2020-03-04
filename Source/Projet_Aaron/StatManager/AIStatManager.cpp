@@ -32,6 +32,69 @@ void UAIStatManager::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	// ...
 }
 
+float UAIStatManager::GetPeripheralVision()
+{
+    ACharacter* owner = Cast<ACharacter>(GetOwner());
+
+    if (owner) {
+
+        AAIController* AiController = Cast<AAIController>(owner->GetController());
+
+        if (AiController) {
+
+            //Take the right sense in the array
+            FAISenseID Id = UAISense::GetSenseID(UAISense_Sight::StaticClass());
+            if (!Id.IsValid())
+            {
+                UE_LOG(LogTemp, Error, TEXT("Wrong Sense ID"));
+                return 0.f;
+            }
+
+            UAISenseConfig* Config = AiController->GetPerceptionComponent()->GetSenseConfig(Id);
+
+            if (Config == nullptr)
+                return 0.f;
+
+            UAISenseConfig_Sight* ConfigSight = Cast<UAISenseConfig_Sight>(Config);
+
+            return ConfigSight->PeripheralVisionAngleDegrees;
+        }
+    }
+}
+
+void UAIStatManager::SetPeripheralVision(float PeripheralVision)
+{
+    ACharacter* owner = Cast<ACharacter>(GetOwner());
+
+    if (owner) {
+
+        AAIController* AiController = Cast<AAIController>(owner->GetController());
+
+        if (AiController) {
+
+            //Take the right sense in the array
+            FAISenseID Id = UAISense::GetSenseID(UAISense_Sight::StaticClass());
+            if (!Id.IsValid())
+            {
+                UE_LOG(LogTemp, Error, TEXT("Wrong Sense ID"));
+                return;
+            }
+
+            UAISenseConfig* Config = AiController->GetPerceptionComponent()->GetSenseConfig(Id);
+
+            if (Config == nullptr)
+                return;
+
+            UAISenseConfig_Sight* ConfigSight = Cast<UAISenseConfig_Sight>(Config);
+
+            ConfigSight->PeripheralVisionAngleDegrees = PeripheralVision;
+
+            AiController->GetPerceptionComponent()->RequestStimuliListenerUpdate();
+        }
+
+    }
+}
+
 void UAIStatManager::SetUpRadiusPerception()
 {
 	ACharacter* owner = Cast<ACharacter>(GetOwner());
@@ -39,10 +102,9 @@ void UAIStatManager::SetUpRadiusPerception()
     if (owner) {
         
         AAIController* AiController = Cast<AAIController>(owner->GetController());
-        UE_LOG(LogActor, Warning, TEXT(" AiController valid %s"), owner->GetController());
         
         if (AiController) {
-            UE_LOG(LogActor, Warning, TEXT(" AiController valid %s"),*AiController->GetName());
+
             //Take the right sense in the array
             FAISenseID Id = UAISense::GetSenseID(UAISense_Sight::StaticClass());
            if (!Id.IsValid())

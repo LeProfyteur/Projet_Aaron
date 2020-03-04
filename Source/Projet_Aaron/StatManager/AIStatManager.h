@@ -28,7 +28,14 @@ protected:
 
 public:	
 	// Called every frame
+	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	/*Getters*/
+	float GetPeripheralVision();
+	/*Setters*/
+	void SetPeripheralVision(float PeripheralVision);
+
+private:
 	void SetUpRadiusPerception();
 		
 };
