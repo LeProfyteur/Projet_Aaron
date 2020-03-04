@@ -25,7 +25,6 @@ void UMudAlteration::BeginPlay()
 void UMudAlteration::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	
 }
 
 void UMudAlteration::OnComponentDestroyed(bool bDestroyingHierarchy)

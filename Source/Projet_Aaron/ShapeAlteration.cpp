@@ -39,10 +39,38 @@ UShapeAlteration::UShapeAlteration(float const Time_Mutation,int const Index_Mut
 void UShapeAlteration::BeginPlay()
 {
 	Super::BeginPlay();
-	// ...
 	
+	CheckComponent();
 }
 
+void UShapeAlteration::CheckComponent()
+{
+	
+	//Protect against Owner-less Calls
+	if (!GetOwner()) return;
+	
+	//Fetch all Components from the Owner
+	TArray<UActorComponent*> OwnerComponents;
+	GetOwner()->GetComponents(OwnerComponents);
+	UClass* SelfClass = GetClass();
+
+	
+	for (UActorComponent* Component : OwnerComponents)
+	{
+		
+		//Ignore itself
+		if (Component == this)
+			continue;
+		
+		//Ignore if it's not a child of SelfClass
+		UClass* CompClass = Component->GetClass();
+		if (!CompClass->IsChildOf(SelfClass))
+			continue;
+		
+		//DestroyComponent(GetOwner()->GetComponentByClass(GetClass()));
+		DestroyComponent(Component);
+	}	
+}
 
 // Called every frame
 void UShapeAlteration::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
