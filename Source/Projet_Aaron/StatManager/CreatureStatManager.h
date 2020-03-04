@@ -25,7 +25,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stamina)
 		float StaminaRecovery = 5.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speed)
-		float BaseSpeed = 600.0f;
+		float BaseSpeed = 450.0f;
 	UPROPERTY(BlueprintReadWrite, Category = Speed)
 		float ActualSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speed)
@@ -34,10 +34,18 @@ protected:
 		float JumpStaminaCost = 5.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stamina)
 		float SprintStaminaCost = 0.1f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stamina)
+		bool bAdrenalineBoost;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speed)
-		float SprintSpeed = 1200.0f;
+		float SprintSpeed = 800.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speed)
-		float CrouchSpeed = 300.0f;
+		float CrouchSpeed = 200.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speed)
+		float WalkSpeed = 300.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speed)
+		float SwimmingSpeed = 350.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speed)
+		float SwimmingSprintSpeed = 500.0f;
 
 	virtual void BeginPlay() override;
 
@@ -79,6 +87,13 @@ public:
 		void SetStaminaRecovery(const float NewStaminaRecovery) { StaminaRecovery = NewStaminaRecovery; }
 	UFUNCTION(BlueprintCallable)
 		void SetStaminaMax(const float NewStaminaMax) { StaminaMax = NewStaminaMax; }
+	/**
+	 * \brief setup value of bAdrenalineBoost : true if the character don't use any stamina, false otherwise
+	 * \param newbAdrenaline new value of bAdrenalineBoost
+	 */
+	UFUNCTION(BlueprintCallable)
+		void SetbAdrenalineBoost(const bool newbAdrenaline) { bAdrenalineBoost = newbAdrenaline; }
+
 	UFUNCTION(BlueprintCallable)
 		void SetActualSpeed(const float NewSpeed);
 	UFUNCTION(BlueprintCallable)

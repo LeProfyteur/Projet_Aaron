@@ -24,7 +24,7 @@ class PROJET_AARON_API IObjectInteractionInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		void Interact(bool IsPressed,UDA_ItemStructure *ItemStructure);
+		void Interact(bool IsPressed,UDA_ItemStructure *ItemStructure,AActor *RefToInteractActor);
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		FString GetLabel();
 };

@@ -69,8 +69,6 @@ protected:
 	FAnchors AnchorsInventoryWindow;*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector2D Alignment;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float RaycastDistanceInventory = 1000.f;
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 		class UUInventoryCastObject* InventoryCastObject;
@@ -146,6 +144,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float HoldingTimeItemWheel=0.2f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float RaycastDistanceInventory = 1000.f;
 
 protected :
 	void CharacterClimb(float DeltaTime);
