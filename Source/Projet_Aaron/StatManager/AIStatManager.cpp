@@ -34,8 +34,8 @@ void UAIStatManager::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 void UAIStatManager::SetUpRadiusPerception()
 {
 	APawn* owner = Cast<APawn>(this->GetOwner());
-	ADetourCrowdAIController* AiController = Cast<ADetourCrowdAIController>(owner->AIControllerClass);
-
+	AAIController* AiController = Cast<AAIController>(owner->GetController());
+    
     FAISenseID Id = UAISense::GetSenseID(UAISense_Sight::StaticClass());
 
     if (!Id.IsValid())
