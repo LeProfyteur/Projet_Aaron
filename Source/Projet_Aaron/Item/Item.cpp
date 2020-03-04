@@ -39,7 +39,7 @@ FString AItem::GetLabel_Implementation()
 	return ItemStructure->Name;
 }
 
-void AItem::Interact_Implementation(bool IsPressed, UDA_ItemStructure* ItemStruct)
+void AItem::Interact_Implementation(bool IsPressed, UDA_ItemStructure* ItemStruct, AActor* self)
 {
 	//Copy
 	if(IsPressed)
@@ -53,6 +53,8 @@ void AItem::Interact_Implementation(bool IsPressed, UDA_ItemStructure* ItemStruc
 		ItemStruct->MaxStackSize = ItemStructure->MaxStackSize;
 		ItemStruct->Thumbnail = ItemStructure->Thumbnail;
 
+		self = this;
+		
 		Destroy();
 
 		UE_LOG(LogActor, Warning, TEXT("Return itemStructure from AItem : %s"), *ItemStruct->Name);
