@@ -2,15 +2,15 @@
 
 
 #include "AIStatManager.h"
+#include <Runtime\AIModule\Classes\Perception\AIPerceptionComponent.h>
 
 // Sets default values for this component's properties
-UAIStatManager::UAIStatManager()
+UAIStatManager::UAIStatManager() : Super()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
+    
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
 }
 
 
@@ -18,7 +18,7 @@ UAIStatManager::UAIStatManager()
 void UAIStatManager::BeginPlay()
 {
 	Super::BeginPlay();
-
+    SetUpRadiusPerception();
 	// ...
 	
 }
@@ -30,5 +30,46 @@ void UAIStatManager::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+}
+
+void UAIStatManager::SetUpRadiusPerception()
+{
+	ACharacter* owner = Cast<ACharacter>(GetOwner());
+
+    if (owner) {
+        
+        AAIController* AiController = Cast<AAIController>(owner->GetController());
+        UE_LOG(LogActor, Warning, TEXT(" AiController valid %s"), owner->GetController());
+        
+        if (AiController) {
+            UE_LOG(LogActor, Warning, TEXT(" AiController valid %s"),*AiController->GetName());
+            //Take the right sense in the array
+            FAISenseID Id = UAISense::GetSenseID(UAISense_Sight::StaticClass());
+           if (!Id.IsValid())
+            {
+                UE_LOG(LogTemp, Error, TEXT("Wrong Sense ID"));
+                return;
+            }
+
+            UAISenseConfig* Config = AiController->GetPerceptionComponent()->GetSenseConfig(Id);
+
+            if (Config == nullptr)
+                return;
+
+            UAISenseConfig_Sight* ConfigSight = Cast<UAISenseConfig_Sight>(Config);
+
+            // Save original lose range
+            float LoseRange = ConfigSight->LoseSightRadius - ConfigSight->SightRadius;
+
+            //setup the right radius
+            ConfigSight->SightRadius = RadiusPercetion;
+
+            // Apply lose range to new radius of the sight
+            ConfigSight->LoseSightRadius = ConfigSight->SightRadius + LoseRange;
+
+            AiController->GetPerceptionComponent()->RequestStimuliListenerUpdate();
+        }
+        
+    }
 }
 
