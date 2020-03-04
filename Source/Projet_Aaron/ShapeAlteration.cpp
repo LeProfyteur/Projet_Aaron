@@ -68,7 +68,8 @@ void UShapeAlteration::CheckComponent()
 			continue;
 		
 		//DestroyComponent(GetOwner()->GetComponentByClass(GetClass()));
-		DestroyComponent(Component);
+		Component->DestroyComponent();
+		//DestroyComponent(Component);
 	}	
 }
 
