@@ -10,6 +10,7 @@
 #include "Engine/Engine.h"
 #include "Projet_Aaron/StatManager/CharacterStatManager.h"
 #include "Projet_Aaron/Mechanisms/ClimbableInterface.h"
+#include "Projet_Aaron/Item/AnalyseObjectInterface.h"
 
 #include "GameFramework/Character.h"
 #include "CoreMinimal.h"
@@ -18,6 +19,19 @@
 #include "Projet_Aaron/Item/HUDCPP.h"
 #include "Projet_Aaron/InventaireComponent.h"
 #include "FPS_Character.generated.h"
+
+enum class EMovement : uint8
+{
+	Forward,
+	Right
+};
+
+enum class EStateMovement : uint8
+{
+	Walk,
+	Run,
+	Sprint
+};
 
 UCLASS()
 class PROJET_AARON_API AFPS_Character : public ACharacter
@@ -52,21 +66,62 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Climbing")
 		float ClimbRange = 400.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float HoldingTimeItemWheel = 0.2f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float RaycastDistanceInventory = 1000.f;
+
+	virtual void Tick(float DeltaTime) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	template<EMovement EMovementCharacter>
+	void MoveCharacter(float AxisValue);
+
+	void StartJump();
+
+	void Sprint();
+	void StopSprint();
+
+	void Crouching();
+	void Dodge();
+
+	void Action();
+	void StopAction();
+	void Scan();
+
+	void ActivatePressedLeft();
+	void ActivateReleasedLeft();
+
+	void ActivatePressedRight();
+	void ActivateReleasedRight();
+
+	void ActivateHeadEquipment();
+	
+	void PressedItemWheel();
+	void RepeatItemWheel();
+	void ReleaseItemWheel();
+	void DisplayWheel();
+
+	UFUNCTION(BlueprintCallable)
+		FVector GetPlayerInput() const;
+
+	UFUNCTION(BlueprintCallable)
+		void UseMyItem(UDA_SlotStructure* ChosenSlot);
+	void PressedUseQuickItem();
+
+	UFUNCTION(BlueprintCallable)
+		void ResetAdrenalineBoost();
+
 protected:
 
 	FHitResult* HitGrab = nullptr;
 	FHitResult* HitActor = nullptr;
-
-	bool IsSprinting = false;
+	
 	bool IsClimbing = false;
 	bool IsLeftHandGripping = false;
 	bool IsRightHandGripping = false;
 	
-
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FAnchors AnchorsCastWidget;*/
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FAnchors AnchorsInventoryWindow;*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector2D Alignment;
 	
@@ -94,65 +149,11 @@ protected:
 	float ForwardAxisMovement;
 	
 	virtual void BeginPlay() override;
-	void CharacterMove();
-	
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	void MoveForward(float value);
-	void MoveRight(float value);
-	
-	void StartJump();
-	
-	void Sprint();
-	void StopSprint();
-
-	void StartAlt();
-	void StopAlt();
-
-	void Crouching();
-	void Dodge(FVector direction);
-
-	void Action();
-	void StopAction();
-	void Analyse();
-
-	void ActivatePressedLeft();
-	void ActivateReleasedLeft();
-
-	void ActivatePressedRight();
-	void ActivateReleasedRight();
-	
-	void PressedItemWheel();
-	void RepeatItemWheel();
-	void ReleaseItemWheel();
-	void DisplayWheel();
-
-	void ActivateHeadEquipment();
-
-	UFUNCTION(BlueprintCallable)
-	void UseMyItem(UDA_SlotStructure* ChosenSlot);
-	void PressedUseQuickItem();
-
-	UFUNCTION(BlueprintCallable)
-		void ResetAdrenalineBoost();
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float HoldingTimeItemWheel=0.2f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float RaycastDistanceInventory = 1000.f;
-
-protected :
 	void CharacterClimb(float DeltaTime);
 	void UpdateClimbingPosition();
 	bool SearchClimbPoint(FVector& ClimbPoint);
 
 	float CurrentTimePressedItemWheel=0.f;
 	bool WheelDisplayed = false;
+	EStateMovement CurrentStateMovement;
 };

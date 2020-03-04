@@ -42,20 +42,14 @@ AFPS_Character::AFPS_Character()
 
 	InventaireComponent = CreateDefaultSubobject<UInventaireComponent>(TEXT("InventaireComponent"));
 	InventaireComponent->PrepareInventory();
+
+	CurrentStateMovement = EStateMovement::Run;
 }
 
 // Called when the game starts or when spawned
 void AFPS_Character::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if(IsValid(InventaireComponent))
-	{
-		UE_LOG(LogActor, Warning, TEXT("Name Inventaire : %s"), *InventaireComponent->InventoryName);
-	}else
-	{
-		UE_LOG(LogActor, Error, TEXT("Name Inventaire : undefined"));
-	}	
 }
 
 // Called every frame
@@ -63,10 +57,14 @@ void AFPS_Character::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (CurrentStateMovement == EStateMovement::Sprint && GetCharacterMovement()->Velocity.SizeSquared() > 0.0f)
+	{
+		if (!StatManager->ConsumeStamina(StatManager->GetSprintStaminaCost()))
+			StopSprint();
+	}
+
 	if (IsClimbing)
 		CharacterClimb(DeltaTime);
-	else
-		CharacterMove();
 
 	StatManager->RecoveryStamina(DeltaTime);
 
@@ -114,8 +112,8 @@ void AFPS_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAxis("MoveForward", this, &AFPS_Character::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &AFPS_Character::MoveRight);
+	PlayerInputComponent->BindAxis("MoveForward", this, &AFPS_Character::MoveCharacter<EMovement::Forward>);
+	PlayerInputComponent->BindAxis("MoveRight", this, &AFPS_Character::MoveCharacter<EMovement::Right>);
 
 	PlayerInputComponent->BindAxis("Turn", this, &AFPS_Character::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &AFPS_Character::AddControllerPitchInput);
@@ -125,9 +123,7 @@ void AFPS_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AFPS_Character::Sprint);
 	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AFPS_Character::StopSprint);
 
-	PlayerInputComponent->BindAction("Dodge", IE_Pressed, this, &AFPS_Character::StartAlt);
-	PlayerInputComponent->BindAction("Dodge", IE_Released, this, &AFPS_Character::StopAlt);
-
+	PlayerInputComponent->BindAction("Dodge", IE_Pressed, this, &AFPS_Character::Dodge);
 	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &AFPS_Character::Crouching);
 	
 	PlayerInputComponent->BindAction("FireLeft", IE_Pressed,this, &AFPS_Character::ActivatePressedLeft);
@@ -140,32 +136,40 @@ void AFPS_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	
 	PlayerInputComponent->BindAction("Action", IE_Pressed, this, &AFPS_Character::Action);
 	PlayerInputComponent->BindAction("Action", IE_Released,this, &AFPS_Character::StopAction);
-
-	//PlayerInputComponent->BindAction("UseQuickItem", IE_Pressed, this, &AFPS_Character::PressedUseQuickItem);
+	
 	PlayerInputComponent->BindAction("ItemWheel", IE_Pressed, this, &AFPS_Character::PressedItemWheel);
 	PlayerInputComponent->BindAction("ItemWheel", IE_Repeat, this, &AFPS_Character::RepeatItemWheel);
 	PlayerInputComponent->BindAction("ItemWheel", IE_Released, this, &AFPS_Character::ReleaseItemWheel);
 
 }
 
-void AFPS_Character::CharacterMove()
+FVector AFPS_Character::GetPlayerInput() const
 {
-	FVector Direction = GetActorForwardVector() * ForwardAxisMovement + GetActorRightVector() * RightAxisMovement;
-	if (bPressedAlt)
-	{
-		Dodge(Direction);
-	}
-	else
-	{
-		AddMovementInput(GetActorForwardVector(), ForwardAxisMovement);
-		AddMovementInput(GetActorRightVector(), RightAxisMovement);
-	}
+	FVector Direction = GetInputAxisValue("MoveForward") * GetActorForwardVector() + GetInputAxisValue("MoveRight") * GetActorRightVector();
+	Direction.Normalize();
+	return  Direction;
+}
 
-	if (IsSprinting && !StatManager->ConsumeStamina(StatManager->GetSprintStaminaCost()))
+template <EMovement EMovementCharacter>
+void AFPS_Character::MoveCharacter(float AxisValue)
+{
+	switch (EMovementCharacter)
 	{
-		StopSprint();
+	case EMovement::Forward:
+		AddMovementInput(GetActorForwardVector(), AxisValue);
+		break;
+
+	case EMovement::Right:
+		AddMovementInput(GetActorRightVector(), AxisValue);
+		break;
+
+	default:
+		UE_LOG(LogActor, Error, TEXT("Default"));
+		break;
 	}
 }
+
+
 
 void AFPS_Character::CharacterClimb(float DeltaTime)
 {
@@ -217,16 +221,6 @@ void AFPS_Character::UpdateClimbingPosition()
 	}
 }
 
-void AFPS_Character::MoveForward(float value)
-{
-	ForwardAxisMovement = value;
-}
-
-void AFPS_Character::MoveRight(float value)
-{
-	RightAxisMovement = value;
-}
-
 void AFPS_Character::StartJump()
 {
 	if(!GetCharacterMovement()->IsFalling() && StatManager->ConsumeStamina(StatManager->GetJumpStaminaCost()) && !IsClimbing)
@@ -238,32 +232,22 @@ void AFPS_Character::StartJump()
 void AFPS_Character::Sprint()
 {
 	StatManager->SetActualSpeed(StatManager->GetSprintSpeed());
-	IsSprinting = true;
+	CurrentStateMovement = EStateMovement::Sprint;
 }
 
 void AFPS_Character::StopSprint()
 {
 	StatManager->ResetSpeed();
-	IsSprinting = false;
+	CurrentStateMovement = EStateMovement::Run;
 }
 
-void AFPS_Character::Dodge(FVector direction)
+void AFPS_Character::Dodge()
 {
-	if(!GetCharacterMovement()->IsFalling() && StatManager->ConsumeStamina(StatManager->GetDodgeStaminaCost()))
+	FVector Direction = GetPlayerInput();
+	if (!GetCharacterMovement()->IsFalling() && Direction.SizeSquared() != 0.0f && StatManager->ConsumeStamina(StatManager->GetDodgeStaminaCost()))
 	{
-		LaunchCharacter(direction * StatManager->GetDodgeForce(), true, false);
-		bPressedAlt = false;
+		LaunchCharacter(Direction * StatManager->GetDodgeForce(), true, false);
 	}
-}
-
-void AFPS_Character::StartAlt()
-{
-	bPressedAlt = true;
-}
-
-void AFPS_Character::StopAlt()
-{
-	bPressedAlt = false;
 }
 
 void AFPS_Character::Crouching()
@@ -297,6 +281,32 @@ void AFPS_Character::StopAction()
 	if (HitActor && HitActor->GetActor()->Implements<UObjectInteractionInterface>())
 	{
 		IObjectInteractionInterface::Execute_Interact(HitActor->GetActor(), false, nullptr,this);
+	}
+}
+
+void AFPS_Character::Scan()
+{
+	FHitResult OutHit;
+	FVector Start = FpsCamera->GetComponentLocation();
+	FVector End = Start + FpsCamera->GetForwardVector() * RaycastDistanceInventory;
+	FCollisionQueryParams collisionParams;
+
+	if (GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECC_Visibility, collisionParams))
+	{
+		if (OutHit.GetActor()->Implements<UAnalyseObjectInterface>())
+		{
+			float ScanPercent = 0.0f;
+			AMyHUD* PlayerHUD = Cast<AMyHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+			PlayerHUD->GetRadiusCircle(ScanPercent);
+
+			if (ScanPercent < 1.0f)
+				PlayerHUD->UpdateCircleRadius(ScanPercent + 0.01f);
+			else
+			{
+				IAnalyseObjectInterface::Execute_ScanFinished(OutHit.GetActor());
+				PlayerHUD->ResetCircleRadius();
+			}
+		}
 	}
 }
 
