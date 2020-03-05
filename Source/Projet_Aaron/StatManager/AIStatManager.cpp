@@ -40,25 +40,29 @@ float UAIStatManager::GetPeripheralVision()
 
         AAIController* AiController = Cast<AAIController>(owner->GetController());
 
-        if (AiController) {
+		if (AiController) {
 
-            //Take the right sense in the array
-            FAISenseID Id = UAISense::GetSenseID(UAISense_Sight::StaticClass());
-            if (!Id.IsValid())
-            {
-                UE_LOG(LogTemp, Error, TEXT("Wrong Sense ID"));
-                return 0.f;
-            }
+			//Take the right sense in the array
+			FAISenseID Id = UAISense::GetSenseID(UAISense_Sight::StaticClass());
+			if (!Id.IsValid())
+			{
+				UE_LOG(LogTemp, Error, TEXT("Wrong Sense ID"));
+				return 0.f;
+			}
 
-            UAISenseConfig* Config = AiController->GetPerceptionComponent()->GetSenseConfig(Id);
+			UAISenseConfig* Config = AiController->GetPerceptionComponent()->GetSenseConfig(Id);
 
-            if (Config == nullptr)
-                return 0.f;
+			if (Config == nullptr)
+				return 0.f;
 
-            UAISenseConfig_Sight* ConfigSight = Cast<UAISenseConfig_Sight>(Config);
+			UAISenseConfig_Sight * ConfigSight = Cast<UAISenseConfig_Sight>(Config);
 
-            return ConfigSight->PeripheralVisionAngleDegrees;
-        }
+			return ConfigSight->PeripheralVisionAngleDegrees;
+		}
+		else return 0.f;
+    }else
+    {
+		return 0.f;
     }
 }
 
