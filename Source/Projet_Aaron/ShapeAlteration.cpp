@@ -39,20 +39,27 @@ UShapeAlteration::UShapeAlteration(float const Time_Mutation,int const Index_Mut
 void UShapeAlteration::BeginPlay()
 {
 	Super::BeginPlay();
-
 	// ...
 	
 }
 
 
 // Called every frame
-
 void UShapeAlteration::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
 	// ...
+
+	TimeMutation -= DeltaTime;
+
+	if (TimeMutation <= 0) 
+	{
+		DestroyComponent();
+	}
+	
 }
+
+
 
 
 

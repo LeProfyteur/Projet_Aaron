@@ -85,15 +85,12 @@ void AFPS_Character::Tick(float DeltaTime)
 	FVector Start = FpsCamera->GetComponentLocation();
 	FVector End = Start + FpsCamera->GetForwardVector() * RaycastDistanceInventory;
 	FCollisionQueryParams collisionParams;
-
-	//DrawDebugLine(GetWorld(), vStart, vEnd, FColor::Red, false, 1, 0, 1);
 	
 	if (GetWorld()->SweepSingleByChannel(OutHit, Start, End, FpsCamera->GetComponentRotation().Quaternion(), ECC_Visibility, FCollisionShape::MakeCapsule(50, 50), collisionParams))
 	{
 		UStaticMeshComponent* actorMeshComponent = OutHit.Actor->FindComponentByClass<UStaticMeshComponent>();
 		if(OutHit.GetActor()->Implements<UObjectInteractionInterface>())
 		{
-            
 			//UE_LOG(LogActor, Warning, TEXT("%s"), *IObjectInteractionInterface::Execute_GetLabel(OutHit.GetActor()));
 			if (!HitActor || OutHit.Actor != HitActor->Actor)
 				HitActor = new FHitResult(OutHit);
@@ -139,7 +136,7 @@ void AFPS_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("FireRight", IE_Pressed, this, &AFPS_Character::ActivatePressedRight);
 	PlayerInputComponent->BindAction("FireRight", IE_Released, this, &AFPS_Character::ActivateReleasedRight);
 	
-	//PlayerInputComponent->BindAction("HeadAction", IE_Pressed, this, &AFPS_Character::ActivateHeadEquipment);
+	PlayerInputComponent->BindAction("HeadAction", IE_Pressed, this, &AFPS_Character::ActivateHeadEquipment);
 	
 	PlayerInputComponent->BindAction("Action", IE_Pressed, this, &AFPS_Character::Action);
 	PlayerInputComponent->BindAction("Action", IE_Released,this, &AFPS_Character::StopAction);
@@ -282,8 +279,8 @@ void AFPS_Character::Action()
 	if (HitActor && HitActor->GetActor()->Implements<UObjectInteractionInterface>())
 	{
 		UDA_ItemStructure* ItemStructure = NewObject<UDA_ItemStructure>(UDA_ItemStructure::StaticClass());
-		IObjectInteractionInterface::Execute_Interact(HitActor->GetActor(), true, ItemStructure);
-		if(IsValid(ItemStructure))
+		IObjectInteractionInterface::Execute_Interact(HitActor->GetActor(), true, ItemStructure, this);
+		if(ItemStructure->Name!="")
 		{
 			UE_LOG(LogActor, Warning, TEXT("Add to inventory : %s"), *ItemStructure->Name);
 			InventaireComponent->AddToInventory(ItemStructure);
@@ -299,7 +296,7 @@ void AFPS_Character::StopAction()
 {
 	if (HitActor && HitActor->GetActor()->Implements<UObjectInteractionInterface>())
 	{
-		IObjectInteractionInterface::Execute_Interact(HitActor->GetActor(), false, nullptr);
+		IObjectInteractionInterface::Execute_Interact(HitActor->GetActor(), false, nullptr,this);
 	}
 }
 
@@ -385,7 +382,6 @@ void AFPS_Character::PressedItemWheel()
 {
 	UE_LOG(LogActor, Warning, TEXT("Item wheel Pressed"));
 	CurrentTimePressedItemWheel += GetWorld()->GetDeltaSeconds();
-	//UE_LOG(LogActor, Warning, TEXT("Item wheel Pressed : %f"),CurrentTimePressedItemWheel);
 }
 
 void AFPS_Character::RepeatItemWheel()

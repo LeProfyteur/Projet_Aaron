@@ -25,7 +25,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stamina)
 		float StaminaRecovery = 5.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speed)
-		float BaseSpeed = 600.0f;
+		float BaseSpeed = 450.0f;
 	UPROPERTY(BlueprintReadWrite, Category = Speed)
 		float ActualSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speed)
@@ -37,9 +37,15 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stamina)
 		bool bAdrenalineBoost;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speed)
-		float SprintSpeed = 1200.0f;
+		float SprintSpeed = 800.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speed)
-		float CrouchSpeed = 300.0f;
+		float CrouchSpeed = 200.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speed)
+		float WalkSpeed = 300.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speed)
+		float SwimmingSpeed = 350.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speed)
+		float SwimmingSprintSpeed = 500.0f;
 
 	virtual void BeginPlay() override;
 
