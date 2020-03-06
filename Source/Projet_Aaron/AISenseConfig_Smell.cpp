@@ -3,9 +3,10 @@
 
 #include "AISenseConfig_Smell.h"
 
-UAISenseConfig_Smell::UAISenseConfig_Smell(const FObjectInitializer& ObjectInitializer)
+UAISenseConfig_Smell::UAISenseConfig_Smell(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	DebugColor = FColor::Green;
+	DebugColor = FColor::Blue;
+	Implementation = GetSenseImplementation();
 }
 
 TSubclassOf<UAISense> UAISenseConfig_Smell::GetSenseImplementation() const
