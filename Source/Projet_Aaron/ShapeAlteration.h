@@ -35,10 +35,8 @@ protected:
 	//Mutation Event
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Event)
 		int IndexMutation;
-
-	
 	
 public:	
 	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;	
+	void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;	
 };
