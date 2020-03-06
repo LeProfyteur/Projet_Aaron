@@ -74,4 +74,4 @@ Plugins/*/Intermediate/*
 DerivedDataCache/*
 
 # not ignore files
-!AIPerceptionStimuliSourceComponent.h
+!Source/Runtime/Classes/Perception/AIModule/AIPerceptionStimuliSourceComponent.h
