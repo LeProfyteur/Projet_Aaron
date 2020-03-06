@@ -21,11 +21,8 @@ void USpeedAlteration::BeginPlay()
 	Super::BeginPlay();
 
 	_CreatureStatManager = GetOwner()->FindComponentByClass<UCreatureStatManager>();
-	BaseSpeed = _CreatureStatManager->GetBaseSpeed();
-	SpeedReducted = BaseSpeed/4.0f;
-	_CreatureStatManager->SetActualSpeed(SpeedReducted);
+	_CreatureStatManager->AddSpeedMultiplier(SpeedReduction);
 	GetWorld()->GetTimerManager().SetTimer(InputTimeHandle, this, &USpeedAlteration::ReductionSpeed, 1.0f, true, 0.5f);
-	
 }
 
 
@@ -42,7 +39,7 @@ void USpeedAlteration::ReductionSpeed()
 	if (TimeAlteration <= 0)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(InputTimeHandle);
-		_CreatureStatManager->ResetSpeed();
+		_CreatureStatManager->AddSpeedMultiplier(-SpeedReduction);
 	}
 	TimeAlteration -= 1.0f;
 }
