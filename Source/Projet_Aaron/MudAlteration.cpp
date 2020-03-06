@@ -31,7 +31,7 @@ void UMudAlteration::OnComponentDestroyed(bool bDestroyingHierarchy)
 {
 	if(GetOwner()->FindComponentByClass<UAIPerceptionStimuliSourceComponent>())
 	{
-		GetOwner()->FindComponentByClass<UAIPerceptionStimuliSourceComponent>()->RegisterForSense(UAISense_Smell::StaticClass());
+		GetOwner()->FindComponentByClass<UAIPerceptionStimuliSourceComponent>()->RegisterAsSourceForSenses.Add(UAISense_Smell::StaticClass());
 	}
 }
 
