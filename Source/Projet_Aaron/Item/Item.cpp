@@ -39,7 +39,7 @@ FString AItem::GetLabel_Implementation()
 	return ItemStructure->Name;
 }
 
-void AItem::Interact_Implementation(bool IsPressed, UDA_ItemStructure* ItemStruct, AActor* self)
+void AItem::Interact_Implementation(bool IsPressed, AActor* self)
 {
 	//Copy
 	if(IsPressed)
