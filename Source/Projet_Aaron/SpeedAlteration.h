@@ -18,19 +18,20 @@ public:
 	// Sets default values for this component's properties
 	USpeedAlteration();
 
+	UPROPERTY(EditAnywhere)
+		float SpeedReduction = -0.25f;
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-
-	UPROPERTY() UCreatureStatManager* _CreatureStatManager;
+	UPROPERTY()
+	UCreatureStatManager* _CreatureStatManager;
 
 	FTimerHandle InputTimeHandle;
 
 private:
 	float TimeAlteration;
 	float BaseSpeed;
-	float SpeedReducted;
 	
 	
 public:	

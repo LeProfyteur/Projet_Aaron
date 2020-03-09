@@ -17,35 +17,29 @@ class PROJET_AARON_API UCreatureStatManager : public UStatManager
 
 protected:
 
-	//Life Stat
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Walking)
+		float RunSpeed = 500.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Walking)
+		float WalkSpeed = 300.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Walking)
+		float SpeedMultiplier = 1.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Jumping)
+		float JumpForce = 600.0f;
 	UPROPERTY(BlueprintReadWrite, Category = Stamina)
 		float Stamina;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stamina)
 		float StaminaMax = 100.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stamina)
 		float StaminaRecovery = 5.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speed)
-		float BaseSpeed = 450.0f;
-	UPROPERTY(BlueprintReadWrite, Category = Speed)
-		float ActualSpeed;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speed)
-		float JumpForce = 600.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stamina)
 		float JumpStaminaCost = 5.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stamina)
 		float SprintStaminaCost = 0.1f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stamina)
 		bool bAdrenalineBoost;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speed)
-		float SprintSpeed = 800.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speed)
-		float CrouchSpeed = 200.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speed)
-		float WalkSpeed = 300.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speed)
-		float SwimmingSpeed = 350.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Speed)
-		float SwimmingSprintSpeed = 500.0f;
+
+	UPROPERTY(BlueprintReadWrite)
+		float ActualSpeed;
 
 	virtual void BeginPlay() override;
 
@@ -56,15 +50,17 @@ public:
 
 	/*Getters*/
 	UFUNCTION(BlueprintCallable)
+		float GetRunSpeed() const { return RunSpeed; }
+	UFUNCTION(BlueprintCallable)
+		float GetWalkSpeed() const { return WalkSpeed; }
+	UFUNCTION(BlueprintCallable)
+		float GetSpeedMultiplier() const { return SpeedMultiplier; }
+	UFUNCTION(BlueprintCallable)
 		float GetStamina() const { return Stamina; }
 	UFUNCTION(BlueprintCallable)
 		float GetStaminaMax() const { return StaminaMax; }
 	UFUNCTION(BlueprintCallable)
 		float GetStaminaRecovery() const { return StaminaRecovery; }
-	UFUNCTION(BlueprintCallable)
-		float GetBaseSpeed() const { return BaseSpeed; }
-	UFUNCTION(BlueprintCallable)
-		float GetActualSpeed() const { return ActualSpeed; }
 	UFUNCTION(BlueprintCallable)
 		float GetJumpForce() const { return JumpForce; }
 	UFUNCTION(BlueprintCallable)
@@ -72,13 +68,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 		float GetSprintStaminaCost() const { return SprintStaminaCost; }
 	UFUNCTION(BlueprintCallable)
-		float GetSprintSpeed() const { return SprintSpeed; }
-	UFUNCTION(BlueprintCallable)
-		float GetCrouchSpeed() const { return SprintStaminaCost; }
-	UFUNCTION(BlueprintCallable)
 		float GetStaminaRate() const { return Stamina / StaminaMax; }
 	UFUNCTION(BlueprintCallable)
 		FString  GetStaminaRateText() const;
+
+	UFUNCTION(BlueprintCallable)
+		float GetActualSpeed() const { return ActualSpeed; }
 
 	/*Setters*/
 	UFUNCTION(BlueprintCallable)
@@ -93,22 +88,22 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable)
 		void SetbAdrenalineBoost(const bool newbAdrenaline) { bAdrenalineBoost = newbAdrenaline; }
-
-	UFUNCTION(BlueprintCallable)
-		void SetActualSpeed(const float NewSpeed);
 	UFUNCTION(BlueprintCallable)
 		void SetJumpForce(const float NewJumpForce);
 	UFUNCTION(BlueprintCallable)
 		void SetJumpStaminaCost(const float NewJumpStaminaCost) { JumpStaminaCost = NewJumpStaminaCost; }
 	UFUNCTION(BlueprintCallable)
 		void SetSprintStaminaCost(const float NewSprintStaminaCost) { SprintStaminaCost = NewSprintStaminaCost; }
+
+	UFUNCTION(BlueprintCallable)
+		void SetActualSpeed(const float NewSpeed);
 	
-	
+	UFUNCTION(BlueprintCallable)
+		void AddSpeedMultiplier(float Value);
 	UFUNCTION(BlueprintCallable, Category = "Stamina")
 		bool ConsumeStamina(float value);
 	UFUNCTION(BlueprintCallable, Category = "Stamina")
 		void RecoveryStamina(float DeltaTime);
-	UFUNCTION(BlueprintCallable, Category = "Speed")
+	UFUNCTION(BlueprintCallable)
 		void ResetSpeed();
-	
 };
