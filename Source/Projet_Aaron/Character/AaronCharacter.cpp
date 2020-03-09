@@ -47,9 +47,10 @@ void AAaronCharacter::Tick(float DeltaTime)
 
 	if (MovementState == EMovementState::Sprint && CharacterMovement->Velocity.Size() > 0.0f)
 	{
-		if (!StatManager->ConsumeStamina(StatManager->GetSprintStaminaCost()))
+		if (!StatManager->ConsumeStamina(StatManager->GetSprintStaminaCost() * DeltaTime))
 			MovementState = EMovementState::Run;
-	}
+	} else
+		StatManager->RecoveryStamina(DeltaTime);
 
 	if (MovementState == EMovementState::Slide && CharacterMovement->Velocity.Size() <= 0.0f)
 	{
@@ -62,9 +63,7 @@ void AAaronCharacter::Tick(float DeltaTime)
 	else
 		UpdateSpeed();
 
-	StatManager->RecoveryStamina(DeltaTime);
-
-	//itemWheel
+	//ItemWheel
 	if (CurrentTimePressedItemWheel > 0.f)
 	{
 		CurrentTimePressedItemWheel += DeltaTime;
@@ -86,7 +85,6 @@ void AAaronCharacter::Tick(float DeltaTime)
 		UStaticMeshComponent* actorMeshComponent = OutHit.Actor->FindComponentByClass<UStaticMeshComponent>();
 		if (OutHit.GetActor()->Implements<UObjectInteractionInterface>())
 		{
-			//UE_LOG(LogActor, Warning, TEXT("%s"), *IObjectInteractionInterface::Execute_GetLabel(OutHit.GetActor()));
 			if (!HitActor || OutHit.Actor != HitActor->Actor)
 				HitActor = new FHitResult(OutHit);
 
@@ -264,17 +262,7 @@ void AAaronCharacter::Action()
 {
 	if (HitActor && HitActor->GetActor()->Implements<UObjectInteractionInterface>())
 	{
-		UDA_ItemStructure* ItemStructure = NewObject<UDA_ItemStructure>(UDA_ItemStructure::StaticClass());
-		IObjectInteractionInterface::Execute_Interact(HitActor->GetActor(), true, ItemStructure, this);
-		if (ItemStructure->Name != "")
-		{
-			UE_LOG(LogActor, Warning, TEXT("Add to inventory : %s"), *ItemStructure->Name);
-			InventaireComponent->AddToInventory(ItemStructure);
-		}
-		else
-		{
-			UE_LOG(LogActor, Error, TEXT("Error add to inventory"));
-		}
+		IObjectInteractionInterface::Execute_Interact(HitActor->GetActor(), true, this);
 		HitActor = nullptr;
 	}
 }
@@ -283,7 +271,7 @@ void AAaronCharacter::StopAction()
 {
 	if (HitActor && HitActor->GetActor()->Implements<UObjectInteractionInterface>())
 	{
-		IObjectInteractionInterface::Execute_Interact(HitActor->GetActor(), false, nullptr, this);
+		IObjectInteractionInterface::Execute_Interact(HitActor->GetActor(), false, this);
 	}
 }
 
