@@ -2,11 +2,11 @@
 
 
 #include "AIStatManager.h"
-#include "Perception\AIPerceptionComponent.h"
+#include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISense_Sight.h"
 
 // Sets default values for this component's properties
-UAIStatManager::UAIStatManager() : Super()
+UAIStatManager::UAIStatManager()
 {
     // Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
     // off to improve performance if you don't need them.
@@ -60,7 +60,9 @@ float UAIStatManager::GetPeripheralVision()
 
             return ConfigSight->PeripheralVisionAngleDegrees;
         }
+        else return 0.f;
     }
+    else return 0.f;
 }
 
 void UAIStatManager::SetPeripheralVision(float PeripheralVision)

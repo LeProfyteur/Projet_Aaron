@@ -3,8 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/ActorComponent.h"
 #include "CreatureStatManager.h"
+#include "Perception/AISense_Sight.h"
+#include "Perception/AISenseConfig.h"
+#include "Perception/AISenseConfig_Sight.h"
+#include "DetourCrowdAIController.h"
+#include "Components/ActorComponent.h"
 #include "AIStatManager.generated.h"
 
 
