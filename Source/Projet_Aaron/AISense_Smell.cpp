@@ -7,7 +7,7 @@
 #include "DrawDebugHelpers.h"
 #include "Perception/AIPerceptionSystem.h"
 #include "Perception/AIPerceptionComponent.h"
-#include "AIStimuliSmellComponent.h"
+#include "AIStimuliSourceModifier.h"
 
 
 UAISense_Smell::UAISense_Smell()
@@ -46,18 +46,35 @@ float UAISense_Smell::Update()
 			for (int32 i = 0; i < HitResults.Num(); i++)
 			{
 				FHitResult hit = HitResults[i];
-				UAIStimuliSmellComponent* stimuli = Cast<UAIStimuliSmellComponent>(hit.GetActor()->GetComponentByClass(UAIStimuliSmellComponent::StaticClass()));
+				UAIStimuliSourceModifier* stimuli = Cast<UAIStimuliSourceModifier>(hit.GetActor()->GetComponentByClass(UAIStimuliSourceModifier::StaticClass()));
 				if (stimuli) {
-					
-					if (FVector::DistSquared(hit.GetActor()->GetActorLocation(), Listener.CachedLocation) <= DigestedProperties[DigestedPropertyIndex].PhobiaRadius * DigestedProperties[DigestedPropertyIndex].PhobiaRadius)
+					UE_LOG(LogTemp, Warning, TEXT("STIMULI"));
+					FAISenseID Id = UAISense::GetSenseID(UAISense_Smell::StaticClass());
+
+					if (!Id.IsValid())
 					{
-						Elem.Value.RegisterStimulus(hit.GetActor(), FAIStimulus(*this, 1.f, hit.GetActor()->GetActorLocation(), Listener.CachedLocation));
-						GLog->Log("registered stimulus!");
+						UE_LOG(LogTemp, Error, TEXT("Wrong Sense ID"));
+						return 0.f;
 					}
-					else
+					bool isSmellSense = false;
+					for (size_t j = 0; j < stimuli->GetRegisterSource().Num(); j++)
 					{
-						Elem.Value.RegisterStimulus(hit.GetActor(), FAIStimulus(*this, 1.f, hit.GetActor()->GetActorLocation(), Listener.CachedLocation,FAIStimulus::SensingFailed));
+						if (stimuli->GetRegisterSource()[j]->GetName() == "AISense_Smell")
+							isSmellSense = true;
 					}
+
+					if (isSmellSense) {
+						if (FVector::DistSquared(hit.GetActor()->GetActorLocation(), Listener.CachedLocation) <= DigestedProperties[DigestedPropertyIndex].PhobiaRadius * DigestedProperties[DigestedPropertyIndex].PhobiaRadius)
+						{
+							Elem.Value.RegisterStimulus(hit.GetActor(), FAIStimulus(*this, 1.f, hit.GetActor()->GetActorLocation(), Listener.CachedLocation));
+							GLog->Log("registered stimulus!");
+						}
+						else
+						{
+							Elem.Value.RegisterStimulus(hit.GetActor(), FAIStimulus(*this, 1.f, hit.GetActor()->GetActorLocation(), Listener.CachedLocation, FAIStimulus::SensingFailed));
+						}
+					}
+					else Elem.Value.RegisterStimulus(hit.GetActor(), FAIStimulus(*this, 1.f, hit.GetActor()->GetActorLocation(), Listener.CachedLocation, FAIStimulus::SensingFailed));
 				}
 			}
 		}
