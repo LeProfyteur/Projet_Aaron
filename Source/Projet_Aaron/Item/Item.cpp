@@ -44,20 +44,15 @@ void AItem::Interact_Implementation(bool IsPressed, UDA_ItemStructure* ItemStruc
 	//Copy
 	if(IsPressed)
 	{
-		ItemStruct->Name = ItemStructure->Name;
-		ItemStruct->IsConsomable = ItemStructure->IsConsomable;
-		ItemStruct->IsStackable = ItemStructure->IsStackable;
-		ItemStruct->Category = ItemStructure->Category;
-		ItemStruct->Class = ItemStructure->Class;
-		ItemStruct->Description = ItemStructure->Description;
-		ItemStruct->MaxStackSize = ItemStructure->MaxStackSize;
-		ItemStruct->Thumbnail = ItemStructure->Thumbnail;
+		auto character = Cast<AFPS_Character>(self);
 
-		self = this;
-		
+		if(character)
+		{
+			UE_LOG(LogActor, Warning, TEXT("Return itemStructure from AItem : %s"), *ItemStructure->Name);
+			character->InventaireComponent->AddToInventory(ItemStructure);
+		}
+
 		Destroy();
-
-		UE_LOG(LogActor, Warning, TEXT("Return itemStructure from AItem : %s"), *ItemStruct->Name);
 	}
 }
 

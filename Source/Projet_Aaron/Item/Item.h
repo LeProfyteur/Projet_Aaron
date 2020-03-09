@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "ObjectInteractionInterface.h"
+#include "Projet_Aaron/Character/FPS_Character.h"
 #include "Item.generated.h"
 
 enum ESyringeType;
