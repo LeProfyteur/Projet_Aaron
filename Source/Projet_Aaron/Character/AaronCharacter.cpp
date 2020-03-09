@@ -76,7 +76,7 @@ void AAaronCharacter::Tick(float DeltaTime)
 	}
 
 	//Detecting pickable objects
-	/*FHitResult OutHit;
+	FHitResult OutHit;
 	FVector Start = FpsCamera->GetComponentLocation();
 	FVector End = Start + FpsCamera->GetForwardVector() * RaycastDistanceInventory;
 	FCollisionQueryParams collisionParams;
@@ -103,7 +103,7 @@ void AAaronCharacter::Tick(float DeltaTime)
 		actorMeshComponent->SetCustomDepthStencilValue(1);
 		InventoryCastObject->nameTextItem = "";
 		HitActor = nullptr;
-	}*/
+	}
 }
 
 // Called to bind functionality to input
