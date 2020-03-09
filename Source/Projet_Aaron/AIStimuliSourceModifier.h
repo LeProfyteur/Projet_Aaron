@@ -4,14 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
-#include "AIStimuliSmellComponent.generated.h"
+#include "AIStimuliSourceModifier.generated.h"
 
 /**
  * 
  */
 UCLASS(ClassGroup = AI, HideCategories = (Activation, Collision), meta = (BlueprintSpawnableComponent), config = Game)
-class PROJET_AARON_API UAIStimuliSmellComponent : public UAIPerceptionStimuliSourceComponent
+class PROJET_AARON_API UAIStimuliSourceModifier : public UAIPerceptionStimuliSourceComponent
 {
 	GENERATED_BODY()
+
+public:
+	TArray<TSubclassOf<UAISense>> GetRegisterSource();
+	void SetRegisterSource(TSubclassOf<UAISense> Sense);
 	
 };
