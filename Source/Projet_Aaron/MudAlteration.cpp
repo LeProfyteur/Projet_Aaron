@@ -3,6 +3,7 @@
 
 #include "MudAlteration.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
+#include "AIStimuliSmellComponent.h"
 #include "AISense_Smell.h"
 
 UMudAlteration::UMudAlteration()
@@ -16,10 +17,10 @@ void UMudAlteration::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (GetOwner()->FindComponentByClass<UAIPerceptionStimuliSourceComponent>())
+	/*if (GetOwner()->FindComponentByClass<UAIStimuliSmellComponent>())
 	{
-		GetOwner()->FindComponentByClass<UAIPerceptionStimuliSourceComponent>()->UnregisterFromSense(UAISense_Smell::StaticClass());
-	}
+		GetOwner()->FindComponentByClass<UAIStimuliSmellComponent>()->UnregisterFromSense(UAISense_Smell::StaticClass());
+	}*/
 }
 
 void UMudAlteration::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -29,10 +30,10 @@ void UMudAlteration::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 
 void UMudAlteration::OnComponentDestroyed(bool bDestroyingHierarchy)
 {
-	if(GetOwner()->FindComponentByClass<UAIPerceptionStimuliSourceComponent>())
+	/*if(GetOwner()->FindComponentByClass<UAIStimuliSmellComponent>())
 	{
-		GetOwner()->FindComponentByClass<UAIPerceptionStimuliSourceComponent>()->RegisterAsSourceForSenses.Add(UAISense_Smell::StaticClass());
-	}
+		GetOwner()->FindComponentByClass<UAIStimuliSmellComponent>()->RegisterAsSourceForSenses.Add(UAISense_Smell::StaticClass());
+	}*/
 }
 
 
