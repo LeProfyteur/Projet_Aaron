@@ -18,6 +18,7 @@ public:
 	// Sets default values for this component's properties
 	//Constructor
 	UShapeAlteration();
+	UShapeAlteration(const FObjectInitializer& ObjectInitializer);
 	UShapeAlteration(float const Time_Mutation);
 	UShapeAlteration(int const Index_Mutation);
 	UShapeAlteration(float const Time_Mutation, int const Index_Mutation);
@@ -29,7 +30,7 @@ protected:
 	//Called in BeginPlay to updat e component if the owner already have it
 	virtual void CheckComponent();
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Time)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Time, meta= (ExposeOnSpawn = true))
 		float TimeMutation;
 
 	//Mutation Event
