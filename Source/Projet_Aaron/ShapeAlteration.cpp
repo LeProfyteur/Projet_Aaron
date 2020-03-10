@@ -4,6 +4,12 @@
 #include "ShapeAlteration.h"
 
 // Sets default values for this component's properties
+UShapeAlteration::UShapeAlteration(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bStartWithTickEnabled = true;
+}
+
 UShapeAlteration::UShapeAlteration(float const Time_Mutation)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
@@ -20,6 +26,8 @@ UShapeAlteration::UShapeAlteration()
 {
 	TimeMutation = 10.0f;
 	IndexMutation = 0;
+	PrimaryComponentTick.bCanEverTick = true;
+	RegisterComponent();
 }
 
 UShapeAlteration::UShapeAlteration(int const Index_Mutation)
@@ -39,6 +47,7 @@ UShapeAlteration::UShapeAlteration(float const Time_Mutation,int const Index_Mut
 void UShapeAlteration::BeginPlay()
 {
 	Super::BeginPlay();
+	TimeMutation = 10.0f;
 	
 	CheckComponent();
 }
@@ -86,12 +95,3 @@ void UShapeAlteration::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	}
 	
 }
-
-
-
-
-
-
-
-
-
