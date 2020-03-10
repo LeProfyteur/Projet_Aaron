@@ -315,16 +315,7 @@ void AFPS_Character::Action()
 {
 	if (HitActor && HitActor->GetActor()->Implements<UObjectInteractionInterface>())
 	{
-		UDA_ItemStructure* ItemStructure = NewObject<UDA_ItemStructure>(UDA_ItemStructure::StaticClass());
-		IObjectInteractionInterface::Execute_Interact(HitActor->GetActor(), true, ItemStructure, this);
-		if(ItemStructure->Name!="")
-		{
-			UE_LOG(LogActor, Warning, TEXT("Add to inventory : %s"), *ItemStructure->Name);
-			InventaireComponent->AddToInventory(ItemStructure);
-		}else
-		{
-			UE_LOG(LogActor, Error, TEXT("Error add to inventory"));
-		}
+		IObjectInteractionInterface::Execute_Interact(HitActor->GetActor(), true, this);
 		HitActor = nullptr;
 	}
 }
@@ -333,7 +324,7 @@ void AFPS_Character::StopAction()
 {
 	if (HitActor && HitActor->GetActor()->Implements<UObjectInteractionInterface>())
 	{
-		IObjectInteractionInterface::Execute_Interact(HitActor->GetActor(), false, nullptr,this);
+		IObjectInteractionInterface::Execute_Interact(HitActor->GetActor(), false,this);
 	}
 }
 

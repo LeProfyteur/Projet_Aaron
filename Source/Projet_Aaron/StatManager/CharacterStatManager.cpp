@@ -27,5 +27,3 @@ void UCharacterStatManager::TakeDamage(float BioDamage, float TechDamage)
 		ParameterCollectionInstance->SetScalarParameterValue(FName(TEXT("Damage")), 1.0f - RateHealth);
 	}
 }
-
-
