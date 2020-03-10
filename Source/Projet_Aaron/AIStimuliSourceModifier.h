@@ -15,7 +15,10 @@ class PROJET_AARON_API UAIStimuliSourceModifier : public UAIPerceptionStimuliSou
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintCallable)
 	TArray<TSubclassOf<UAISense>> GetRegisterSource();
+
+	UFUNCTION(BlueprintCallable)
 	void SetRegisterSource(TSubclassOf<UAISense> Sense);
 	
 };
