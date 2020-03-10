@@ -49,7 +49,7 @@ AFPS_Character::AFPS_Character()
 	UpdateTimeline.BindUFunction(this, FName("UpdateTimelineFunction"));
 	FinishTimeLine.BindUFunction(this, FName("EndTimelineFunction"));
 	
-	CurrentStateMovement = EStateMovement::Run;
+	CurrentStateMovement = EMovementState::Run;
 }
 
 // Called when the game starts or when spawned
@@ -65,7 +65,7 @@ void AFPS_Character::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (CurrentStateMovement == EStateMovement::Sprint && GetCharacterMovement()->Velocity.SizeSquared() > 0.0f)
+	if (CurrentStateMovement == EMovementState::Sprint && GetCharacterMovement()->Velocity.SizeSquared() > 0.0f)
 	{
 		if (!StatManager->ConsumeStamina(StatManager->GetSprintStaminaCost()))
 			StopSprint();
@@ -285,13 +285,13 @@ void AFPS_Character::StartJump()
 void AFPS_Character::Sprint()
 {
 	StatManager->SetActualSpeed(StatManager->GetSprintSpeed());
-	CurrentStateMovement = EStateMovement::Sprint;
+	CurrentStateMovement = EMovementState::Sprint;
 }
 
 void AFPS_Character::StopSprint()
 {
 	StatManager->ResetSpeed();
-	CurrentStateMovement = EStateMovement::Run;
+	CurrentStateMovement = EMovementState::Run;
 }
 
 void AFPS_Character::Dodge()

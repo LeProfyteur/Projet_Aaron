@@ -12,6 +12,7 @@
 #include "Projet_Aaron/Mechanisms/ClimbableInterface.h"
 #include "Projet_Aaron/Item/AnalyseObjectInterface.h"
 
+#include "CharacterUtils.h"
 #include "GameFramework/Character.h"
 #include "CoreMinimal.h"
 #include "Projet_Aaron/Item/UInventoryCastObject.h"
@@ -19,129 +20,6 @@
 #include "Projet_Aaron/Item/HUDCPP.h"
 #include "Projet_Aaron/InventaireComponent.h"
 #include "FPS_Character.generated.h"
-
-enum class EMovement : uint8
-{
-	Forward,
-	Right
-};
-
-enum class VaultType : uint8
-{
-	HighVault,
-	LowVault,
-	FallingCatch
-};
-
-enum class EStateMovement : uint8
-{
-	Walk,
-	Run,
-	Sprint
-};
-
-struct FVaultComponentAndTransform
-{
-	UPrimitiveComponent* Component;
-	FTransform Transform;
-
-	FVaultComponentAndTransform(UPrimitiveComponent* Comp, FTransform Trans)
-	{
-		Component = Comp;
-		Transform = Trans;
-	}
-
-	FVaultComponentAndTransform(): Component(nullptr)
-	{
-	}
-};
-
-struct VaultTraceSettings
-{
-	float MaxLedgeHeight;
-	float MinLedgeHeight;
-	float Distance;
-	float ForwardTraceRadius;
-	float DownwardTraceRadius;
-
-	VaultTraceSettings() {}
-	VaultTraceSettings(float MaxLH, float MinLH, float D, float FTR, float DTR)
-	{
-		MaxLedgeHeight = MaxLH;
-		MinLedgeHeight = MinLH;
-		Distance = D;
-		ForwardTraceRadius = FTR;
-		DownwardTraceRadius = DTR;
-	}
-};
-
-USTRUCT(BlueprintType)
-struct FVaultAsset
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UAnimMontage* AnimMontage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UCurveVector* PositionCurve;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FVector StartingOffset;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float LowHeight;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float LowPlayRate;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float LowStartPosition;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float HightHeight;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float HightPlayRate;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float HightStartPosition;
-
-	FVaultAsset(): AnimMontage(nullptr), PositionCurve(nullptr), LowHeight(0), LowPlayRate(0), LowStartPosition(0),
-	              HightHeight(0),
-	              HightPlayRate(0),
-	              HightStartPosition(0)
-	{}
-};
-
-struct FVaultParams
-{
-	UAnimMontage* AnimMontage;
-	UCurveVector* PositionCurve;
-	FVector StartingOffset;
-	float PlayRate;
-	float StartingPosition;
-
-	FVaultParams() : AnimMontage(nullptr), PositionCurve(nullptr), PlayRate(0), StartingPosition(0) {}
-
-	FVaultParams(UAnimMontage* Anim, UCurveVector* Curve, float PlayR, float StartPos, FVector StartOffset)
-	{
-		AnimMontage = Anim;
-		PositionCurve = Curve;
-		PlayRate = PlayR;
-		StartingPosition = StartPos;
-		StartingOffset = StartOffset;
-	}
-
-	FVaultParams(FVaultAsset& VaultAsset, float PlayR, float StartPos)
-	{
-		AnimMontage = VaultAsset.AnimMontage;
-		PositionCurve = VaultAsset.PositionCurve;
-		PlayRate = PlayR;
-		StartingPosition = StartPos;
-		StartingOffset = VaultAsset.StartingOffset;
-	}
-};
 
 UCLASS()
 class PROJET_AARON_API AFPS_Character : public ACharacter
@@ -290,7 +168,7 @@ protected:
 
 	float CurrentTimePressedItemWheel = 0.f;
 	bool WheelDisplayed = false;
-	EStateMovement CurrentStateMovement;
+	EMovementState CurrentStateMovement;
 
 	VaultTraceSettings GroundedTraceSettings = VaultTraceSettings(250.0f, 30.0f, 75.0f, 30.0f, 30.0f);
 	VaultTraceSettings FallingTraceSettings = VaultTraceSettings(150.0f, 30.0f, 70.0f, 30.0f, 30.0f);
