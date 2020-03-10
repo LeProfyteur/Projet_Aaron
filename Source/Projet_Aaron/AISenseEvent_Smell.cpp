@@ -3,7 +3,3 @@
 
 #include "AISenseEvent_Smell.h"
 
-FAISenseID UAISenseEvent_Smell::GetSenseID() const
-{
-	return UAISense::GetSenseID<UAISense_Smell>();
-}
