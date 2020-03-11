@@ -191,7 +191,16 @@ void AAaronCharacter::UpdateSpeed()
 
 FVector AAaronCharacter::GetCharacterDirection() const
 {
-	FVector Direction = GetInputAxisValue("MoveForward") * GetActorForwardVector() + GetInputAxisValue("MoveRight") * GetActorRightVector() * GetActorUpVector();
+	FHitResult HitResult;
+	FVector Start = this->GetActorLocation();
+	FVector End = Start - GetActorUpVector() * GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	FVector GroundNormal = GetActorUpVector();
+	
+	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility);
+	if (HitResult.IsValidBlockingHit())
+		GroundNormal = HitResult.ImpactNormal;
+
+	FVector Direction = GetInputAxisValue("MoveForward") * GetActorForwardVector() + GetInputAxisValue("MoveRight") * GetActorRightVector();
 	Direction.Normalize();
 	return Direction;
 }
