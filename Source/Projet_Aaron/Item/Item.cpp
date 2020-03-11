@@ -39,12 +39,12 @@ FString AItem::GetLabel_Implementation()
 	return ItemStructure->Name;
 }
 
-void AItem::Interact_Implementation(bool IsPressed, AActor* self)
+void AItem::Interact_Implementation(bool IsPressed, AActor* RefToInteractActor)
 {
 	//Copy
 	if(IsPressed)
 	{
-		auto character = Cast<AFPS_Character>(self);
+		auto character = Cast<AFPS_Character>(RefToInteractActor);
 
 		if(character)
 		{
