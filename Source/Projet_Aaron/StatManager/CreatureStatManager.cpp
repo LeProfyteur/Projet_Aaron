@@ -13,11 +13,23 @@ void UCreatureStatManager::BeginPlay()
 	Super::BeginPlay();
 	
 	Stamina = StaminaMax;
-	ResetSpeed();
 	SetJumpForce(JumpForce);
 }
 
 
+void UCreatureStatManager::SetActualSpeed(const float NewSpeed)
+{
+	ActualSpeed = NewSpeed;
+	UCharacterMovementComponent* CharacterMovementComponent = Cast<UCharacterMovementComponent>(GetOwner()->GetComponentByClass(UCharacterMovementComponent::StaticClass()));
+	CharacterMovementComponent->MaxWalkSpeed = ActualSpeed;
+	CharacterMovementComponent->MaxFlySpeed = ActualSpeed;
+	CharacterMovementComponent->MaxSwimSpeed = ActualSpeed;
+}
+
+void UCreatureStatManager::AddSpeedMultiplier(float Value)
+{
+	SpeedMultiplier = SpeedMultiplier + Value;
+}
 
 /**
  * \brief 
@@ -26,6 +38,10 @@ void UCreatureStatManager::BeginPlay()
  */
 bool UCreatureStatManager::ConsumeStamina(float value)
 {
+	if(bAdrenalineBoost)
+	{
+		return true;
+	}
 	if (Stamina - value < 0)
 	{
 		return false;
@@ -55,15 +71,6 @@ FString UCreatureStatManager::GetStaminaRateText() const
 	return FString::Format(TEXT("{0} / {1}"), StringArgs);
 }
 
-void UCreatureStatManager::SetActualSpeed(const float NewSpeed)
-{
-	ActualSpeed = NewSpeed;
-	UCharacterMovementComponent*CharacterMovementComponent = Cast<UCharacterMovementComponent>(GetOwner()->GetComponentByClass(UCharacterMovementComponent::StaticClass()));
-	CharacterMovementComponent->MaxWalkSpeed = ActualSpeed;
-	CharacterMovementComponent->MaxFlySpeed = ActualSpeed;
-	CharacterMovementComponent->MaxSwimSpeed = ActualSpeed;
-}
-
 void UCreatureStatManager::SetJumpForce(const float NewJumpForce)
 {
 	JumpForce = NewJumpForce;
@@ -73,8 +80,5 @@ void UCreatureStatManager::SetJumpForce(const float NewJumpForce)
 
 void UCreatureStatManager::ResetSpeed()
 {
-	SetActualSpeed(BaseSpeed);
+	SetActualSpeed(RunSpeed);
 }
-
-
-

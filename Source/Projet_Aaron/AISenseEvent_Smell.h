@@ -14,18 +14,5 @@ UCLASS()
 class PROJET_AARON_API UAISenseEvent_Smell : public UAISenseEvent
 {
 	GENERATED_BODY()
-
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sense")
-	FAISmellEvent Event;
-
-public:
-	virtual FAISenseID GetSenseID() const override;
-
-	FORCEINLINE FAISmellEvent& GetSmellEvent()
-	{
-		Event.Compile();
-		return Event;
-	}
 	
 };
