@@ -10,7 +10,9 @@
 #include "Engine/Engine.h"
 #include "Projet_Aaron/StatManager/CharacterStatManager.h"
 #include "Projet_Aaron/Mechanisms/ClimbableInterface.h"
+#include "Projet_Aaron/Item/AnalyseObjectInterface.h"
 
+#include "CharacterUtils.h"
 #include "GameFramework/Character.h"
 #include "CoreMinimal.h"
 #include "Projet_Aaron/Item/UInventoryCastObject.h"
@@ -27,6 +29,21 @@ class PROJET_AARON_API AFPS_Character : public ACharacter
 public:
 	// Sets default values for this character's properties
 	AFPS_Character();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UTimelineComponent* VaultTimeline;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UCurveFloat* CurveFloat;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FVaultAsset LowVaultAsset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FVaultAsset HightVaultAsset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FVaultAsset FallingVaultAsset;
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly)
 	class UCameraComponent* FpsCamera;
@@ -52,25 +69,76 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Climbing")
 		float ClimbRange = 400.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float HoldingTimeItemWheel = 0.2f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float RaycastDistanceInventory = 1000.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool CanVault = false;
+
+	virtual void Tick(float DeltaTime) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	template<EMovement EMovementCharacter>
+	void MoveCharacter(float AxisValue);
+
+	void StartJump();
+
+	void Sprint();
+	void StopSprint();
+
+	void Crouching();
+	void Dodge();
+
+	void Action();
+	void StopAction();
+	void Scan();
+
+	void ActivatePressedLeft();
+	void ActivateReleasedLeft();
+
+	void ActivatePressedRight();
+	void ActivateReleasedRight();
+
+	void ActivateHeadEquipment();
+	
+	void PressedItemWheel();
+	void RepeatItemWheel();
+	void ReleaseItemWheel();
+	void DisplayWheel();
+
+	bool VaultCheck(VaultTraceSettings TraceSettings);
+	void VaultStart(float VaultHeight, FVaultComponentAndTransform VaultLedgeWS, VaultType VaultType);
+
+	UFUNCTION(BlueprintCallable)
+		FVector GetPlayerInput() const;
+
+	UFUNCTION(BlueprintCallable)
+		void UseMyItem(UDA_SlotStructure* ChosenSlot);
+	void PressedUseQuickItem();
+
+	UFUNCTION(BlueprintCallable)
+		void ResetAdrenalineBoost();
+
+	UFUNCTION()
+		void UpdateTimelineFunction(float value);
+
+	UFUNCTION()
+		void EndTimelineFunction();
+
 protected:
 
 	FHitResult* HitGrab = nullptr;
 	FHitResult* HitActor = nullptr;
-
-	bool IsSprinting = false;
+	
 	bool IsClimbing = false;
 	bool IsLeftHandGripping = false;
 	bool IsRightHandGripping = false;
 	
-
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FAnchors AnchorsCastWidget;*/
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FAnchors AnchorsInventoryWindow;*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector2D Alignment;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float RaycastDistanceInventory = 1000.f;
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 		class UUInventoryCastObject* InventoryCastObject;
@@ -83,75 +151,43 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TSubclassOf<class UUInventoryCastObject> InventoryCastObjectClass;
+	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 		TSubclassOf<class UMainHudFixedSizeCPP> MainHudFixedSizeCPPClass;
 
 	bool bPressedAlt = false;
 
+	FVaultParams VaultParams;
+	FVaultComponentAndTransform VaultLedgeLS;
+	FTransform VaultStartOffset;
+	FTransform VaultAnimatedStartOffset;
+
 	FVector ClimbPosition = FVector::ZeroVector;
 	FVector LeftHandPosition = FVector::ZeroVector;
 	FVector RightHandPosition = FVector::ZeroVector;
 
-	float RightAxisMovement;
-	float ForwardAxisMovement;
+	float CurrentTimePressedItemWheel = 0.f;
+	bool WheelDisplayed = false;
+	EMovementState CurrentStateMovement;
+
+	VaultTraceSettings GroundedTraceSettings = VaultTraceSettings(250.0f, 30.0f, 75.0f, 30.0f, 30.0f);
+	VaultTraceSettings FallingTraceSettings = VaultTraceSettings(150.0f, 30.0f, 70.0f, 30.0f, 30.0f);
 	
 	virtual void BeginPlay() override;
-	void CharacterMove();
-	
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	void MoveForward(float value);
-	void MoveRight(float value);
-	
-	void StartJump();
-	
-	void Sprint();
-	void StopSprint();
-
-	void StartAlt();
-	void StopAlt();
-
-	void Crouching();
-	void Dodge(FVector direction);
-
-	void Action();
-	void StopAction();
-	void Analyse();
-
-	void ActivatePressedLeft();
-	void ActivateReleasedLeft();
-
-	void ActivatePressedRight();
-	void ActivateReleasedRight();
-	
-	void PressedItemWheel();
-	void RepeatItemWheel();
-	void ReleaseItemWheel();
-	void DisplayWheel();
-
-	void ActivateHeadEquipment();
-
-	UFUNCTION(BlueprintCallable)
-	void UseMyItem(UDA_SlotStructure* ChosenSlot);
-	void PressedUseQuickItem();
-
-	UFUNCTION(BlueprintCallable)
-		void ResetAdrenalineBoost();
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float HoldingTimeItemWheel=0.2f;
-
-protected :
 	void CharacterClimb(float DeltaTime);
 	void UpdateClimbingPosition();
 	bool SearchClimbPoint(FVector& ClimbPoint);
+	bool FindWallToClimb(VaultTraceSettings TraceSettings, FVector& InitialTraceImpactPoint, FVector& InitialTraceNormal);
+	bool CanClimbOnWall(VaultTraceSettings TraceSettings, FVector& InitialTraceImpactPoint, FVector& InitialTraceNormal, float& VaultHeight, FVaultComponentAndTransform& TransformAndTransform, VaultType& Vault);
+	bool CapsuleHasRoomCheck(FVector TargetLocation, float HeightOffset, float RadiusOffset);
+	FVaultComponentAndTransform ConvertWorldToLocal(FVaultComponentAndTransform WorldSpaceVault);
+	FVaultComponentAndTransform ConvertLocalToWorld(FVaultComponentAndTransform LocalSpaceVault);
+	FVaultParams GetVaultParam(VaultType Vault, float VaultHeight);
+	FTransform GetVaultStartOffset(FTransform& VaultTarget);
+	FTransform GetVaultAnimatedStartOffset(FVaultParams& VaultParam ,FTransform& VaultTarget);
+	FVector GetCapsuleBaseLocation(float ZOffset) const;
+	FVector GetCapsuleBaseLocationFromBase(FVector BaseLocation ,float ZOffset) const;
 
-	float CurrentTimePressedItemWheel=0.f;
-	bool WheelDisplayed = false;
+	FOnTimelineFloat UpdateTimeline{};
+	FOnTimelineEvent FinishTimeLine{};
 };

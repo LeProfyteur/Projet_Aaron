@@ -21,7 +21,6 @@ void AMyHUD::BeginPlay()
 	BarMatInstance->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor(0.7f, 200.0f, 0.34f));
 
 	SetActorTickEnabled(false);
-	UE_LOG(LogActor, Error, TEXT("%d"), IsActorTickEnabled());
 }
 
 void AMyHUD::Tick(float DeltaSeconds)
@@ -48,6 +47,11 @@ void AMyHUD::ResetCircleRadius()
 {
 	SetActorTickEnabled(false);
 	BarMatInstance->SetScalarParameterValue(FName(TEXT("Decimal")), 0.0f);
+}
+
+void AMyHUD::GetRadiusCircle(float& Radius)
+{
+	BarMatInstance->GetScalarParameterValue(FName("Decimal"), Radius);
 }
 
 
