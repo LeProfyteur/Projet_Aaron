@@ -25,13 +25,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int NumberOfSlots=6;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		TArray<UDA_SlotStructure*> Inventory;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		TArray<UDA_SlotStructure*> InventoryFlacon;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		TArray<UDA_SlotStructure*> InventoryConsomable;
 
 	UFUNCTION(BlueprintCallable)
