@@ -59,7 +59,7 @@ void AAaronCharacter::Tick(float DeltaTime)
 	} else
 		StatManager->RecoveryStamina(DeltaTime);
 
-	if (MovementState == EMovementState::Slide && CharacterMovement->Velocity.Size() <= 0.0f)
+	if (MovementState == EMovementState::Slide && (CharacterMovement->Velocity.Size() <= StatManager->GetSlideStopVelocity() || CharacterMovement->IsSwimming()))
 	{
 		CharacterMovement->GroundFriction = 8.0f;
 		MovementState = EMovementState::Run;
@@ -207,13 +207,17 @@ FVector AAaronCharacter::GetCharacterDirection() const
 
 void AAaronCharacter::MoveForward(float Value)
 {
-	if (MovementState != EMovementState::Slide)
+	if (CharacterMovement->IsSwimming())
+		AddMovementInput(FpsCamera->GetForwardVector(), Value);
+	else if (MovementState != EMovementState::Slide)
 		AddMovementInput(GetActorForwardVector(), Value);
 }
 
 void AAaronCharacter::MoveRight(float Value)
 {
-	if (MovementState != EMovementState::Slide)
+	if (CharacterMovement->IsSwimming())
+		AddMovementInput(FpsCamera->GetRightVector(), Value);
+	else if (MovementState != EMovementState::Slide)
 		AddMovementInput(GetActorRightVector(), Value);
 }
 
@@ -228,7 +232,7 @@ void AAaronCharacter::StartJumping()
 	{
 		if (GetCharacterDirection().Size() != 0.0f)
 			res = VaultCheck(GroundedTraceSettings);
-		if (!res && MovementState != EMovementState::Climb && StatManager->ConsumeStamina(StatManager->GetJumpStaminaCost()))
+		if (!res && MovementState != EMovementState::Climb && !CharacterMovement->IsSwimming() && StatManager->ConsumeStamina(StatManager->GetJumpStaminaCost()))
 		{
 			if (CharacterMovement->IsCrouching())
 			{
@@ -256,14 +260,14 @@ void AAaronCharacter::Walking()
 
 void AAaronCharacter::Crouching()
 {
-	if (CanCrouch())
+	if (CanCrouch() && !CharacterMovement->IsSwimming())
 	{
 		if (MovementState == EMovementState::Sprint)
 		{
 			Crouch();
 			CharacterMovement->GroundFriction = 0.f;
 			MovementState = EMovementState::Slide;
-			LaunchCharacter(GetCharacterDirection() * 3000.0f, true, true);
+			LaunchCharacter(GetCharacterDirection() * StatManager->GetSlideForce(), true, true);
 		}
 		else
 			Crouch();
