@@ -25,6 +25,7 @@ public:
 
     UFUNCTION(BlueprintCallable) void UpdateCircleRadius(float RadiusBar);
     UFUNCTION(BlueprintCallable) void ResetCircleRadius();
+    UFUNCTION(BlueprintCallable) void GetRadiusCircle(float& Radius);
 
     UPROPERTY(EditAnywhere) UMaterial* AnalyseMat;
     UPROPERTY(EditAnywhere) UMaterialInstanceDynamic* BarMatInstance;
