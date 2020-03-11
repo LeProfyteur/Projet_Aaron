@@ -3,7 +3,7 @@
 
 #include "DialogCondition.h"
 
-bool UDialogCondition::Verify()
+bool UDialogCondition::Verify(UObject* WorldContextObject)
 {
 	return false;
 }

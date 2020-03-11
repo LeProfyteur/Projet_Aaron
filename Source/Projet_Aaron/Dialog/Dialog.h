@@ -19,12 +19,12 @@ class PROJET_AARON_API UDialog : public UDataAsset
 public:
 
 	UPROPERTY(EditDefaultsOnly, Instanced, Category = "Dialog")
-		TArray<UDialogCondition*> ListConditions;
+	TArray<UDialogCondition*> ListConditions;
 
 	UPROPERTY(EditAnywhere, Category = "Dialog")
-		UBehaviorTree* DialogBehaviourTree;
+	UBehaviorTree* DialogBehaviourTree;
 
-	UFUNCTION(BlueprintCallable)
-		bool IsValid();
+	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
+	bool IsValid(UObject* WorldContextObject);
 	
 };
