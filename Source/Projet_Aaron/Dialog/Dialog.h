@@ -21,7 +21,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Instanced, Category = "Dialog")
 	TArray<UDialogCondition*> ListConditions;
 
-	UPROPERTY(EditAnywhere, Category = "Dialog")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Dialog")
 	UBehaviorTree* DialogBehaviourTree;
 
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
