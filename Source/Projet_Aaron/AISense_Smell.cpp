@@ -48,7 +48,7 @@ float UAISense_Smell::Update()
 				FHitResult hit = HitResults[i];
 				UAIStimuliSourceModifier* stimuli = Cast<UAIStimuliSourceModifier>(hit.GetActor()->GetComponentByClass(UAIStimuliSourceModifier::StaticClass()));
 				if (stimuli) {
-					UE_LOG(LogTemp, Warning, TEXT("STIMULI"));
+					
 					FAISenseID Id = UAISense::GetSenseID(UAISense_Smell::StaticClass());
 
 					if (!Id.IsValid())
@@ -64,9 +64,10 @@ float UAISense_Smell::Update()
 					}
 
 					if (isSmellSense) {
+						
 						if (FVector::DistSquared(hit.GetActor()->GetActorLocation(), Listener.CachedLocation) <= DigestedProperties[DigestedPropertyIndex].PhobiaRadius * DigestedProperties[DigestedPropertyIndex].PhobiaRadius)
 						{
-							Elem.Value.RegisterStimulus(hit.GetActor(), FAIStimulus(*this, 1.f, hit.GetActor()->GetActorLocation(), Listener.CachedLocation));
+							Elem.Value.RegisterStimulus(hit.GetActor(), FAIStimulus(*this, 1.f, hit.GetActor()->GetActorLocation(), Listener.CachedLocation, FAIStimulus::SensingSucceeded));
 							GLog->Log("registered stimulus!");
 						}
 						else
