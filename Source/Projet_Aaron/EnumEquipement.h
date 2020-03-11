@@ -12,5 +12,6 @@ enum EnumEquipment
 	EE_Arm UMETA(DisplayName = "Arm"),
 	EE_Leg UMETA(DisplayName = "Legs"),
 	EE_Abilities UMETA(DisplayName = "Abilities"),
+	EE_Metroidvania UMETA(DisplayName = "Metroidvania"),
 };
 
