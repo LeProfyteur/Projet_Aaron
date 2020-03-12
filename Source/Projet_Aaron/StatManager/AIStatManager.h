@@ -12,12 +12,12 @@
 #include "AIStatManager.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class PROJET_AARON_API UAIStatManager : public UCreatureStatManager
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	// Sets default values for this component's properties
 	UAIStatManager();
 
@@ -26,9 +26,9 @@ protected:
 		float RadiusPercetion = 1500.0f;
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
-	
+
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	/*Getters*/
 	float GetPeripheralVision();
@@ -37,5 +37,5 @@ public:
 
 private:
 	void SetUpRadiusPerception();
-		
+
 };

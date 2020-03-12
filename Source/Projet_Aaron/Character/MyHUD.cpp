@@ -49,6 +49,11 @@ void AMyHUD::ResetCircleRadius()
 	BarMatInstance->SetScalarParameterValue(FName(TEXT("Decimal")), 0.0f);
 }
 
+void AMyHUD::GetRadiusCircle(float& Radius)
+{
+	BarMatInstance->GetScalarParameterValue(FName("Decimal"), Radius);
+}
+
 
 
 

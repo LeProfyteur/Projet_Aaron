@@ -2,34 +2,35 @@
 
 
 #include "AIStatManager.h"
-#include <Runtime\AIModule\Classes\Perception\AIPerceptionComponent.h>
+#include "Perception/AIPerceptionComponent.h"
+#include "Perception/AISense_Sight.h"
 
 // Sets default values for this component's properties
 UAIStatManager::UAIStatManager() : Super()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-    
-	PrimaryComponentTick.bCanEverTick = true;
+    // Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
+    // off to improve performance if you don't need them.
+
+    PrimaryComponentTick.bCanEverTick = true;
 }
 
 
 // Called when the game starts
 void UAIStatManager::BeginPlay()
 {
-	Super::BeginPlay();
+    Super::BeginPlay();
     SetUpRadiusPerception();
-	// ...
-	
+    // ...
+
 }
 
 
 // Called every frame
 void UAIStatManager::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+    Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+    // ...
 }
 
 float UAIStatManager::GetPeripheralVision()
@@ -40,30 +41,28 @@ float UAIStatManager::GetPeripheralVision()
 
         AAIController* AiController = Cast<AAIController>(owner->GetController());
 
-		if (AiController) {
+        if (AiController) {
 
-			//Take the right sense in the array
-			FAISenseID Id = UAISense::GetSenseID(UAISense_Sight::StaticClass());
-			if (!Id.IsValid())
-			{
-				UE_LOG(LogTemp, Error, TEXT("Wrong Sense ID"));
-				return 0.f;
-			}
+            //Take the right sense in the array
+            FAISenseID Id = UAISense::GetSenseID(UAISense_Sight::StaticClass());
+            if (!Id.IsValid())
+            {
+                UE_LOG(LogTemp, Error, TEXT("Wrong Sense ID"));
+                return 0.f;
+            }
 
-			UAISenseConfig* Config = AiController->GetPerceptionComponent()->GetSenseConfig(Id);
+            UAISenseConfig* Config = AiController->GetPerceptionComponent()->GetSenseConfig(Id);
 
-			if (Config == nullptr)
-				return 0.f;
+            if (Config == nullptr)
+                return 0.f;
 
-			UAISenseConfig_Sight * ConfigSight = Cast<UAISenseConfig_Sight>(Config);
+            UAISenseConfig_Sight* ConfigSight = Cast<UAISenseConfig_Sight>(Config);
 
-			return ConfigSight->PeripheralVisionAngleDegrees;
-		}
-		else return 0.f;
-    }else
-    {
-		return 0.f;
+            return ConfigSight->PeripheralVisionAngleDegrees;
+        }
+        else return 0.f;
     }
+    else return 0.f;
 }
 
 void UAIStatManager::SetPeripheralVision(float PeripheralVision)
@@ -101,17 +100,17 @@ void UAIStatManager::SetPeripheralVision(float PeripheralVision)
 
 void UAIStatManager::SetUpRadiusPerception()
 {
-	ACharacter* owner = Cast<ACharacter>(GetOwner());
+    ACharacter* owner = Cast<ACharacter>(GetOwner());
 
     if (owner) {
-        
+
         AAIController* AiController = Cast<AAIController>(owner->GetController());
-        
+
         if (AiController) {
 
             //Take the right sense in the array
             FAISenseID Id = UAISense::GetSenseID(UAISense_Sight::StaticClass());
-           if (!Id.IsValid())
+            if (!Id.IsValid())
             {
                 UE_LOG(LogTemp, Error, TEXT("Wrong Sense ID"));
                 return;
@@ -135,7 +134,7 @@ void UAIStatManager::SetUpRadiusPerception()
 
             AiController->GetPerceptionComponent()->RequestStimuliListenerUpdate();
         }
-        
+
     }
 }
 
