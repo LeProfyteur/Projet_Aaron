@@ -28,6 +28,10 @@ protected:
 		float SwimmingSpeed = 350.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Swimming)
 		float SwimmingSprintSpeed = 500.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sliding)
+		float SlideForce = 1000.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sliding)
+		float SlideStopVelocity = 25.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Dodging)
 		float DodgeStaminaCost = 5.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Dodging)
@@ -36,6 +40,10 @@ protected:
 		float ClimbSpeed = 0.1f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Climbing)
 		float ClimbRange = 400.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Climbing)
+		float Oxygene;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Climbing)
+		float OxygeneMax = 60.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		UMaterialParameterCollectionInstance* ParameterCollectionInstance;
@@ -69,6 +77,10 @@ public:
 		float GetClimbRange() const { return ClimbRange; }
 	UFUNCTION(BlueprintCallable)
 		float GetClimbSpeed() const { return ClimbSpeed; }
+	UFUNCTION(BlueprintCallable)
+		float GetSlideForce() const { return SlideForce; }
+	UFUNCTION(BlueprintCallable)
+		float GetSlideStopVelocity() const { return SlideStopVelocity; }
 
 	/*Setters*/
 	UFUNCTION(BlueprintCallable)

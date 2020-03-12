@@ -31,6 +31,11 @@ AAaronCharacter::AAaronCharacter()
 
 	InventaireComponent = CreateDefaultSubobject<UInventaireComponent>(TEXT("InventaireComponent"));
 	InventaireComponent->PrepareInventory();
+
+	VaultTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Vault Timeline"));
+
+	UpdateTimeline.BindUFunction(this, FName("UpdateTimelineFunction"));
+	FinishTimeLine.BindUFunction(this, FName("EndTimelineFunction"));
 }
 
 // Called when the game starts or when spawned
@@ -38,6 +43,8 @@ void AAaronCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	MovementState = EMovementState::Run;
+	VaultTimeline->AddInterpFloat(CurveFloat, UpdateTimeline);
+	VaultTimeline->SetTimelineFinishedFunc(FinishTimeLine);
 }
 
 // Called every frame
@@ -52,7 +59,7 @@ void AAaronCharacter::Tick(float DeltaTime)
 	} else
 		StatManager->RecoveryStamina(DeltaTime);
 
-	if (MovementState == EMovementState::Slide && CharacterMovement->Velocity.Size() <= 0.0f)
+	if (MovementState == EMovementState::Slide && (CharacterMovement->Velocity.Size() <= StatManager->GetSlideStopVelocity() || CharacterMovement->IsSwimming()))
 	{
 		CharacterMovement->GroundFriction = 8.0f;
 		MovementState = EMovementState::Run;
@@ -88,7 +95,7 @@ void AAaronCharacter::Tick(float DeltaTime)
 			if (!HitActor || OutHit.Actor != HitActor->Actor)
 				HitActor = new FHitResult(OutHit);
 
-			InventoryCastObject->nameTextItem = IObjectInteractionInterface::Execute_GetLabel(OutHit.GetActor()) + " [F]";
+			InventoryCastObject->nameTextItem = IObjectInteractionInterface::Execute_GetLabel(OutHit.GetActor());
 		}
 		else
 		{
@@ -101,6 +108,12 @@ void AAaronCharacter::Tick(float DeltaTime)
 		actorMeshComponent->SetCustomDepthStencilValue(1);
 		InventoryCastObject->nameTextItem = "";
 		HitActor = nullptr;
+	}
+
+	if (CrouchJumped)
+	{
+		Jump();
+		CrouchJumped = false;
 	}
 }
 
@@ -135,9 +148,11 @@ void AAaronCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 	PlayerInputComponent->BindAction("HeadAction", IE_Pressed, this, &AAaronCharacter::ActivateHeadEquipment);
 
-	PlayerInputComponent->BindAction("Action", IE_Pressed, this, &AAaronCharacter::Action);
-	PlayerInputComponent->BindAction("Action", IE_Released, this, &AAaronCharacter::StopAction);
+	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AAaronCharacter::Interact);
+	PlayerInputComponent->BindAction("Interact", IE_Released, this, &AAaronCharacter::StopInteract);
 
+	PlayerInputComponent->BindAction("Scan", IE_Repeat, this, &AAaronCharacter::Scan);
+	
 	PlayerInputComponent->BindAction("ItemWheel", IE_Pressed, this, &AAaronCharacter::PressedItemWheel);
 	PlayerInputComponent->BindAction("ItemWheel", IE_Repeat, this, &AAaronCharacter::RepeatItemWheel);
 	PlayerInputComponent->BindAction("ItemWheel", IE_Released, this, &AAaronCharacter::ReleaseItemWheel);
@@ -176,31 +191,62 @@ void AAaronCharacter::UpdateSpeed()
 
 FVector AAaronCharacter::GetCharacterDirection() const
 {
-	FVector Direction = GetInputAxisValue("MoveForward") * GetActorForwardVector() + GetInputAxisValue("MoveRight") * GetActorRightVector() * GetActorUpVector();
+	FHitResult HitResult;
+	FVector Start = this->GetActorLocation();
+	FVector End = Start - GetActorUpVector() * GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	FVector GroundNormal = GetActorUpVector();
+	
+	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility);
+	if (HitResult.IsValidBlockingHit())
+		GroundNormal = HitResult.ImpactNormal;
+
+	FVector Direction = GetInputAxisValue("MoveForward") * GetActorForwardVector() + GetInputAxisValue("MoveRight") * GetActorRightVector();
 	Direction.Normalize();
 	return Direction;
 }
 
 void AAaronCharacter::MoveForward(float Value)
 {
-	if (MovementState != EMovementState::Slide)
+	if (CharacterMovement->IsSwimming())
+		AddMovementInput(FpsCamera->GetForwardVector(), Value);
+	else if (MovementState != EMovementState::Slide)
 		AddMovementInput(GetActorForwardVector(), Value);
 }
 
 void AAaronCharacter::MoveRight(float Value)
 {
-	if (MovementState != EMovementState::Slide)
+	if (CharacterMovement->IsSwimming())
+		AddMovementInput(FpsCamera->GetRightVector(), Value);
+	else if (MovementState != EMovementState::Slide)
 		AddMovementInput(GetActorRightVector(), Value);
 }
 
 void AAaronCharacter::StartJumping()
 {
-	//if (MovementState == EMovementState::Slide)
-	if (MovementState != EMovementState::Climb && !CharacterMovement->IsFalling() && StatManager->ConsumeStamina(StatManager->GetJumpStaminaCost()))
+	bool res = false;
+	if (GetCharacterMovement()->IsFalling())
 	{
-	
-		UnCrouch();
-		Jump();
+		res = VaultCheck(FallingTraceSettings);
+	}
+	else
+	{
+		if (GetCharacterDirection().Size() != 0.0f)
+			res = VaultCheck(GroundedTraceSettings);
+		if (!res && MovementState != EMovementState::Climb && !CharacterMovement->IsSwimming() && StatManager->ConsumeStamina(StatManager->GetJumpStaminaCost()))
+		{
+			if (CharacterMovement->IsCrouching())
+			{
+				if (MovementState == EMovementState::Slide)
+				{
+					CharacterMovement->GroundFriction = 8.0f;
+					MovementState = EMovementState::Run;
+				}
+				UnCrouch();
+				CrouchJumped = true;
+			}
+			else
+				Jump();
+		}
 	}
 }
 
@@ -214,14 +260,14 @@ void AAaronCharacter::Walking()
 
 void AAaronCharacter::Crouching()
 {
-	if (CanCrouch())
+	if (CanCrouch() && !CharacterMovement->IsSwimming())
 	{
 		if (MovementState == EMovementState::Sprint)
 		{
 			Crouch();
 			CharacterMovement->GroundFriction = 0.f;
 			MovementState = EMovementState::Slide;
-			LaunchCharacter(GetCharacterDirection() * 3000.0f, true, true);
+			LaunchCharacter(GetCharacterDirection() * StatManager->GetSlideForce(), true, true);
 		}
 		else
 			Crouch();
@@ -258,7 +304,7 @@ void AAaronCharacter::Dodge()
 	}
 }
 
-void AAaronCharacter::Action()
+void AAaronCharacter::Interact()
 {
 	if (HitActor && HitActor->GetActor()->Implements<UObjectInteractionInterface>())
 	{
@@ -267,7 +313,7 @@ void AAaronCharacter::Action()
 	}
 }
 
-void AAaronCharacter::StopAction()
+void AAaronCharacter::StopInteract()
 {
 	if (HitActor && HitActor->GetActor()->Implements<UObjectInteractionInterface>())
 	{
@@ -396,6 +442,32 @@ void AAaronCharacter::UpdateClimbingPosition()
 	}
 }
 
+void AAaronCharacter::Scan()
+{
+	FHitResult OutHit;
+	FVector Start = FpsCamera->GetComponentLocation();
+	FVector End = Start + FpsCamera->GetForwardVector() * RaycastDistanceInventory;
+	FCollisionQueryParams collisionParams;
+
+	if (GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECC_Visibility, collisionParams))
+	{
+		if (OutHit.GetActor()->Implements<UAnalyseObjectInterface>())
+		{
+			float ScanPercent = 0.0f;
+			AMyHUD* PlayerHUD = Cast<AMyHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+			PlayerHUD->GetRadiusCircle(ScanPercent);
+
+			if (ScanPercent < 1.0f)
+				PlayerHUD->UpdateCircleRadius(ScanPercent + 0.01f);
+			else
+			{
+				IAnalyseObjectInterface::Execute_ScanFinished(OutHit.GetActor());
+				PlayerHUD->ResetCircleRadius();
+			}
+		}
+	}
+}
+
 void AAaronCharacter::PressedItemWheel()
 {
 	UE_LOG(LogActor, Warning, TEXT("Item wheel Pressed"));
@@ -493,4 +565,220 @@ void AAaronCharacter::PressedUseQuickItem()
 	{
 		UseMyItem(MainHudFixedSizeCPP->ChosenSlot);
 	}
+}
+
+FVector AAaronCharacter::GetCapsuleBaseLocation(float ZOffset) const
+{
+	return GetCapsuleComponent()->GetComponentLocation() - ((GetCapsuleComponent()->GetScaledCapsuleHalfHeight() + ZOffset) * GetCapsuleComponent()->GetUpVector());
+}
+
+FVector AAaronCharacter::GetCapsuleBaseLocationFromBase(FVector BaseLocation, float ZOffset) const
+{
+	return FVector(BaseLocation.X, BaseLocation.Y, BaseLocation.Z + GetCapsuleComponent()->GetScaledCapsuleHalfHeight() + ZOffset);
+}
+
+void AAaronCharacter::UpdateTimelineFunction(float value)
+{
+	FTransform VaultTarget = ConvertLocalToWorld(VaultLedgeLS).Transform;
+	FVector VectorOfCurve = VaultParams.PositionCurve->GetVectorValue(VaultTimeline->GetPlaybackPosition() + VaultParams.StartingPosition);
+	FTransform BlendTrans = FTransform(VaultAnimatedStartOffset.GetRotation(), FVector(VaultAnimatedStartOffset.GetLocation().X, VaultAnimatedStartOffset.GetLocation().Y, VaultStartOffset.GetLocation().Z));
+	FTransform XYCorrectionTrans = UKismetMathLibrary::TLerp(VaultStartOffset, BlendTrans, VectorOfCurve.Y);
+	FTransform ZCorrectionTrans = UKismetMathLibrary::TLerp(VaultStartOffset, BlendTrans, VectorOfCurve.Z);
+
+	FTransform LerpTrans = FTransform(XYCorrectionTrans.GetRotation(), FVector(XYCorrectionTrans.GetLocation().X, XYCorrectionTrans.GetLocation().Y, ZCorrectionTrans.GetLocation().Z));
+	FTransform Transform = UKismetMathLibrary::TLerp(VaultTarget + LerpTrans, VaultTarget, VectorOfCurve.Y);
+	LerpTrans = UKismetMathLibrary::TLerp(VaultTarget + VaultStartOffset, Transform, value);
+
+	SetActorLocationAndRotation(LerpTrans.GetLocation(), LerpTrans.GetRotation());
+}
+
+void AAaronCharacter::EndTimelineFunction()
+{
+	CanVault = false;
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+}
+
+bool AAaronCharacter::VaultCheck(VaultTraceSettings TraceSettings)
+{
+	VaultType VaultType;
+	FVector InitialTraceImpactPoint;
+	FVector InitialTraceNormal;
+	FVaultComponentAndTransform TransformAndTransform = FVaultComponentAndTransform();
+	float VaultHeight;
+
+	if (FindWallToClimb(TraceSettings, InitialTraceImpactPoint, InitialTraceNormal))
+	{
+		UE_LOG(LogActor, Error, TEXT("FPS_Character::VaultCheck : Wall founded"));
+		if (CanClimbOnWall(TraceSettings, InitialTraceImpactPoint, InitialTraceNormal, VaultHeight, TransformAndTransform, VaultType))
+		{
+			UE_LOG(LogActor, Error, TEXT("FPS_Character::VaultCheck : Can Climb"));
+			VaultStart(VaultHeight, TransformAndTransform, VaultType);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void AAaronCharacter::VaultStart(float VaultHeight, FVaultComponentAndTransform VaultLedgeWS, VaultType VaultType)
+{
+	VaultParams = GetVaultParam(VaultType, VaultHeight);
+	VaultLedgeLS = ConvertWorldToLocal(VaultLedgeWS);
+	VaultStartOffset = GetVaultStartOffset(VaultLedgeWS.Transform);
+	VaultAnimatedStartOffset = GetVaultAnimatedStartOffset(VaultParams, VaultLedgeWS.Transform);
+
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	float MaxTime, MinTime;
+	VaultParams.PositionCurve->GetTimeRange(MinTime, MaxTime);
+	VaultTimeline->SetTimelineLength(MaxTime - VaultParams.StartingPosition);
+	VaultTimeline->SetPlayRate(VaultParams.PlayRate);
+	VaultTimeline->PlayFromStart();
+
+	CanVault = true;
+}
+
+bool AAaronCharacter::FindWallToClimb(VaultTraceSettings TraceSettings, FVector& InitialTraceImpactPoint, FVector& InitialTraceNormal)
+{
+	FVector Start = GetCapsuleBaseLocation(2.0f) + GetCharacterDirection() * (-30);
+	Start.Z += (TraceSettings.MaxLedgeHeight + TraceSettings.MinLedgeHeight) / 2.0f;
+	FVector End = Start + GetCharacterDirection() * TraceSettings.Distance;
+	FHitResult OutHit;
+
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(this);
+
+	FCollisionShape CapsuleShape = FCollisionShape();
+	//CapsuleShape.MakeCapsule(TraceSettings.ForwardTraceRadius, (TraceSettings.MaxLedgeHeight - TraceSettings.MinLedgeHeight) / 2.0f + 1.0f);
+	CapsuleShape.MakeCapsule(TraceSettings.ForwardTraceRadius, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
+
+	
+	if (GetWorld()->SweepSingleByChannel(OutHit, Start, End, FQuat::Identity, ECC_GameTraceChannel2, CapsuleShape, CollisionParams))
+	{
+		if (/*GetCharacterMovement()->IsWalkable(OutHit) &&*/ !OutHit.bStartPenetrating)
+		{
+			InitialTraceImpactPoint = OutHit.ImpactPoint;
+			InitialTraceNormal = OutHit.ImpactNormal;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool AAaronCharacter::CanClimbOnWall(VaultTraceSettings TraceSettings, FVector& InitialTraceImpactPoint, FVector& InitialTraceNormal, float& VaultHeight, FVaultComponentAndTransform& TransformAndTransform, VaultType& Vault)
+{
+	FVector DownTraceLocation;
+
+	FVector End = FVector(InitialTraceImpactPoint.X, InitialTraceImpactPoint.Y, GetCapsuleBaseLocation(2.0f).Z) + InitialTraceNormal * (-15.0f);
+	FVector Start = FVector(End.X, End.Y, GetActorLocation().Z + TraceSettings.MaxLedgeHeight + TraceSettings.DownwardTraceRadius + 1.0f);
+	FHitResult OutHit;
+
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(this);
+	CollisionParams.bDebugQuery = true;
+
+	FCollisionShape CapsuleShape = FCollisionShape();
+	//CapsuleShape.MakeSphere(TraceSettings.DownwardTraceRadius);
+	CapsuleShape.MakeCapsule(TraceSettings.DownwardTraceRadius, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
+
+	if (GetWorld()->SweepSingleByChannel(OutHit, Start, End, FQuat::Identity, ECC_GameTraceChannel2, CapsuleShape, CollisionParams))
+	{
+		UE_LOG(LogActor, Error, TEXT("FPS_Character::CanClimbOnWall : %s"), *OutHit.GetActor()->GetName());
+		if (/*GetCharacterMovement()->IsWalkable(OutHit)*/ true)
+		{
+			UE_LOG(LogActor, Error, TEXT("FPS_Character::CanClimbOnWall : Can Climb"));
+			DownTraceLocation = FVector(OutHit.Location.X, OutHit.Location.Y, OutHit.ImpactPoint.Z);
+			if (CapsuleHasRoomCheck(GetCapsuleBaseLocationFromBase(DownTraceLocation, 2.0f), 0.0f, 0.0f))
+			{
+				FVector toRot = InitialTraceNormal * FVector(-1.0f, -1.0f, 0.0f);
+				FTransform Transform = FTransform(toRot.Rotation(), GetCapsuleBaseLocationFromBase(DownTraceLocation, 2.0f), FVector::OneVector);
+				TransformAndTransform = FVaultComponentAndTransform(OutHit.GetComponent(), Transform);
+				VaultHeight = (Transform.GetLocation() - GetActorLocation()).Z;
+
+				if (!GetCharacterMovement()->IsFalling())
+				{
+					if (VaultHeight > 125.0f)
+						Vault = VaultType::HighVault;
+					else
+						Vault = VaultType::LowVault;
+				}
+				else
+					Vault = VaultType::FallingCatch;
+
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+bool AAaronCharacter::CapsuleHasRoomCheck(FVector TargetLocation, float HeightOffset, float RadiusOffset)
+{
+	float ZValue = GetCapsuleComponent()->GetScaledCapsuleHalfHeight_WithoutHemisphere() + RadiusOffset * (-1.0f) + HeightOffset;
+	FVector Start = TargetLocation + FVector(0, 0, ZValue);
+	FHitResult OutHit;
+
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(this);
+
+	FCollisionShape CapsuleShape = FCollisionShape();
+	CapsuleShape.MakeSphere(GetCapsuleComponent()->GetScaledCapsuleRadius() + RadiusOffset);
+
+	return !(GetWorld()->SweepSingleByChannel(OutHit, Start, Start, FpsCamera->GetComponentRotation().Quaternion(), ECC_GameTraceChannel2, CapsuleShape, CollisionParams) || OutHit.bStartPenetrating);
+}
+
+FVaultComponentAndTransform AAaronCharacter::ConvertWorldToLocal(FVaultComponentAndTransform WorldSpaceVault)
+{
+	FTransform TransformLocal = WorldSpaceVault.Transform * WorldSpaceVault.Component->GetComponentTransform().Inverse();
+	return  FVaultComponentAndTransform(WorldSpaceVault.Component, TransformLocal);
+}
+
+FVaultComponentAndTransform AAaronCharacter::ConvertLocalToWorld(FVaultComponentAndTransform LocalSpaceVault)
+{
+	FTransform TransformWorld = LocalSpaceVault.Transform * LocalSpaceVault.Component->GetComponentTransform();
+	return FVaultComponentAndTransform(LocalSpaceVault.Component, TransformWorld);
+}
+
+FVaultParams AAaronCharacter::GetVaultParam(VaultType Vault, float VaultHeight)
+{
+	FVaultAsset VaultAsset;
+	switch (Vault)
+	{
+	case VaultType::LowVault:
+		VaultAsset = LowVaultAsset;
+		break;
+	case VaultType::HighVault:
+		VaultAsset = HightVaultAsset;
+		break;
+	case VaultType::FallingCatch:
+		VaultAsset = FallingVaultAsset;
+	}
+
+	float PlayRate = UKismetMathLibrary::MapRangeClamped(VaultHeight, VaultAsset.LowHeight, VaultAsset.HightHeight, VaultAsset.LowPlayRate, VaultAsset.HightPlayRate);
+	float StartingPos = UKismetMathLibrary::MapRangeClamped(VaultHeight, VaultAsset.LowHeight, VaultAsset.HightHeight, VaultAsset.LowStartPosition, VaultAsset.HightStartPosition);
+
+	return FVaultParams(VaultAsset, PlayRate, StartingPos);
+
+}
+
+FTransform AAaronCharacter::GetVaultStartOffset(FTransform& VaultTarget)
+{
+	FTransform OutputTransform;
+	OutputTransform.SetLocation(GetActorTransform().GetLocation() - VaultTarget.GetLocation());
+	OutputTransform.SetRotation(GetActorTransform().GetRotation() - VaultTarget.GetRotation());
+	OutputTransform.SetScale3D(GetActorTransform().GetScale3D() - VaultTarget.GetScale3D());
+	return  OutputTransform;
+}
+
+FTransform AAaronCharacter::GetVaultAnimatedStartOffset(FVaultParams& VaultParam, FTransform& VaultTarget)
+{
+	FVector blbl = VaultTarget.GetRotation().GetAxisX() * VaultParam.StartingOffset.Y;
+	blbl.Z = VaultParam.StartingOffset.Z;
+	FTransform Transform = FTransform(VaultTarget.GetRotation(), VaultTarget.GetLocation() - blbl, FVector::OneVector);
+
+	FTransform OutputTransform;
+	OutputTransform.SetLocation(Transform.GetLocation() - VaultTarget.GetLocation());
+	OutputTransform.SetRotation(Transform.GetRotation() - VaultTarget.GetRotation());
+	OutputTransform.SetScale3D(Transform.GetScale3D() - VaultTarget.GetScale3D());
+	return  OutputTransform;
+
 }
