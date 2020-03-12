@@ -19,7 +19,7 @@ AAaronCharacter::AAaronCharacter()
 	CharacterMovement = GetCharacterMovement();
 	CharacterMovement->JumpZVelocity = StatManager->GetJumpForce();
 	CharacterMovement->GetNavAgentPropertiesRef().bCanCrouch = true;
-
+	
 	RightArmEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Right Arm Equipment"));
 	RightArmEquipment->SetupAttachment(FpsCamera);
 
@@ -45,12 +45,39 @@ void AAaronCharacter::BeginPlay()
 	MovementState = EMovementState::Run;
 	VaultTimeline->AddInterpFloat(CurveFloat, UpdateTimeline);
 	VaultTimeline->SetTimelineFinishedFunc(FinishTimeLine);
+
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AAaronCharacter::OnBeginOverlap);
+	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AAaronCharacter::OnEndOverlap);
+}
+
+void AAaronCharacter::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	APhysicsVolume* WaterVolume = Cast<APhysicsVolume>(OtherActor);
+	if(WaterVolume && WaterVolume->bWaterVolume)
+	{
+		UE_LOG(LogActor, Error, TEXT("In Water"));
+		IsInWater = true;
+		FBoxSphereBounds WaterBounds = WaterVolume->GetBounds();
+		WaterHeight = WaterBounds.Origin.Z + WaterBounds.BoxExtent.Z;
+	}
+}
+
+void AAaronCharacter::OnEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	APhysicsVolume* WaterVolume = Cast<APhysicsVolume>(OtherActor);
+	if (WaterVolume && WaterVolume->bWaterVolume)
+		IsInWater = false;
 }
 
 // Called every frame
 void AAaronCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (IsInWater && GetMesh()->GetSocketLocation(FName("head")).Z < WaterHeight)
+		StatManager->ConsumeOxygene(1.0f * DeltaTime);
+	else
+		StatManager->RecoveryOxygene(DeltaTime);
 
 	if (MovementState == EMovementState::Sprint && CharacterMovement->Velocity.Size() > 0.0f)
 	{
@@ -608,10 +635,8 @@ bool AAaronCharacter::VaultCheck(VaultTraceSettings TraceSettings)
 
 	if (FindWallToClimb(TraceSettings, InitialTraceImpactPoint, InitialTraceNormal))
 	{
-		UE_LOG(LogActor, Error, TEXT("FPS_Character::VaultCheck : Wall founded"));
 		if (CanClimbOnWall(TraceSettings, InitialTraceImpactPoint, InitialTraceNormal, VaultHeight, TransformAndTransform, VaultType))
 		{
-			UE_LOG(LogActor, Error, TEXT("FPS_Character::VaultCheck : Can Climb"));
 			VaultStart(VaultHeight, TransformAndTransform, VaultType);
 			return true;
 		}
@@ -682,10 +707,8 @@ bool AAaronCharacter::CanClimbOnWall(VaultTraceSettings TraceSettings, FVector& 
 
 	if (GetWorld()->SweepSingleByChannel(OutHit, Start, End, FQuat::Identity, ECC_GameTraceChannel2, CapsuleShape, CollisionParams))
 	{
-		UE_LOG(LogActor, Error, TEXT("FPS_Character::CanClimbOnWall : %s"), *OutHit.GetActor()->GetName());
 		if (/*GetCharacterMovement()->IsWalkable(OutHit)*/ true)
 		{
-			UE_LOG(LogActor, Error, TEXT("FPS_Character::CanClimbOnWall : Can Climb"));
 			DownTraceLocation = FVector(OutHit.Location.X, OutHit.Location.Y, OutHit.ImpactPoint.Z);
 			if (CapsuleHasRoomCheck(GetCapsuleBaseLocationFromBase(DownTraceLocation, 2.0f), 0.0f, 0.0f))
 			{
