@@ -27,7 +27,6 @@ UShapeAlteration::UShapeAlteration()
 	TimeMutation = 10.0f;
 	//IndexMutation = 0;
 	PrimaryComponentTick.bCanEverTick = true;
-	RegisterComponent();
 }
 
 UShapeAlteration::UShapeAlteration(int const Index_Mutation)
@@ -47,9 +46,9 @@ UShapeAlteration::UShapeAlteration(float const Time_Mutation,int const Index_Mut
 void UShapeAlteration::BeginPlay()
 {
 	Super::BeginPlay();
-	UE_LOG(LogActor, Warning, TEXT("TimeMutation : %f"), TimeMutation);
+	//UE_LOG(LogActor, Warning, TEXT("TimeMutation : %f"), TimeMutation);
 	//TimeMutation = 10.0f;
-	
+	RegisterComponent();
 	CheckComponent();
 }
 

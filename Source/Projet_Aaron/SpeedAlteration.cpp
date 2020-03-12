@@ -30,6 +30,7 @@ void USpeedAlteration::BeginPlay()
 void USpeedAlteration::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	//UE_LOG(LogActor, Warning, TEXT("TimeAlteration : %f"), TimeAlteration);
 	// ...
 }
 

@@ -18,8 +18,8 @@ public:
 	// Sets default values for this component's properties
 	USpeedAlteration();
 
-	UPROPERTY(EditAnywhere)
-		float SpeedReduction = -0.25f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Time, meta = (ExposeOnSpawn = true))
+		float SpeedReduction = -0.9f;
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
