@@ -58,6 +58,7 @@ void AFPS_Character::BeginPlay()
 	Super::BeginPlay();
 	VaultTimeline->AddInterpFloat(CurveFloat, UpdateTimeline);
 	VaultTimeline->SetTimelineFinishedFunc(FinishTimeLine);
+	CurrentStateMovement = EStateMovement::Run;
 }
 
 // Called every frame
@@ -168,11 +169,17 @@ void AFPS_Character::MoveCharacter(float AxisValue)
 	switch (EMovementCharacter)
 	{
 	case EMovement::Forward:
-		AddMovementInput(GetActorForwardVector(), AxisValue);
+		if (GetCharacterMovement()->IsSwimming())
+			AddMovementInput(FpsCamera->GetForwardVector(), AxisValue);
+		else
+			AddMovementInput(GetActorForwardVector(), AxisValue);
 		break;
 
 	case EMovement::Right:
-		AddMovementInput(GetActorRightVector(), AxisValue);
+		if (GetCharacterMovement()->IsSwimming())
+			AddMovementInput(FpsCamera->GetRightVector(), AxisValue);
+		else
+			AddMovementInput(GetActorRightVector(), AxisValue);
 		break;
 
 	default:
@@ -278,8 +285,6 @@ void AFPS_Character::StartJump()
 			else
 				UnCrouch();
 	}
-
-	UE_LOG(LogActor, Error, TEXT("FPS_Character::StartJump : VaultCheck = %d"), res);
 }
 
 void AFPS_Character::Sprint()
@@ -501,10 +506,8 @@ bool AFPS_Character::VaultCheck(VaultTraceSettings TraceSettings)
 
 	if(FindWallToClimb(TraceSettings, InitialTraceImpactPoint, InitialTraceNormal))
 	{
-		UE_LOG(LogActor, Error, TEXT("FPS_Character::VaultCheck : Wall founded"));
 		if(CanClimbOnWall(TraceSettings, InitialTraceImpactPoint, InitialTraceNormal, VaultHeight, TransformAndTransform, VaultType))
-		{
-			UE_LOG(LogActor, Error, TEXT("FPS_Character::VaultCheck : Can Climb"));
+		{;
 			VaultStart(VaultHeight, TransformAndTransform, VaultType);
 			return true;
 		}
@@ -575,11 +578,9 @@ bool AFPS_Character::CanClimbOnWall(VaultTraceSettings TraceSettings, FVector& I
 	CapsuleShape.MakeCapsule(TraceSettings.DownwardTraceRadius, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
 
 	if (GetWorld()->SweepSingleByChannel(OutHit, Start, End, FQuat::Identity, ECC_GameTraceChannel2, CapsuleShape, CollisionParams))
-	{
-		UE_LOG(LogActor, Error, TEXT("FPS_Character::CanClimbOnWall : %s"), *OutHit.GetActor()->GetName());
+	{;
 		if (/*GetCharacterMovement()->IsWalkable(OutHit)*/ true)
 		{
-			UE_LOG(LogActor, Error, TEXT("FPS_Character::CanClimbOnWall : Can Climb"));
 			DownTraceLocation = FVector(OutHit.Location.X, OutHit.Location.Y, OutHit.ImpactPoint.Z);
 			DrawDebugPoint(GetWorld(), DownTraceLocation, 10.0f, FColor::Yellow, false, 5.0f);
 			DrawDebugLine(GetWorld(), DownTraceLocation, DownTraceLocation + FVector(200.0f, 0, 0), FColor::Yellow, false, 5.0f);
