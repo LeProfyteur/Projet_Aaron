@@ -40,6 +40,10 @@ protected:
 		float ClimbSpeed = 0.1f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Climbing)
 		float ClimbRange = 400.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Climbing)
+		float Oxygene;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Climbing)
+		float OxygeneMax = 60.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		UMaterialParameterCollectionInstance* ParameterCollectionInstance;
