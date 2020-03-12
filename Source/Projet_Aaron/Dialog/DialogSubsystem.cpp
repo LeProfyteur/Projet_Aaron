@@ -3,6 +3,14 @@
 
 #include "DialogSubsystem.h"
 #include "Engine/Engine.h"
+#include "AIController.h"
+
+void UDialogSubsystem::Clear()
+{
+	Metrics.Reset();
+	Knowledge.Reset();
+	Dialog.Reset();
+}
 
 void UDialogSubsystem::SetMetric(FString MetricToUpdate, int32 NewValue)
 {
@@ -19,7 +27,7 @@ void UDialogSubsystem::IncrementMetric(FString MetricToUpdate)
 {
 	if (GEngine)
 	{
-		if (UDialogSubsystem* DialogSubsystem = GEngine->GetEngineSubsystem<UDialogSubsystem>())
+		if ( UDialogSubsystem* DialogSubsystem = GEngine->GetEngineSubsystem<UDialogSubsystem>() )
 		{
 			DialogSubsystem->Metrics.FindOrAdd(MetricToUpdate)++;
 		}
@@ -30,7 +38,7 @@ void UDialogSubsystem::UpdateKnowledge(FString KnowledgeToUpdate)
 {
 	if (GEngine)
 	{
-		if (UDialogSubsystem* DialogSubsystem = GEngine->GetEngineSubsystem<UDialogSubsystem>())
+		if ( UDialogSubsystem* DialogSubsystem = GEngine->GetEngineSubsystem<UDialogSubsystem>() )
 		{
 			DialogSubsystem->Knowledge.Add(KnowledgeToUpdate, true);
 		}
@@ -41,7 +49,7 @@ int UDialogSubsystem::GetMetric(FString MetricToGet)
 {
 	if (GEngine)
 	{
-		if (UDialogSubsystem* DialogSubsystem = GEngine->GetEngineSubsystem<UDialogSubsystem>())
+		if ( UDialogSubsystem* DialogSubsystem = GEngine->GetEngineSubsystem<UDialogSubsystem>() )
 		{
 			if(int32* ptr = DialogSubsystem->Metrics.Find(MetricToGet))
 			{
@@ -56,7 +64,7 @@ bool UDialogSubsystem::GetKnowledge(FString KnowledgeToGet)
 {
 	if (GEngine)
 	{
-		if (UDialogSubsystem* DialogSubsystem = GEngine->GetEngineSubsystem<UDialogSubsystem>())
+		if ( UDialogSubsystem* DialogSubsystem = GEngine->GetEngineSubsystem<UDialogSubsystem>() )
 		{
 			if (bool* ptr = DialogSubsystem->Knowledge.Find(KnowledgeToGet))
 			{
@@ -67,10 +75,15 @@ bool UDialogSubsystem::GetKnowledge(FString KnowledgeToGet)
 	return false;
 }
 
-void UDialogSubsystem::QueueDialog(UDialog* DataAssetDialog)
+void UDialogSubsystem::QueueDialog(UObject* WorldContextObject, UDialog* DataAssetDialog)
 {
-	if(DataAssetDialog && DataAssetDialog->IsValid() )
+	if( DataAssetDialog && DataAssetDialog->IsValid() )
 	{
-		
+		APawn* Pawn = WorldContextObject->GetWorld()->SpawnActor<APawn>(APawn::StaticClass());
+		Pawn->SpawnDefaultController();
+		if ( AAIController* Controller = Cast<AAIController>(Pawn->GetController()) )
+		{
+			Controller->RunBehaviorTree(DataAssetDialog->DialogBehaviourTree);
+		}
 	}
 }

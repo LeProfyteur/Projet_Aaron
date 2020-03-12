@@ -29,6 +29,9 @@ public:
 	TMap<FString, bool> Dialog;
 
 	UFUNCTION(BlueprintCallable)
+	void Clear();
+
+	UFUNCTION(BlueprintCallable)
 	static void SetMetric(FString MetricToUpdate, int32 NewValue);
 
 	UFUNCTION(BlueprintCallable)
@@ -43,6 +46,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	static bool GetKnowledge(FString KnowledgeToGet);
 
-	UFUNCTION(BlueprintCallable)
-	static void QueueDialog(UDialog* DataAssetDialog);
+	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
+	static void QueueDialog(UObject* WorldContextObject, UDialog* DataAssetDialog);
+
 };
