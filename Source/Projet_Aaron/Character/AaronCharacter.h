@@ -194,7 +194,6 @@ protected:
 	void Scan();
 
 	void PressedItemWheel();
-	void RepeatItemWheel();
 	void ReleaseItemWheel();
 	void DisplayWheel();
 
