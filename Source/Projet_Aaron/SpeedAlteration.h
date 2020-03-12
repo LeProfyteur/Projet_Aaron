@@ -38,6 +38,8 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UFUNCTION(BlueprintCallable, Category = "Speed")
+	/*UFUNCTION(BlueprintCallable, Category = "Speed")
 		void ReductionSpeed();
+	*/
+	virtual void OnComponentDestroyed(bool bDestroyingHierarchy) override;
 };
