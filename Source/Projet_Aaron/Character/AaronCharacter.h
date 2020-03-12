@@ -110,12 +110,13 @@ protected:
 		TSubclassOf<class UMainHudFixedSizeCPP> MainHudFixedSizeCPPClass;
 
 	bool bPressedAlt = false;
-
 	bool CrouchJumped = false;
-
 	bool IsClimbing = false;
 	bool IsLeftHandGripping = false;
 	bool IsRightHandGripping = false;
+	bool IsInWater = false;
+
+	float WaterHeight;
 
 	FVaultParams VaultParams;
 	FVaultComponentAndTransform VaultLedgeLS;
@@ -147,6 +148,12 @@ public:
 
 protected:
 	void BeginPlay() override;
+
+	UFUNCTION()
+	void OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	// Called to bind functionality to input
 	void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

@@ -81,6 +81,8 @@ public:
 		float GetSlideForce() const { return SlideForce; }
 	UFUNCTION(BlueprintCallable)
 		float GetSlideStopVelocity() const { return SlideStopVelocity; }
+	UFUNCTION(BlueprintCallable)
+		float GetOxygeneRate() const { return Oxygene / OxygeneMax; }
 
 	/*Setters*/
 	UFUNCTION(BlueprintCallable)
@@ -89,4 +91,8 @@ public:
 		void SetDodgeForce(float NewDodgeForce) { DodgeForce = NewDodgeForce; }
 
 		void TakeDamage(float BioDamage, float TechDamage);
+
+		void ConsumeOxygene(float OxygeneToConsume);
+
+		void RecoveryOxygene(float DeltaTime);
 };
