@@ -43,11 +43,11 @@ void AItem::Interact_Implementation(bool IsPressed, AActor* RefToInteractActor)
 	//Copy
 	if(IsPressed)
 	{
-		auto character = Cast<AFPS_Character>(RefToInteractActor);
+		UInventaireComponent* inventaire = RefToInteractActor->FindComponentByClass<UInventaireComponent>();
 
-		if(character)
+		if(inventaire)
 		{
-			character->InventaireComponent->AddToInventory(ItemStructure);
+			inventaire->AddToInventory(ItemStructure);
 		}
 
 		Destroy();
