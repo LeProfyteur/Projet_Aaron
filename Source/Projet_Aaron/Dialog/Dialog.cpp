@@ -3,11 +3,11 @@
 
 #include "Dialog.h"
 
-bool UDialog::IsValid(UObject* WorldContextObject)
+bool UDialog::IsValid()
 {
 	for(auto Condition : ListConditions)
 	{
-		bool Valid = Condition->Verify(WorldContextObject) ^ Condition->Inverted;
+		bool Valid = Condition->Verify() ^ Condition->Inverted;
 
 		if(Valid == false)
 		{

@@ -22,7 +22,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Condition")
 	int32 Value;
 
-	virtual bool Verify(UObject* WorldContextObject) override;
+	virtual bool Verify() override;
 };
 
 
@@ -39,7 +39,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Condition")
 	int32 Value;
 
-	virtual bool Verify(UObject* WorldContextObject) override;
+	virtual bool Verify() override;
 
 };
 
@@ -57,6 +57,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Condition")
 	int32 Value;
 
-	virtual bool Verify(UObject* WorldContextObject) override;
+	virtual bool Verify() override;
 
 };

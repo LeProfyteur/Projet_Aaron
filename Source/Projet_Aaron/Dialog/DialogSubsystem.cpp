@@ -66,3 +66,11 @@ bool UDialogSubsystem::GetKnowledge(FString KnowledgeToGet)
 	}
 	return false;
 }
+
+void UDialogSubsystem::QueueDialog(UDialog* DataAssetDialog)
+{
+	if(DataAssetDialog && DataAssetDialog->IsValid() )
+	{
+		
+	}
+}

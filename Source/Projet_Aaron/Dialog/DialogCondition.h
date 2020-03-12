@@ -19,6 +19,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Condition")
 		bool Inverted;
 
-	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
-	virtual bool Verify(UObject* WorldContextObject);
+	UFUNCTION(BlueprintCallable)
+	virtual bool Verify();
 };

@@ -4,8 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/EngineSubsystem.h"
+#include "Dialog.h"
+
 #include "DialogSubsystem.generated.h"
 
+class UDialog;
 /**
  * 
  */
@@ -17,23 +20,29 @@ class PROJET_AARON_API UDialogSubsystem : public UEngineSubsystem
 public:
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "metrics")
-		TMap<FString, int32> Metrics;
+	TMap<FString, int32> Metrics;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "metrics")
-		TMap<FString, bool> Knowledge;
+	TMap<FString, bool> Knowledge;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "metrics")
+	TMap<FString, bool> Dialog;
 
 	UFUNCTION(BlueprintCallable)
-		static void SetMetric(FString MetricToUpdate, int32 NewValue);
+	static void SetMetric(FString MetricToUpdate, int32 NewValue);
 
 	UFUNCTION(BlueprintCallable)
-		static void IncrementMetric(FString MetricToUpdate);
+	static void IncrementMetric(FString MetricToUpdate);
 
 	UFUNCTION(BlueprintCallable)
-		static void UpdateKnowledge(FString KnowledgeToUpdate);
+	static void UpdateKnowledge(FString KnowledgeToUpdate);
 
 	UFUNCTION(BlueprintCallable)
-		static int GetMetric(FString MetricToGet);
+	static int GetMetric(FString MetricToGet);
 
 	UFUNCTION(BlueprintCallable)
-		static bool GetKnowledge(FString KnowledgeToGet);
+	static bool GetKnowledge(FString KnowledgeToGet);
+
+	UFUNCTION(BlueprintCallable)
+	static void QueueDialog(UDialog* DataAssetDialog);
 };

@@ -4,17 +4,17 @@
 #include "MetricConditions.h"
 #include "DialogSubsystem.h"
 
-bool UIsMetricLowerThan::Verify(UObject* WorldContextObject)
+bool UIsMetricLowerThan::Verify()
 {
 	return UDialogSubsystem::GetMetric(MetricName) < Value;
 }
 
-bool UIsMetricEqual::Verify(UObject* WorldContextObject)
+bool UIsMetricEqual::Verify()
 {
 	return UDialogSubsystem::GetMetric(MetricName) == Value;
 }
 
-bool UIsMetricGreaterThan::Verify(UObject* WorldContextObject)
+bool UIsMetricGreaterThan::Verify()
 {
 	return UDialogSubsystem::GetMetric(MetricName) > Value;
 }

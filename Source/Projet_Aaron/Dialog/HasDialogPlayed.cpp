@@ -6,7 +6,7 @@
 #include "Projet_Aaron/Character/AaronPlayerControllerCPP.h"
 #include "DialogSubsystem.h"
 
-bool UHasDialogPlayed::Verify(UObject* WorldContextObject)
+bool UHasDialogPlayed::Verify()
 {
 	return UDialogSubsystem::GetKnowledge(DialogName) ;
 }

@@ -19,5 +19,5 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Condition")
 		FString DialogName;
 	
-	bool Verify(UObject* WorldContextObject) override;
+	bool Verify() override;
 };

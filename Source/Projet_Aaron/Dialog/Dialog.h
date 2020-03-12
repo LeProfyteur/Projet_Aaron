@@ -24,7 +24,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Dialog")
 	UBehaviorTree* DialogBehaviourTree;
 
-	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
-	bool IsValid(UObject* WorldContextObject);
+	UFUNCTION(BlueprintCallable)
+	bool IsValid();
 	
 };
