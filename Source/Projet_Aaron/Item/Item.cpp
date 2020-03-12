@@ -30,13 +30,12 @@ void AItem::Tick(float DeltaTime)
 
 bool AItem::UseItem_Implementation()
 {
-	UE_LOG(LogActor, Error, TEXT("UseItem : Item.CPP"));
 	return ItemStructure->IsConsomable;
 }
 
 FString AItem::GetLabel_Implementation()
 {
-	return ItemStructure->Name;
+	return (ItemStructure->Name + " [E]");
 }
 
 void AItem::Interact_Implementation(bool IsPressed, AActor* RefToInteractActor)
@@ -48,7 +47,6 @@ void AItem::Interact_Implementation(bool IsPressed, AActor* RefToInteractActor)
 
 		if(character)
 		{
-			UE_LOG(LogActor, Warning, TEXT("Return itemStructure from AItem : %s"), *ItemStructure->Name);
 			character->InventaireComponent->AddToInventory(ItemStructure);
 		}
 
