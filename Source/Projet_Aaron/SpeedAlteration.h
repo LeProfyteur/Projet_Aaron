@@ -31,7 +31,6 @@ protected:
 
 private:
 	float TimeAlteration;
-	float BaseSpeed;
 	
 	
 public:	
