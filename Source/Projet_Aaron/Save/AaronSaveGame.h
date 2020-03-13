@@ -9,8 +9,6 @@
 
 #include "AaronSaveGame.generated.h"
 
-
-//WIP : This Structure will represent a serialized Component. NOT USEABLE YET
 USTRUCT(BlueprintType)
 struct FComponentRecord
 {
@@ -21,11 +19,23 @@ public:
 		TSubclassOf<UActorComponent> Class;
 
 	UPROPERTY(SaveGame)
+		uint32 OwnerID;
+
+	UPROPERTY(SaveGame)
+		uint32 UniqueID;
+
+	UPROPERTY(SaveGame)
+		FName Name;
+
+	UPROPERTY(SaveGame)
 		TArray<uint8> ComponentData;
 
 	FORCEINLINE FArchive& Serialize(FArchive& Ar)
 	{
 		Ar << Class;
+		Ar << OwnerID;
+		Ar << UniqueID;
+		Ar << Name;
 		Ar << ComponentData;
 		return Ar;
 	}
@@ -40,6 +50,12 @@ public:
 	
 	UPROPERTY(SaveGame)
 		TSubclassOf<AActor> Class;
+
+	UPROPERTY(SaveGame)
+		uint32 UniqueID;
+
+	UPROPERTY(SaveGame)
+		uint32 ParentID;
 	
 	UPROPERTY(SaveGame)
 		FName Name;
@@ -50,12 +66,11 @@ public:
 	UPROPERTY(SaveGame)
 		TArray<uint8> ActorData;
 
-	UPROPERTY(SaveGame)
-		TArray<FComponentRecord> ComponentRecords;
-
 	FORCEINLINE FArchive& Serialize(FArchive& Ar)
 	{
 		Ar << Class;
+		Ar << UniqueID;
+		Ar << ParentID;
 		Ar << Name;
 		Ar << Transform;
 		Ar << ActorData;
@@ -72,13 +87,19 @@ public:
 	 * Name of the level to open
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ProjetAaron")
-	FString LevelName;
+		FString LevelName;
 
 	/**
-	 * Array of all the persisted Actors
+	 * Array of all the persisted Actors (without hierarchy)
 	 */
 	UPROPERTY(VisibleAnywhere, Category = "ProjetAaron")
-	TArray<FActorRecord> Actors;
+		TArray<FActorRecord> Actors;
+
+	/**
+	 * Array of all the persisted ActorComponents (without hierarchy)
+	 */
+	UPROPERTY(VisibleAnywhere, Category = "ProjetAaron")
+		TArray<FComponentRecord> Components;
 
 	/**
 	 * Default constructor
@@ -89,7 +110,9 @@ private:
 	//--------------------------------------------------------------------------//
 	// AaronSaveGame Functions
 	//--------------------------------------------------------------------------//
-	void Save(AActor* Actor);
+	void SaveActor(AActor* Actor);
+	void SaveComponent(UActorComponent* Component);
+
 	void PreLoad(UObject* WorldContextObject, FActorRecord& Record);
 	void PostLoad(AActor* Actor, FActorRecord& Record);
 
@@ -103,10 +126,10 @@ public:
 	static void Serialize(UObject* Object, UPARAM(ref) TArray<uint8>& Buffer);
 	
 	static void Deserialize(UObject* Object, UPARAM(ref) TArray<uint8>& Buffer);
-	
+
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
-	static void SaveAaronSaveGame(UObject* WorldContextObject, const FString& SlotName, int32 UserIndex);
-	
+	static UAaronSaveGame* CreateAaronSaveGame(UObject* WorldContextObject);
+
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
 	static void LoadAaronSaveGame(UObject* WorldContextObject, const FString& SlotName, int32 UserIndex);
 };

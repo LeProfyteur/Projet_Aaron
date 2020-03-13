@@ -6,24 +6,64 @@
 #include "Misc/Paths.h"
 #include "Serialization/ObjectAndNameAsStringProxyArchive.h"
 #include "Engine/World.h"
+#include "UObject/UObjectIterator.h"
+#include "AaronPersistentComponent.h"
 
 UAaronSaveGame::UAaronSaveGame()
 {
 }
 
-void UAaronSaveGame::Save(AActor* Actor)
+void UAaronSaveGame::SaveActor(AActor* Actor)
 {
+	//Reject invalid call
 	if (!Actor) return;
 
-	//Emplace a new Actor in the save
+	//Detect Transient Actors
+	UAaronPersistentComponent* Persistence = Actor->FindComponentByClass<UAaronPersistentComponent>();
+	if (!Persistence) return;
+	if (Persistence->Transient) return;
+		
+	//Serialize Actor
 	int32 Index = Actors.Emplace();
 	FActorRecord& Record = Actors[Index];
-
-	//Configure the Record data
+	Record.UniqueID = Actor->GetUniqueID();
+	Record.ParentID = Actor->GetParentActor() ? Actor->GetParentActor()->GetUniqueID() : uint32(INDEX_NONE);
 	Record.Class = Actor->GetClass();
 	Record.Name = Actor->GetFName();
 	Record.Transform = Actor->GetTransform();
 	Serialize(Actor, Record.ActorData);
+
+	//Serialize Actor's Components
+	for (auto ActorComponent : Actor->GetComponents())
+	{
+		if (ActorComponent)
+		{
+			SaveComponent(ActorComponent);
+		}
+	}
+
+	//Serialize Actor's Children (direct children only)
+	TArray<AActor*> ChildActors;
+	Actor->GetAllChildActors(ChildActors, false);
+	for (auto ChildActor : ChildActors)
+	{
+		SaveActor(ChildActor);
+	}
+}
+
+void UAaronSaveGame::SaveComponent(UActorComponent* Component)
+{
+	//Reject invalid call
+	if (!Component) return;
+	if (!Component->GetOwner()) return;
+
+	int32 Index = Components.Emplace();
+	FComponentRecord& Record = Components[Index];
+	Record.Class = Component->GetClass();
+	Record.OwnerID = Component->GetOwner()->GetUniqueID();
+	Record.UniqueID = Component->GetUniqueID();
+	Record.Name = Component->GetFName();
+	Serialize(Component, Record.ComponentData);
 }
 
 void UAaronSaveGame::PreLoad(UObject* WorldContextObject, FActorRecord& Record)
@@ -79,7 +119,6 @@ void UAaronSaveGame::Deserialize(UObject* Object, UPARAM(ref) TArray<uint8>& Buf
 {
 	if (Object)
 	{
-		UE_LOG(LogLevel, Warning, TEXT("Deserializing %s"), *Object->GetName());
 		FMemoryReader MemoryReader(Buffer, true);
 		FObjectAndNameAsStringProxyArchive Archive = FObjectAndNameAsStringProxyArchive(MemoryReader, true);
 		Archive.ArIsSaveGame = true;
@@ -89,23 +128,19 @@ void UAaronSaveGame::Deserialize(UObject* Object, UPARAM(ref) TArray<uint8>& Buf
 	}
 }
 
-void UAaronSaveGame::SaveAaronSaveGame(UObject* WorldContextObject, const FString& SlotName, int32 UserIndex)
+UAaronSaveGame* UAaronSaveGame::CreateAaronSaveGame(UObject* WorldContextObject)
 {
 	if (UAaronSaveGame* SaveGame = Cast<UAaronSaveGame>(UGameplayStatics::CreateSaveGameObject(UAaronSaveGame::StaticClass())))
 	{
-		//Save Level context
-		SaveGame->LevelName = UGameplayStatics::GetCurrentLevelName(WorldContextObject);
-
-		TArray<AActor*> PersistentActors;
-		UGameplayStatics::GetAllActorsWithTag(WorldContextObject, "AaronPersistent", PersistentActors);
-		for (auto Actor : PersistentActors)
+		//Persist all Actors
+		for (TObjectIterator<AActor> Itr; Itr; ++Itr)
 		{
-			SaveGame->Save(Actor);
+			SaveGame->SaveActor(*Itr);
 		}
-
-		//Persist SaveGame
-		UGameplayStatics::SaveGameToSlot(SaveGame, SlotName, UserIndex);
+		
+		return SaveGame;
 	}
+	return nullptr;
 }
 
 void UAaronSaveGame::LoadAaronSaveGame(UObject* WorldContextObject, const FString& SlotName, int32 UserIndex)
