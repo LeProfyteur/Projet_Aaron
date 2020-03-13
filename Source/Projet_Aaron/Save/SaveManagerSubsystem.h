@@ -17,10 +17,10 @@ struct FSaveSlot
 	GENERATED_BODY()
 public:
 	
-	UPROPERTY(SaveGame)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame)
 		FString SlotName;
 
-	UPROPERTY(SaveGame)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame)
 		int32 UserIndex;
 
 	FSaveSlot();
@@ -39,13 +39,13 @@ struct FSaveInfo
 	GENERATED_BODY()
 public:
 
-	UPROPERTY(SaveGame)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame)
 		FString DisplayName;
 
-	UPROPERTY(SaveGame)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame)
 		FString LevelName;
 
-	UPROPERTY(SaveGame)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame)
 		FDateTime Date;
 
 	//TODO : Include a Screenshot ? (Serialized Image or something similar ?)
@@ -95,4 +95,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void DeleteGame(const FSaveSlot& SaveSlot);
+
+	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
+		void LoadGame(UObject* WorldContextObject, const FSaveSlot& SaveSlot, bool ForceOpenLevel);
 };
