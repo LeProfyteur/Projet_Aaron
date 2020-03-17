@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "Projet_Aaron/DA_ItemStructure.h"
+#include "Projet_Aaron/Item/DA_ItemStructure.h"
 #include "ObjectInteractionInterface.generated.h"
 
 // This class does not need to be modified.

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "DA_ItemStructure.h"
+#include "Item/DA_ItemStructure.h"
 #include "Interact_Interface.generated.h"
 
 class UDA_SlotStructure;

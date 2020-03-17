@@ -3,8 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "DA_ItemStructure.h"
-#include "DA_SlotStructure.h"
+#include "Item/DA_SlotStructure.h"
 #include "Components/ActorComponent.h"
 #include "InventaireComponent.generated.h"
 
