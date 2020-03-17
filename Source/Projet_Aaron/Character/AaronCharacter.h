@@ -120,6 +120,7 @@ protected:
 
 	FVaultParams VaultParams;
 	FVaultComponentAndTransform VaultLedgeLS;
+	FVaultComponentAndTransform VaultLedgeWS;
 	FTransform VaultStartOffset;
 	FTransform VaultAnimatedStartOffset;
 
@@ -194,7 +195,6 @@ protected:
 	void Scan();
 
 	void PressedItemWheel();
-	void RepeatItemWheel();
 	void ReleaseItemWheel();
 	void DisplayWheel();
 
@@ -203,10 +203,10 @@ protected:
 	void PressedUseQuickItem();
 
 	bool VaultCheck(VaultTraceSettings TraceSettings);
-	void VaultStart(float VaultHeight, FVaultComponentAndTransform VaultLedgeWS, VaultType VaultType);
+	void VaultStart(float VaultHeight, VaultType VaultType);
 
 	bool FindWallToClimb(VaultTraceSettings TraceSettings, FVector& InitialTraceImpactPoint, FVector& InitialTraceNormal);
-	bool CanClimbOnWall(VaultTraceSettings TraceSettings, FVector& InitialTraceImpactPoint, FVector& InitialTraceNormal, float& VaultHeight, FVaultComponentAndTransform& TransformAndTransform, VaultType& Vault);
+	bool CanClimbOnWall(VaultTraceSettings TraceSettings, FVector& InitialTraceImpactPoint, FVector& InitialTraceNormal, float& VaultHeight, VaultType& Vault);
 	bool CapsuleHasRoomCheck(FVector TargetLocation, float HeightOffset, float RadiusOffset);
 	FVaultComponentAndTransform ConvertWorldToLocal(FVaultComponentAndTransform WorldSpaceVault);
 	FVaultComponentAndTransform ConvertLocalToWorld(FVaultComponentAndTransform LocalSpaceVault);

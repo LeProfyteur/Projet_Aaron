@@ -58,6 +58,7 @@ void AFPS_Character::BeginPlay()
 	Super::BeginPlay();
 	VaultTimeline->AddInterpFloat(CurveFloat, UpdateTimeline);
 	VaultTimeline->SetTimelineFinishedFunc(FinishTimeLine);
+	CurrentStateMovement = EMovementState::Run;
 }
 
 // Called every frame

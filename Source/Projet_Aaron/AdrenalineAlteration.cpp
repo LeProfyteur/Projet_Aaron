@@ -11,10 +11,10 @@ UAdrenalineAlteration::UAdrenalineAlteration()
 void UAdrenalineAlteration::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (GetOwner()->FindComponentByClass<UCreatureStatManager>())
+	_CreatureStatManager = GetOwner()->FindComponentByClass<UCreatureStatManager>();
+	if (_CreatureStatManager)
 	{
-		GetOwner()->FindComponentByClass<UCreatureStatManager>()->SetbAdrenalineBoost(true);
+		_CreatureStatManager->SetbAdrenalineBoost(true);
 	}
 
 	
@@ -22,8 +22,8 @@ void UAdrenalineAlteration::BeginPlay()
 
 void UAdrenalineAlteration::OnComponentDestroyed(bool bDestroyingHierarchy)
 {
-	if (GetOwner()->FindComponentByClass<UCreatureStatManager>())
+	if (_CreatureStatManager)
 	{
-		GetOwner()->FindComponentByClass<UCreatureStatManager>()->SetbAdrenalineBoost(false);
+		_CreatureStatManager->SetbAdrenalineBoost(false);
 	}
 }

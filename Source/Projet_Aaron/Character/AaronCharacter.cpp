@@ -86,7 +86,22 @@ void AAaronCharacter::Tick(float DeltaTime)
 	} else
 		StatManager->RecoveryStamina(DeltaTime);
 
-	if (MovementState == EMovementState::Slide && (CharacterMovement->Velocity.Size() <= StatManager->GetSlideStopVelocity() || CharacterMovement->IsSwimming()))
+	if (MovementState == EMovementState::Slide)
+	{
+		FHitResult HitResult;
+		FVector Start = GetActorLocation();
+		FVector End = GetActorLocation() - GetActorUpVector() * 200.0f;
+		GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility);
+
+		if (HitResult.IsValidBlockingHit())
+		{
+			FVector GroundNormal = HitResult.ImpactNormal;
+			float GroundAngle = GetActorUpVector().CosineAngle2D(GroundNormal);
+			// Continue sliding if angle is enough
+		}
+	}
+
+	if (MovementState == EMovementState::Slide && (CharacterMovement->Velocity.Size() <= 0.0f || CharacterMovement->IsSwimming()))
 	{
 		CharacterMovement->GroundFriction = 8.0f;
 		MovementState = EMovementState::Run;
@@ -181,7 +196,6 @@ void AAaronCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	PlayerInputComponent->BindAction("Scan", IE_Repeat, this, &AAaronCharacter::Scan);
 	
 	PlayerInputComponent->BindAction("ItemWheel", IE_Pressed, this, &AAaronCharacter::PressedItemWheel);
-	PlayerInputComponent->BindAction("ItemWheel", IE_Repeat, this, &AAaronCharacter::RepeatItemWheel);
 	PlayerInputComponent->BindAction("ItemWheel", IE_Released, this, &AAaronCharacter::ReleaseItemWheel);
 }
 
@@ -194,23 +208,22 @@ void AAaronCharacter::Climb(float DeltaTime)
 void AAaronCharacter::UpdateSpeed()
 {
 	float Multiplier = StatManager->GetSpeedMultiplier();
-	UCharacterMovementComponent* CM = CharacterMovement;
 	switch(MovementState)
 	{
 	case EMovementState::Run:
-		CM->MaxWalkSpeed = StatManager->GetRunSpeed() * Multiplier;
-		CM->MaxWalkSpeedCrouched = StatManager->GetCrouchRunSpeed() * Multiplier;
-		CM->MaxSwimSpeed = StatManager->GetSwimmingSpeed() * Multiplier;
+		CharacterMovement->MaxWalkSpeed = StatManager->GetRunSpeed() * Multiplier;
+		CharacterMovement->MaxWalkSpeedCrouched = StatManager->GetCrouchRunSpeed() * Multiplier;
+		CharacterMovement->MaxSwimSpeed = StatManager->GetSwimmingSpeed() * Multiplier;
 		break;
 	case EMovementState::Walk:
-		CM->MaxWalkSpeed = StatManager->GetWalkSpeed() * Multiplier;
-		CM->MaxWalkSpeedCrouched = StatManager->GetCrouchWalkSpeed() * Multiplier;
-		CM->MaxSwimSpeed = StatManager->GetSwimmingSpeed() * Multiplier;
+		CharacterMovement->MaxWalkSpeed = StatManager->GetWalkSpeed() * Multiplier;
+		CharacterMovement->MaxWalkSpeedCrouched = StatManager->GetCrouchWalkSpeed() * Multiplier;
+		CharacterMovement->MaxSwimSpeed = StatManager->GetSwimmingSpeed() * Multiplier;
 		break;
 	case EMovementState::Sprint:
-		CM->MaxWalkSpeed = StatManager->GetSprintSpeed() * Multiplier;
-		CM->MaxWalkSpeedCrouched = StatManager->GetCrouchRunSpeed() * Multiplier;
-		CM->MaxSwimSpeed = StatManager->GetSwimmingSprintSpeed() * Multiplier;
+		CharacterMovement->MaxWalkSpeed = StatManager->GetSprintSpeed() * Multiplier;
+		CharacterMovement->MaxWalkSpeedCrouched = StatManager->GetSprintSpeed() * Multiplier;
+		CharacterMovement->MaxSwimSpeed = StatManager->GetSwimmingSprintSpeed() * Multiplier;
 		break;
 	default: ;
 	}
@@ -218,15 +231,6 @@ void AAaronCharacter::UpdateSpeed()
 
 FVector AAaronCharacter::GetCharacterDirection() const
 {
-	FHitResult HitResult;
-	FVector Start = this->GetActorLocation();
-	FVector End = Start - GetActorUpVector() * GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
-	FVector GroundNormal = GetActorUpVector();
-	
-	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility);
-	if (HitResult.IsValidBlockingHit())
-		GroundNormal = HitResult.ImpactNormal;
-
 	FVector Direction = GetInputAxisValue("MoveForward") * GetActorForwardVector() + GetInputAxisValue("MoveRight") * GetActorRightVector();
 	Direction.Normalize();
 	return Direction;
@@ -294,7 +298,6 @@ void AAaronCharacter::Crouching()
 			Crouch();
 			CharacterMovement->GroundFriction = 0.f;
 			MovementState = EMovementState::Slide;
-			LaunchCharacter(GetCharacterDirection() * StatManager->GetSlideForce(), true, true);
 		}
 		else
 			Crouch();
@@ -497,21 +500,11 @@ void AAaronCharacter::Scan()
 
 void AAaronCharacter::PressedItemWheel()
 {
-	UE_LOG(LogActor, Warning, TEXT("Item wheel Pressed"));
 	CurrentTimePressedItemWheel += GetWorld()->GetDeltaSeconds();
 }
 
-void AAaronCharacter::RepeatItemWheel()
-{
-	UE_LOG(LogActor, Warning, TEXT("Item wheel Repeat"));
-}
-
-
 void AAaronCharacter::ReleaseItemWheel()
 {
-	UE_LOG(LogActor, Warning, TEXT("Item wheel Released"));
-
-
 	if (WheelDisplayed)
 	{
 		//reset wheel
@@ -586,8 +579,6 @@ void AAaronCharacter::UseMyItem(UDA_SlotStructure* ChosenSlot)
 
 void AAaronCharacter::PressedUseQuickItem()
 {
-	UE_LOG(LogActor, Warning, TEXT("Use Quick Item"));
-
 	if (IsValid(MainHudFixedSizeCPP->ChosenSlot) && MainHudFixedSizeCPP->ChosenSlot->Quantity > 0)
 	{
 		UseMyItem(MainHudFixedSizeCPP->ChosenSlot);
@@ -606,7 +597,7 @@ FVector AAaronCharacter::GetCapsuleBaseLocationFromBase(FVector BaseLocation, fl
 
 void AAaronCharacter::UpdateTimelineFunction(float value)
 {
-	FTransform VaultTarget = ConvertLocalToWorld(VaultLedgeLS).Transform;
+	FTransform VaultTarget = VaultLedgeWS.Transform;//ConvertLocalToWorld(VaultLedgeLS).Transform;
 	FVector VectorOfCurve = VaultParams.PositionCurve->GetVectorValue(VaultTimeline->GetPlaybackPosition() + VaultParams.StartingPosition);
 	FTransform BlendTrans = FTransform(VaultAnimatedStartOffset.GetRotation(), FVector(VaultAnimatedStartOffset.GetLocation().X, VaultAnimatedStartOffset.GetLocation().Y, VaultStartOffset.GetLocation().Z));
 	FTransform XYCorrectionTrans = UKismetMathLibrary::TLerp(VaultStartOffset, BlendTrans, VectorOfCurve.Y);
@@ -630,14 +621,13 @@ bool AAaronCharacter::VaultCheck(VaultTraceSettings TraceSettings)
 	VaultType VaultType;
 	FVector InitialTraceImpactPoint;
 	FVector InitialTraceNormal;
-	FVaultComponentAndTransform TransformAndTransform = FVaultComponentAndTransform();
 	float VaultHeight;
 
 	if (FindWallToClimb(TraceSettings, InitialTraceImpactPoint, InitialTraceNormal))
 	{
-		if (CanClimbOnWall(TraceSettings, InitialTraceImpactPoint, InitialTraceNormal, VaultHeight, TransformAndTransform, VaultType))
+		if (CanClimbOnWall(TraceSettings, InitialTraceImpactPoint, InitialTraceNormal, VaultHeight, VaultType))
 		{
-			VaultStart(VaultHeight, TransformAndTransform, VaultType);
+			VaultStart(VaultHeight, VaultType);
 			return true;
 		}
 	}
@@ -645,7 +635,7 @@ bool AAaronCharacter::VaultCheck(VaultTraceSettings TraceSettings)
 	return false;
 }
 
-void AAaronCharacter::VaultStart(float VaultHeight, FVaultComponentAndTransform VaultLedgeWS, VaultType VaultType)
+void AAaronCharacter::VaultStart(float VaultHeight, VaultType VaultType)
 {
 	VaultParams = GetVaultParam(VaultType, VaultHeight);
 	VaultLedgeLS = ConvertWorldToLocal(VaultLedgeWS);
@@ -689,7 +679,7 @@ bool AAaronCharacter::FindWallToClimb(VaultTraceSettings TraceSettings, FVector&
 	return false;
 }
 
-bool AAaronCharacter::CanClimbOnWall(VaultTraceSettings TraceSettings, FVector& InitialTraceImpactPoint, FVector& InitialTraceNormal, float& VaultHeight, FVaultComponentAndTransform& TransformAndTransform, VaultType& Vault)
+bool AAaronCharacter::CanClimbOnWall(VaultTraceSettings TraceSettings, FVector& InitialTraceImpactPoint, FVector& InitialTraceNormal, float& VaultHeight, VaultType& Vault)
 {
 	FVector DownTraceLocation;
 
@@ -707,14 +697,14 @@ bool AAaronCharacter::CanClimbOnWall(VaultTraceSettings TraceSettings, FVector& 
 
 	if (GetWorld()->SweepSingleByChannel(OutHit, Start, End, FQuat::Identity, ECC_GameTraceChannel2, CapsuleShape, CollisionParams))
 	{
-		if (/*GetCharacterMovement()->IsWalkable(OutHit)*/ true)
+		if (GetCharacterMovement()->IsWalkable(OutHit))
 		{
 			DownTraceLocation = FVector(OutHit.Location.X, OutHit.Location.Y, OutHit.ImpactPoint.Z);
 			if (CapsuleHasRoomCheck(GetCapsuleBaseLocationFromBase(DownTraceLocation, 2.0f), 0.0f, 0.0f))
 			{
 				FVector toRot = InitialTraceNormal * FVector(-1.0f, -1.0f, 0.0f);
 				FTransform Transform = FTransform(toRot.Rotation(), GetCapsuleBaseLocationFromBase(DownTraceLocation, 2.0f), FVector::OneVector);
-				TransformAndTransform = FVaultComponentAndTransform(OutHit.GetComponent(), Transform);
+				VaultLedgeWS = FVaultComponentAndTransform(OutHit.GetComponent(), Transform);
 				VaultHeight = (Transform.GetLocation() - GetActorLocation()).Z;
 
 				if (!GetCharacterMovement()->IsFalling())
