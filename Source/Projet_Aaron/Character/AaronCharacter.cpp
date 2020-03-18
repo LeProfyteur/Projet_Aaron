@@ -264,6 +264,8 @@ void AAaronCharacter::StartJumping()
 	if (GetCharacterMovement()->IsFalling())
 	{
 		VaultCheck(FallingTraceSettings);
+		CharacterMovement->SetMovementMode(EMovementMode::MOVE_Flying);
+		//CharacterMovement->GetGroundMovementMode();
 	}
 	else
 	{
@@ -298,6 +300,10 @@ void AAaronCharacter::EndJumping()
 		Jump();
 		bPressedJump = false;
 		JumpMultPercent = 0.0f;
+	}
+	if (CharacterMovement->GetGroundMovementMode() == 1)
+	{
+		CharacterMovement->SetMovementMode(CharacterMovement->DefaultLandMovementMode);
 	}
 }
 
