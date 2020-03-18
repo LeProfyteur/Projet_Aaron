@@ -105,8 +105,9 @@ void AAaronCharacter::Tick(float DeltaTime)
 		if (HitResult.IsValidBlockingHit())
 		{
 			FVector GroundNormal = HitResult.ImpactNormal;
-			float GroundAngle = GetActorUpVector().CosineAngle2D(GroundNormal);
+			float GroundAngle = FVector::DotProduct(GroundNormal, GetActorForwardVector());
 			// Continue sliding if angle is enough
+			UE_LOG(LogActor, Warning, TEXT("%f"), GroundAngle);
 		}
 	}
 
