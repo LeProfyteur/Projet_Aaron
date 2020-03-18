@@ -80,6 +80,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float RaycastDistanceInventory = 1000.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float JumpMultPercent = 0.0f;
+
 protected:
 
 	FHitResult* HitGrab = nullptr;
@@ -115,6 +118,7 @@ protected:
 	bool IsLeftHandGripping = false;
 	bool IsRightHandGripping = false;
 	bool IsInWater = false;
+	bool bPressedJump = false;
 
 	float WaterHeight;
 
@@ -166,10 +170,13 @@ protected:
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 
+	UFUNCTION(BlueprintCallable)
 	void StartJumping();
 
-	void Walking();
+	UFUNCTION(BlueprintCallable)
+	void EndJumping();
 
+	void Walking();
 	void Crouching();
 
 	void StartSprinting();

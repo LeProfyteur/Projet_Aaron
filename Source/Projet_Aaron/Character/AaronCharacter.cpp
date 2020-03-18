@@ -74,6 +74,13 @@ void AAaronCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (bPressedJump && JumpMultPercent < 1.0f)
+	{
+		JumpMultPercent += 0.25f * DeltaTime;
+		if (JumpMultPercent > 1.0f)
+			JumpMultPercent = 1.0f;
+	}
+
 	if (IsInWater && GetMesh()->GetSocketLocation(FName("head")).Z < WaterHeight)
 		StatManager->ConsumeOxygene(1.0f * DeltaTime);
 	else
@@ -171,7 +178,7 @@ void AAaronCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	PlayerInputComponent->BindAxis("LookUp", this, &AAaronCharacter::AddControllerPitchInput);
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AAaronCharacter::StartJumping);
-	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AAaronCharacter::StopJumping);
+	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AAaronCharacter::EndJumping);
 
 	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AAaronCharacter::StartSprinting);
 	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AAaronCharacter::StopSprinting);
@@ -254,30 +261,43 @@ void AAaronCharacter::MoveRight(float Value)
 
 void AAaronCharacter::StartJumping()
 {
-	bool res = false;
 	if (GetCharacterMovement()->IsFalling())
 	{
-		res = VaultCheck(FallingTraceSettings);
+		VaultCheck(FallingTraceSettings);
 	}
 	else
 	{
-		if (GetCharacterDirection().Size() != 0.0f)
-			res = VaultCheck(GroundedTraceSettings);
-		if (!res && MovementState != EMovementState::Climb && !CharacterMovement->IsSwimming() && StatManager->ConsumeStamina(StatManager->GetJumpStaminaCost()))
+		if (GetCharacterDirection().Size() == 0.0f || !VaultCheck(GroundedTraceSettings))
 		{
-			if (CharacterMovement->IsCrouching())
+			if (MovementState != EMovementState::Climb && !CharacterMovement->IsSwimming() && StatManager->ConsumeStamina(StatManager->GetJumpStaminaCost()))
 			{
-				if (MovementState == EMovementState::Slide)
+				if (CharacterMovement->IsCrouching())
 				{
-					CharacterMovement->GroundFriction = 8.0f;
-					MovementState = EMovementState::Run;
+					if (MovementState == EMovementState::Slide)
+					{
+						CharacterMovement->GroundFriction = 8.0f;
+						MovementState = EMovementState::Run;
+					}
+					UnCrouch();
+					CrouchJumped = true;
 				}
-				UnCrouch();
-				CrouchJumped = true;
+				else
+				{
+					bPressedJump = true;
+				}
 			}
-			else
-				Jump();
 		}
+	}
+}
+
+void AAaronCharacter::EndJumping()
+{
+	if (bPressedJump)
+	{
+		GetCharacterMovement()->JumpZVelocity = StatManager->GetJumpForce() * (1.0f + 2.0f * JumpMultPercent);
+		Jump();
+		bPressedJump = false;
+		JumpMultPercent = 0.0f;
 	}
 }
 
