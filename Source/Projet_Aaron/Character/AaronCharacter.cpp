@@ -265,6 +265,7 @@ void AAaronCharacter::StartJumping()
 	{
 		VaultCheck(FallingTraceSettings);
 		CharacterMovement->SetMovementMode(EMovementMode::MOVE_Flying);
+		GetWorldTimerManager().SetTimer(GliderTimerHandle, this, &AAaronCharacter::EndJumping, MaxTimeGliding);
 		//CharacterMovement->GetGroundMovementMode();
 	}
 	else

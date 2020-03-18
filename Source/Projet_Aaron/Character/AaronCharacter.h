@@ -83,6 +83,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float JumpMultPercent = 0.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float MaxTimeGliding = 2.0f;
+
 protected:
 
 	FHitResult* HitGrab = nullptr;
@@ -137,6 +140,9 @@ protected:
 
 	float RightAxisMovement;
 	float ForwardAxisMovement;
+
+	/* Handle to manage the timer */
+	FTimerHandle GliderTimerHandle;
 
 	float CurrentTimePressedItemWheel = 0.f;
 	bool WheelDisplayed = false;
