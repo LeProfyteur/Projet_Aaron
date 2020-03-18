@@ -164,6 +164,12 @@ void AAaronCharacter::Tick(float DeltaTime)
 		Jump();
 		CrouchJumped = false;
 	}
+
+	if(CharacterMovement->MovementMode==EMovementMode::MOVE_Flying)
+	{
+		//FlightMode
+		GetMesh()->AddForce(FVector(0, 0, -1000), "None", false);
+	}
 }
 
 // Called to bind functionality to input
@@ -302,7 +308,7 @@ void AAaronCharacter::EndJumping()
 		bPressedJump = false;
 		JumpMultPercent = 0.0f;
 	}
-	if (CharacterMovement->GetGroundMovementMode() == 1)
+	if (CharacterMovement->MovementMode == EMovementMode::MOVE_Flying)
 	{
 		CharacterMovement->SetMovementMode(CharacterMovement->DefaultLandMovementMode);
 	}

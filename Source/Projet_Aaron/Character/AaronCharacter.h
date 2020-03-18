@@ -84,7 +84,7 @@ public:
 	float JumpMultPercent = 0.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float MaxTimeGliding = 2.0f;
+		float MaxTimeGliding = 5.0f;
 
 protected:
 
