@@ -23,13 +23,12 @@ void UInventaireComponent::AddToInventory(UDA_ItemStructure* ItemToAdd)
 		//UDA_SlotStructure slot;
 		slot->ItemStructure = ItemToAdd;
 		slot->Quantity = 1;
-		UE_LOG(LogActor, Warning, TEXT("Pickup nom : %s"), *slot->ItemStructure->Name);
 		Inventory.Add(slot);
 		if(slot->ItemStructure->Category==ECategoryEnum::CE_Consomable)
 		{
 			if(InventoryConsomable.Num()>=3)
 			{
-				UE_LOG(LogActor, Error, TEXT("Already 3 slot taken in inventoryConsomable"));
+				//UE_LOG(LogActor, Error, TEXT("Already 3 slot taken in inventoryConsomable"));
 			}else
 			{
 				InventoryConsomable.Add(slot);
@@ -38,19 +37,17 @@ void UInventaireComponent::AddToInventory(UDA_ItemStructure* ItemToAdd)
 		{
 			if(InventoryFlacon.Num()>=3)
 			{
-				UE_LOG(LogActor, Error, TEXT("Already 3 slot taken in InventorySeringue"));
+				//UE_LOG(LogActor, Error, TEXT("Already 3 slot taken in InventorySeringue"));
 			}else
 			{
 				InventoryFlacon.Add(slot);
 			}
 		}
-		UE_LOG(LogActor, Warning, TEXT("Size inventory Conso : %d"), InventoryConsomable.Num());
 		//Inventory.Insert(slot, 0);
 	}
 	else
 	{
 		int index = GetIndexSlot(ItemToAdd);
-		UE_LOG(LogActor, Warning, TEXT("Index : %d"), index);
 
 		if (index < 0)
 		{
@@ -63,7 +60,7 @@ void UInventaireComponent::AddToInventory(UDA_ItemStructure* ItemToAdd)
 			{
 				if (InventoryConsomable.Num() >= 3)
 				{
-					UE_LOG(LogActor, Error, TEXT("Already 3 slot taken in inventoryConsomable"));
+					//UE_LOG(LogActor, Error, TEXT("Already 3 slot taken in inventoryConsomable"));
 				}
 				else
 				{
@@ -74,7 +71,7 @@ void UInventaireComponent::AddToInventory(UDA_ItemStructure* ItemToAdd)
 			{
 				if (InventoryFlacon.Num() >= 3)
 				{
-					UE_LOG(LogActor, Error, TEXT("Already 3 slot taken in InventorySeringue"));
+					//UE_LOG(LogActor, Error, TEXT("Already 3 slot taken in InventorySeringue"));
 				}
 				else
 				{
@@ -99,7 +96,7 @@ void UInventaireComponent::AddToInventory(UDA_ItemStructure* ItemToAdd)
 				}
 				else
 				{
-					UE_LOG(LogActor, Error, TEXT("Already 3 stack full in InventoryConso"));
+					//UE_LOG(LogActor, Error, TEXT("Already 3 stack full in InventoryConso"));
 
 				}
 			}
@@ -113,7 +110,7 @@ void UInventaireComponent::AddToInventory(UDA_ItemStructure* ItemToAdd)
 				}
 				else
 				{
-					UE_LOG(LogActor, Error, TEXT("Already 3 stack full in InventorySeringue"));
+					//UE_LOG(LogActor, Error, TEXT("Already 3 stack full in InventorySeringue"));
 
 				}
 			}
@@ -159,20 +156,16 @@ void UInventaireComponent::PrepareInventory()
 	NumberOfSlots = 6;
 	Inventory.Reserve(NumberOfSlots);
 	InventoryName = "Backpack";
-	UE_LOG(LogActor, Warning, TEXT("InventorySetup"));
 }
 
 int UInventaireComponent::GetIndexSlot(UDA_ItemStructure* ItemToSearch)
 {
 	// index = -1;
-	UE_LOG(LogActor, Warning, TEXT("Size Inventory : %d"), Inventory.Num());
 
 	for (int i = 0; i < Inventory.Num(); i++)
 	{
-		UE_LOG(LogActor, Warning, TEXT("Item search : %d"), Inventory[i]->Quantity);
 		if (Inventory[i]->ItemStructure->Name == ItemToSearch->Name && Inventory[i]->ItemStructure->MaxStackSize > Inventory[i]->Quantity)
 		{
-			UE_LOG(LogActor, Warning, TEXT("Item trouvé : %p"), Inventory[i]);
 			return i;
 		}
 	}
@@ -181,14 +174,12 @@ int UInventaireComponent::GetIndexSlot(UDA_ItemStructure* ItemToSearch)
 
 int UInventaireComponent::GetIndexSlotConso(UDA_ItemStructure* ItemToSearch)
 {
-	UE_LOG(LogActor, Warning, TEXT("Size Inventory : %d"), InventoryConsomable.Num());
 
 	for (int i = 0; i < InventoryConsomable.Num(); i++)
 	{
 		UE_LOG(LogActor, Warning, TEXT("Item search : %d"), InventoryConsomable[i]->Quantity);
 		if (InventoryConsomable[i]->ItemStructure->Name == ItemToSearch->Name && InventoryConsomable[i]->ItemStructure->MaxStackSize > InventoryConsomable[i]->Quantity)
 		{
-			UE_LOG(LogActor, Warning, TEXT("Item trouvé : %p"), InventoryConsomable[i]);
 			return i;
 		}
 	}
@@ -197,14 +188,12 @@ int UInventaireComponent::GetIndexSlotConso(UDA_ItemStructure* ItemToSearch)
 
 int UInventaireComponent::GetIndexSlotSeringue(UDA_ItemStructure* ItemToSearch)
 {
-	UE_LOG(LogActor, Warning, TEXT("Size Inventory : %d"), InventoryFlacon.Num());
 
 	for (int i = 0; i < InventoryFlacon.Num(); i++)
 	{
 		UE_LOG(LogActor, Warning, TEXT("Item search : %d"), InventoryFlacon[i]->Quantity);
 		if (InventoryFlacon[i]->ItemStructure->Name == ItemToSearch->Name && InventoryFlacon[i]->ItemStructure->MaxStackSize > InventoryFlacon[i]->Quantity)
 		{
-			UE_LOG(LogActor, Warning, TEXT("Item trouvé : %p"), InventoryFlacon[i]);
 			return i;
 		}
 	}

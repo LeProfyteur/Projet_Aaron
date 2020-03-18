@@ -575,7 +575,7 @@ void AAaronCharacter::UseMyItem(UDA_SlotStructure* ChosenSlot)
 		if (ChosenSlot->ItemStructure->IsConsomable)
 		{
 			FTransform* transform = new FTransform();
-			transform->SetScale3D(FVector(0., 0., 0.));
+			transform->SetScale3D(FVector(0.1, 0.1, 0.1));
 			AItem* item = (AItem*)GetWorld()->SpawnActor(ChosenSlot->ItemStructure->Class.Get(), transform, FActorSpawnParameters());
 			bool bItemUsed = item->UseItem();
 			item->Destroy();
