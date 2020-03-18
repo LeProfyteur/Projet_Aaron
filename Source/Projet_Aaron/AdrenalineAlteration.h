@@ -16,6 +16,8 @@ class PROJET_AARON_API UAdrenalineAlteration : public UShapeAlteration
 {
 	GENERATED_BODY()
 
+protected:
+	UCreatureStatManager* _CreatureStatManager;
 public :
 
 	UAdrenalineAlteration();

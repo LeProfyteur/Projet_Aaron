@@ -30,13 +30,12 @@ void AItem::Tick(float DeltaTime)
 
 bool AItem::UseItem_Implementation()
 {
-	UE_LOG(LogActor, Error, TEXT("UseItem : Item.CPP"));
 	return ItemStructure->IsConsomable;
 }
 
 FString AItem::GetLabel_Implementation()
 {
-	return ItemStructure->Name;
+	return (ItemStructure->Name + " [E]");
 }
 
 void AItem::Interact_Implementation(bool IsPressed, AActor* RefToInteractActor)
@@ -44,12 +43,11 @@ void AItem::Interact_Implementation(bool IsPressed, AActor* RefToInteractActor)
 	//Copy
 	if(IsPressed)
 	{
-		auto character = Cast<AFPS_Character>(RefToInteractActor);
+		UInventaireComponent* inventaire = RefToInteractActor->FindComponentByClass<UInventaireComponent>();
 
-		if(character)
+		if(inventaire)
 		{
-			UE_LOG(LogActor, Warning, TEXT("Return itemStructure from AItem : %s"), *ItemStructure->Name);
-			character->InventaireComponent->AddToInventory(ItemStructure);
+			inventaire->AddToInventory(ItemStructure);
 		}
 
 		Destroy();
