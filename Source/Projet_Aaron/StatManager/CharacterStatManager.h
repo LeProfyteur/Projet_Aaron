@@ -40,6 +40,12 @@ protected:
 		float ClimbSpeed = 0.1f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Climbing)
 		float ClimbRange = 400.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oxygene)
+		float Oxygene;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oxygene)
+		float OxygeneMax = 60.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Jump)
+		float MaxJumpMulti = 3.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		UMaterialParameterCollectionInstance* ParameterCollectionInstance;
@@ -77,6 +83,8 @@ public:
 		float GetSlideForce() const { return SlideForce; }
 	UFUNCTION(BlueprintCallable)
 		float GetSlideStopVelocity() const { return SlideStopVelocity; }
+	UFUNCTION(BlueprintCallable)
+		float GetOxygeneRate() const { return Oxygene / OxygeneMax; }
 
 	/*Setters*/
 	UFUNCTION(BlueprintCallable)
@@ -85,4 +93,8 @@ public:
 		void SetDodgeForce(float NewDodgeForce) { DodgeForce = NewDodgeForce; }
 
 		void TakeDamage(float BioDamage, float TechDamage);
+
+		void ConsumeOxygene(float OxygeneToConsume);
+
+		void RecoveryOxygene(float DeltaTime);
 };
