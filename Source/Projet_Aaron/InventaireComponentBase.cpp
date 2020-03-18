@@ -10,7 +10,7 @@ UInventaireBaseComponent::UInventaireBaseComponent()
 
 void UInventaireBaseComponent::PrepareInventory()
 {
-	NumberOfSlots = 80;
+	NumberOfSlots = 8;
 	Inventory.Reserve(NumberOfSlots);
 	InventoryConsomable.Reserve(NumberOfSlots);
 	InventoryFlacon.Reserve(NumberOfSlots);
