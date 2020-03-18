@@ -6,7 +6,6 @@
 
 bool AItem_FlaconCPP::UseItem_Implementation()
 {
-	UE_LOG(LogActor, Warning, TEXT("FlaconCPP::UseItem"));
 	FHitResult OutHit;
 	//APawn* character = GetWorld()->GetFirstPlayerController()->GetPawn();
 	AAaronCharacter* Character = Cast<AAaronCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
