@@ -34,17 +34,17 @@ public:
 		TArray<UDA_SlotStructure*> InventoryConsomable;
 
 	UFUNCTION(BlueprintCallable)
-		void AddToInventory(UDA_ItemStructure* ItemToAdd);
+		virtual void AddToInventory(UDA_ItemStructure* ItemToAdd);
 
 	UFUNCTION(BlueprintCallable)
 		void RemoveFromInventory(UDA_SlotStructure* SlotToRemove);
 
 	UFUNCTION(BlueprintCallable)
-		void PrepareInventory();
+		virtual void PrepareInventory();
 
-	int GetIndexSlot(UDA_ItemStructure* ItemToSearch);
-	int GetIndexSlotConso(UDA_ItemStructure* ItemToSearch);
-	int GetIndexSlotSeringue(UDA_ItemStructure* ItemToSearch);
+	virtual int GetIndexSlot(UDA_ItemStructure* ItemToSearch);
+	virtual int GetIndexSlotConso(UDA_ItemStructure* ItemToSearch);
+	virtual int GetIndexSlotSeringue(UDA_ItemStructure* ItemToSearch);
 
 
 protected:

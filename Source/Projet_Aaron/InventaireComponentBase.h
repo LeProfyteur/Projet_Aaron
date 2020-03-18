@@ -9,12 +9,15 @@
 /**
  * 
  */
-UCLASS()
-class PROJET_AARON_API UInventaireComponentBase : public UInventaireComponent
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
+class PROJET_AARON_API UInventaireBaseComponent : public UInventaireComponent
 {
 	GENERATED_BODY()
 
 public:
-	void AddToInventory(UDA_ItemStructure* ItemToAdd);
-	
+	UInventaireBaseComponent();
+	void PrepareInventory() override;
+	int GetIndexSlot(UDA_ItemStructure* ItemToSearch) override;
+	int GetIndexSlotConso(UDA_ItemStructure* ItemToSearch) override;
+	int GetIndexSlotSeringue(UDA_ItemStructure* ItemToSearch) override;
 };
