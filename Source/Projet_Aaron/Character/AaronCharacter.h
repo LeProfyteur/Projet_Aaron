@@ -80,6 +80,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float RaycastDistanceInventory = 1000.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float JumpMultPercent = 0.0f;
+
 protected:
 
 	FHitResult* HitGrab = nullptr;
@@ -110,15 +113,18 @@ protected:
 		TSubclassOf<class UMainHudFixedSizeCPP> MainHudFixedSizeCPPClass;
 
 	bool bPressedAlt = false;
-
 	bool CrouchJumped = false;
-
 	bool IsClimbing = false;
 	bool IsLeftHandGripping = false;
 	bool IsRightHandGripping = false;
+	bool IsInWater = false;
+	bool bPressedJump = false;
+
+	float WaterHeight;
 
 	FVaultParams VaultParams;
 	FVaultComponentAndTransform VaultLedgeLS;
+	FVaultComponentAndTransform VaultLedgeWS;
 	FTransform VaultStartOffset;
 	FTransform VaultAnimatedStartOffset;
 
@@ -148,6 +154,12 @@ public:
 protected:
 	void BeginPlay() override;
 
+	UFUNCTION()
+	void OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
 	// Called to bind functionality to input
 	void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -158,10 +170,13 @@ protected:
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 
+	UFUNCTION(BlueprintCallable)
 	void StartJumping();
 
-	void Walking();
+	UFUNCTION(BlueprintCallable)
+	void EndJumping();
 
+	void Walking();
 	void Crouching();
 
 	void StartSprinting();
@@ -187,7 +202,6 @@ protected:
 	void Scan();
 
 	void PressedItemWheel();
-	void RepeatItemWheel();
 	void ReleaseItemWheel();
 	void DisplayWheel();
 
@@ -196,10 +210,10 @@ protected:
 	void PressedUseQuickItem();
 
 	bool VaultCheck(VaultTraceSettings TraceSettings);
-	void VaultStart(float VaultHeight, FVaultComponentAndTransform VaultLedgeWS, VaultType VaultType);
+	void VaultStart(float VaultHeight, VaultType VaultType);
 
 	bool FindWallToClimb(VaultTraceSettings TraceSettings, FVector& InitialTraceImpactPoint, FVector& InitialTraceNormal);
-	bool CanClimbOnWall(VaultTraceSettings TraceSettings, FVector& InitialTraceImpactPoint, FVector& InitialTraceNormal, float& VaultHeight, FVaultComponentAndTransform& TransformAndTransform, VaultType& Vault);
+	bool CanClimbOnWall(VaultTraceSettings TraceSettings, FVector& InitialTraceImpactPoint, FVector& InitialTraceNormal, float& VaultHeight, VaultType& Vault);
 	bool CapsuleHasRoomCheck(FVector TargetLocation, float HeightOffset, float RadiusOffset);
 	FVaultComponentAndTransform ConvertWorldToLocal(FVaultComponentAndTransform WorldSpaceVault);
 	FVaultComponentAndTransform ConvertLocalToWorld(FVaultComponentAndTransform LocalSpaceVault);

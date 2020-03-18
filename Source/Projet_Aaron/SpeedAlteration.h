@@ -18,8 +18,8 @@ public:
 	// Sets default values for this component's properties
 	USpeedAlteration();
 
-	UPROPERTY(EditAnywhere)
-		float SpeedReduction = -0.25f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Time, meta = (ExposeOnSpawn = true))
+		float SpeedReduction = -0.9f;
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -31,13 +31,14 @@ protected:
 
 private:
 	float TimeAlteration;
-	float BaseSpeed;
 	
 	
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UFUNCTION(BlueprintCallable, Category = "Speed")
+	/*UFUNCTION(BlueprintCallable, Category = "Speed")
 		void ReductionSpeed();
+	*/
+	virtual void OnComponentDestroyed(bool bDestroyingHierarchy) override;
 };
