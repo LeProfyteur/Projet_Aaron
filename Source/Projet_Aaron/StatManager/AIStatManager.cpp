@@ -57,7 +57,7 @@ float UAIStatManager::GetPeripheralVision()
                 return 0.f;
 
             UAISenseConfig_Sight* ConfigSight = Cast<UAISenseConfig_Sight>(Config);
-
+            
             return ConfigSight->PeripheralVisionAngleDegrees;
         }
         else return 0.f;

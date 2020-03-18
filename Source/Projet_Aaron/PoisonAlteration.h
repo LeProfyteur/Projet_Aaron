@@ -19,6 +19,11 @@ class PROJET_AARON_API UPoisonAlteration : public UShapeAlteration
 public:	
 	// Sets default values for this component's properties
 	UPoisonAlteration();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage", meta = (ExposeOnSpawn = true))
+		float PoisonDamageBio = 5.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage", meta = (ExposeOnSpawn = true))
+		float PoisonDamageTech = 3.0f;
 	
 	
 
@@ -26,9 +31,7 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 	
-	//UFUNCTION(BlueprintCallable, Category = "Damage")
-	float PoisonDamageBio;
-	float PoisonDamageTech;
+	
 	
 	UPROPERTY() UStatManager* _statManager;
 
