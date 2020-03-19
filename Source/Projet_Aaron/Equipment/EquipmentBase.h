@@ -28,7 +28,7 @@ protected:
 public:	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		void Activate(bool isPressed);
-		virtual void Activate_Implementation(bool isPressed) override;
+		virtual void Activate_Implementation(bool isPressed) override; 
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 		void OnEquip();
