@@ -164,12 +164,6 @@ void AAaronCharacter::Tick(float DeltaTime)
 		Jump();
 		CrouchJumped = false;
 	}
-
-	if(CharacterMovement->MovementMode==EMovementMode::MOVE_Flying)
-	{
-		//FlightMode
-		GetMesh()->AddForce(FVector(0, 0, -1000), "None", false);
-	}
 }
 
 // Called to bind functionality to input
@@ -270,9 +264,13 @@ void AAaronCharacter::StartJumping()
 	if (GetCharacterMovement()->IsFalling())
 	{
 		VaultCheck(FallingTraceSettings);
-		CharacterMovement->SetMovementMode(EMovementMode::MOVE_Flying);
+		//CharacterMovement->SetMovementMode(EMovementMode::MOVE_Flying);
+		
+		IsGliding = true;
+		CharacterMovement->GravityScale = 0.15f;
+		CharacterMovement->AirControl = 1.0f;
+		CharacterMovement->FallingLateralFriction = 10.0f;
 		GetWorldTimerManager().SetTimer(GliderTimerHandle, this, &AAaronCharacter::EndJumping, MaxTimeGliding);
-		//CharacterMovement->GetGroundMovementMode();
 	}
 	else
 	{
@@ -308,9 +306,12 @@ void AAaronCharacter::EndJumping()
 		bPressedJump = false;
 		JumpMultPercent = 0.0f;
 	}
-	if (CharacterMovement->MovementMode == EMovementMode::MOVE_Flying)
+	if (IsGliding)
 	{
-		CharacterMovement->SetMovementMode(CharacterMovement->DefaultLandMovementMode);
+		CharacterMovement->GravityScale = 1.0f;
+		CharacterMovement->AirControl = 0.5f;
+		CharacterMovement->FallingLateralFriction = 0.0f;
+		IsGliding = false;
 	}
 }
 

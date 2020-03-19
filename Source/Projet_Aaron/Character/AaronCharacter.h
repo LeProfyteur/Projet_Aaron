@@ -85,6 +85,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float MaxTimeGliding = 5.0f;
+	bool IsGliding = false;
 
 protected:
 
