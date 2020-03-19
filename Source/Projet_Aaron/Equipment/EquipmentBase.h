@@ -9,6 +9,7 @@
 #include "EquipmentInterface.h"
 #include "EquipmentBase.generated.h"
 
+struct FCharacterSkills;
 UCLASS()
 class PROJET_AARON_API AEquipmentBase : public AActor, public IEquipmentInterface
 {
@@ -31,10 +32,10 @@ public:
 		virtual void Activate_Implementation(bool isPressed) override; 
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		void OnEquip();
-		virtual void OnEquip_Implementation() override;
+		void OnEquip(FCharacterSkills Skills);
+		virtual void OnEquip_Implementation(FCharacterSkills Skills) override;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		void OnUnequip();
-		virtual void OnUnequip_Implementation() override;
+		void OnUnequip(FCharacterSkills Skills);
+		virtual void OnUnequip_Implementation(FCharacterSkills Skills) override;
 };
