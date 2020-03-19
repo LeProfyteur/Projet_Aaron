@@ -108,12 +108,11 @@ void AAaronCharacter::Tick(float DeltaTime)
 		{
 			FVector GroundNormal = HitResult.ImpactNormal;
 			float GroundAngle = FVector::DotProduct(GroundNormal, SlideRotation);
-			if (GroundAngle >= 0.4f) //We are on a slope steep enough
+			if (GroundAngle >= StatManager->GetSlopeSlideAngle()) //We are on a slope steep enough
 			{
 				float SlideVelocity = StatManager->GetSprintSpeed();
-				FVector Direction = SlideRotation;
-				CharacterMovement->Velocity = FVector(SlideVelocity * Direction.X, SlideVelocity * Direction.Y, 0.0f);
-			} else if (GroundAngle <= -0.3f)
+				CharacterMovement->Velocity = FVector(SlideVelocity * SlideRotation.X, SlideVelocity * SlideRotation.Y, 0.0f);
+			} else if (GroundAngle <= -(StatManager->GetSlopeStoppingAngle()))
 			{
 				CharacterMovement->Velocity = FVector::ZeroVector;
 			}
