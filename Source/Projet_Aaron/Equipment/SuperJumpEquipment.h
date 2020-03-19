@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "EquipmentBase.h"
-#include "HighJumpEquipment.generated.h"
+#include "SuperJumpEquipment.generated.h"
 
 /**
  * 
