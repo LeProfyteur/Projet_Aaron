@@ -48,7 +48,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame)
 		FDateTime Date;
 
-	//TODO : Include a Screenshot ? (Serialized Image or something similar ?)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame)
+		FTimespan PlayTime;
 };
 
 /**

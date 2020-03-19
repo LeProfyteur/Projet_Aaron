@@ -9,6 +9,49 @@
 #include "UObject/UObjectIterator.h"
 #include "AaronPersistentComponent.h"
 
+static inline UActorComponent* GetComponentByFName(AActor* Owner, const FName& Name)
+{
+	for (UActorComponent* Component : Owner->GetComponents())
+	{
+		if (Component && Component->GetFName() == Name)
+			return Component;
+	}
+	return nullptr;
+}
+
+
+bool FSerializationContext::Register(uint32 UniqueID, AActor* Actor)
+{
+	//Reject invalid calls
+	if (!Actor) return false;
+
+	//Reject Already registered objects
+	if (Actors.Contains(UniqueID)) return false;
+
+	//Register object
+	Actors.Add(UniqueID, Actor);
+	return true;
+}
+
+bool FSerializationContext::Register(uint32 UniqueID, UActorComponent* Component)
+{
+	//Reject invalid calls
+	if (!Component) return false;
+
+	//Reject Already registered objects
+	if (Components.Contains(UniqueID)) return false;
+
+	//Register object
+	Components.Add(UniqueID, Component);
+	return false;
+}
+
+void FSerializationContext::Reset()
+{
+	Actors.Reset();
+	Components.Reset();
+}
+
 UAaronSaveGame::UAaronSaveGame()
 {
 }
@@ -64,6 +107,70 @@ void UAaronSaveGame::SaveComponent(UActorComponent* Component)
 	Record.UniqueID = Component->GetUniqueID();
 	Record.Name = Component->GetFName();
 	Serialize(Component, Record.ComponentData);
+}
+
+void UAaronSaveGame::Load(UObject* WorldContextObject)
+{
+	UWorld* World = WorldContextObject->GetWorld();
+	FSerializationContext SerializationContext;
+
+	//Load Actors
+	for (auto& Record : Actors)
+	{
+		FActorSpawnParameters SpawnParameters;
+		SpawnParameters.Name = Record.Name;
+		UClass* ActorClass = Record.Class.Get();
+		AActor* Actor = World->SpawnActor<AActor>(ActorClass, Record.Transform, SpawnParameters);
+		Deserialize(Actor, Record.ActorData);
+
+		//Register using the Serialized ID (for reference resolving)
+		SerializationContext.Register(Record.UniqueID, Actor);
+
+		//Find the subset of Component Records that were owned by this Actor
+		TArray<FComponentRecord> ActorSerializedComponents;
+		FindComponentsForActor(Record.UniqueID, ActorSerializedComponents);
+
+
+		//Load ONLY persisted Components. Destroy Components that should not be there anymore.
+		TArray<UActorComponent*> DeserializedComponents;
+		for (auto& ComponentRecord : ActorSerializedComponents)
+		{
+			UActorComponent* Component = GetComponentByFName(Actor, ComponentRecord.Name);
+
+			//Component requires instantiation
+			if (!Component)
+			{
+				UClass* Class = ComponentRecord.Class.Get();
+
+				//BROKEN : Crashes on load
+				Component = Cast<UActorComponent>(Actor->CreateDefaultSubobject(ComponentRecord.Name, UActorComponent::StaticClass(), Class, false, false));
+			}
+
+			//Deserialize Component
+			Deserialize(Component, ComponentRecord.ComponentData);
+			DeserializedComponents.Add(Component);
+		}
+
+		for (auto Component : Actor->GetComponents())
+		{
+			// Ignore already destroyed OR deserialized components
+			if (!Component) continue;
+			if (DeserializedComponents.Contains(Component)) continue;
+
+			//Destroy this component. It wasn't serialized because it was destroyed (or transient ?)
+			Component->DestroyComponent();
+		}
+	}
+}
+
+void UAaronSaveGame::FindComponentsForActor(uint32 ActorUniqueID, TArray<FComponentRecord>& Records)
+{
+	Records.Reset();
+	for (auto& Record : Components)
+	{
+		if (Record.OwnerID == ActorUniqueID)
+			Records.Add(Record);
+	}
 }
 
 void UAaronSaveGame::PreLoad(UObject* WorldContextObject, FActorRecord& Record)
@@ -137,6 +244,8 @@ UAaronSaveGame* UAaronSaveGame::CreateAaronSaveGame(UObject* WorldContextObject)
 		{
 			SaveGame->SaveActor(*Itr);
 		}
+
+		//TODO : Persist Subsystem data?
 		
 		return SaveGame;
 	}
@@ -146,20 +255,7 @@ UAaronSaveGame* UAaronSaveGame::CreateAaronSaveGame(UObject* WorldContextObject)
 void UAaronSaveGame::LoadAaronSaveGame(UObject* WorldContextObject, const FString& SlotName, int32 UserIndex)
 {
 	if (UAaronSaveGame* SaveGame = Cast<UAaronSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, UserIndex)))
-	{	
-		//Instantiate all Actors in the World (without applying their presets)
-		for (FActorRecord& Record : SaveGame->Actors)
-		{
-			SaveGame->PreLoad(WorldContextObject, Record);
-		}
-		
-		//Configure all instantiated Actors deserializing their respective Records
-		for (FActorRecord& Record : SaveGame->Actors)
-		{		
-//			AActor* Actor = SaveGame->ActorSerializationContext.FindRef(Record.UniqueID);
-//			SaveGame->PostLoad(Actor, Record);
-		}
-		
-		UE_LOG(LogLevel, Warning, TEXT("Loaded SaveGame %s with %d Actors"), *SlotName, SaveGame->Actors.Num());
+	{
+		SaveGame->Load(WorldContextObject);
 	}
 }

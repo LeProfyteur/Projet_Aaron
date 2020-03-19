@@ -78,6 +78,17 @@ public:
 	}
 };
 
+struct FSerializationContext
+{
+	TMap<uint32, AActor*> Actors;
+	TMap<uint32, UActorComponent*> Components;
+
+	bool Register(uint32 UniqueID, AActor* Actor);
+	bool Register(uint32 UniqueID, UActorComponent* Component);
+
+	void Reset();
+};
+
 UCLASS(BlueprintType)
 class PROJET_AARON_API UAaronSaveGame : public USaveGame
 {
@@ -100,7 +111,7 @@ public:
 	 */
 	UPROPERTY(VisibleAnywhere, Category = "ProjetAaron")
 		TArray<FComponentRecord> Components;
-
+	
 	/**
 	 * Default constructor
 	 */
@@ -113,6 +124,9 @@ private:
 	void SaveActor(AActor* Actor);
 	void SaveComponent(UActorComponent* Component);
 
+	void Load(UObject* WorldContextObject);
+	void FindComponentsForActor(uint32 ActorUniqueID, TArray<FComponentRecord>& Records); // MAYDO : optimize that to avoid copying data around
+
 	void PreLoad(UObject* WorldContextObject, FActorRecord& Record);
 	void PostLoad(AActor* Actor, FActorRecord& Record);
 
@@ -120,8 +134,6 @@ public:
 	//--------------------------------------------------------------------------//
 	// Static Utility Functions
 	//--------------------------------------------------------------------------//
-
-	//TODO : list save games ?
 	
 	static void Serialize(UObject* Object, UPARAM(ref) TArray<uint8>& Buffer);
 	

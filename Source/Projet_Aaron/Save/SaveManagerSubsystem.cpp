@@ -103,7 +103,9 @@ void USaveManagerSubsystem::SaveGame(const FSaveSlot& SaveSlot, const FSaveInfo&
 	if (UGameplayStatics::SaveGameToSlot(SaveGame, SaveSlot.SlotName, SaveSlot.UserIndex))
 	{
 		//New Save or Override Save, same operation.
-		GetIndex()->Saves.Add(SaveSlot, SaveInfo);
+		FSaveInfo UpdatedSaveInfo = SaveInfo;
+		UpdatedSaveInfo.Date = FDateTime::Now();
+		GetIndex()->Saves.Add(SaveSlot, UpdatedSaveInfo);
 		SaveIndex();
 	}
 }
