@@ -92,7 +92,9 @@ void AAaronCharacter::Tick(float DeltaTime)
 	{
 		if (!StatManager->ConsumeStamina(StatManager->GetSprintStaminaCost() * DeltaTime))
 			MovementState = EMovementState::Run;
-	} else
+	} else if (MovementState == EMovementState::Sprint && CharacterMovement->Velocity.Size() <= 0.0f)
+		MovementState = EMovementState::Run;
+	else
 		StatManager->RecoveryStamina(DeltaTime);
 
 	if (MovementState == EMovementState::Slide)
@@ -106,8 +108,15 @@ void AAaronCharacter::Tick(float DeltaTime)
 		{
 			FVector GroundNormal = HitResult.ImpactNormal;
 			float GroundAngle = FVector::DotProduct(GroundNormal, GetActorForwardVector());
-			// Continue sliding if angle is enough
-			UE_LOG(LogActor, Warning, TEXT("%f"), GroundAngle);
+			if (GroundAngle >= 0.4f) //We are on a slope steep enough
+			{
+				float SlideVelocity = StatManager->GetSprintSpeed();
+				FVector Direction = GetActorRotation().Vector();
+				CharacterMovement->Velocity = FVector(SlideVelocity * Direction.X, SlideVelocity * Direction.Y, 0.0f);
+			} else if (GroundAngle <= -0.3f)
+			{
+				CharacterMovement->Velocity = FVector::ZeroVector;
+			}
 		}
 	}
 
@@ -183,12 +192,14 @@ void AAaronCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AAaronCharacter::StartJumping);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AAaronCharacter::EndJumping);
 
-	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AAaronCharacter::StartSprinting);
-	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AAaronCharacter::StopSprinting);
+	/*PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AAaronCharacter::StartSprinting);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AAaronCharacter::StopSprinting);*/
 
-	PlayerInputComponent->BindAction("Walk", IE_Pressed, this, &AAaronCharacter::Walking);
+	PlayerInputComponent->BindAction("Walk", IE_Pressed, this, &AAaronCharacter::ToggleWalk);
 
-	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &AAaronCharacter::Crouching);
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AAaronCharacter::ToggleSprint);
+
+	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &AAaronCharacter::ToggleCrouch);
 
 	PlayerInputComponent->BindAction("Dodge", IE_Pressed, this, &AAaronCharacter::Dodge);
 	
@@ -324,15 +335,7 @@ void AAaronCharacter::EndJumping()
 	}
 }
 
-void AAaronCharacter::Walking()
-{
-	if (MovementState == EMovementState::Run)
-		MovementState = EMovementState::Walk;
-	else if (MovementState == EMovementState::Walk)
-		MovementState = EMovementState::Run;
-}
-
-void AAaronCharacter::Crouching()
+void AAaronCharacter::ToggleCrouch()
 {
 	if (CanCrouch() && !CharacterMovement->IsSwimming())
 	{
@@ -356,7 +359,28 @@ void AAaronCharacter::Crouching()
 	}
 }
 
-void AAaronCharacter::StartSprinting()
+void AAaronCharacter::ToggleWalk()
+{
+	if (MovementState == EMovementState::Run)
+		MovementState = EMovementState::Walk;
+	else if (MovementState == EMovementState::Walk)
+		MovementState = EMovementState::Run;
+}
+
+void AAaronCharacter::ToggleSprint()
+{
+	
+	if (MovementState == EMovementState::Sprint)
+		MovementState = EMovementState::Run;
+	else if (CharacterMovement->Velocity.Size() > 0.0f)
+	{
+		UnCrouch();
+		MovementState = EMovementState::Sprint;
+	}
+		
+}
+
+/*void AAaronCharacter::StartSprinting()
 {
 	UnCrouch();
 	MovementState = EMovementState::Sprint;
@@ -366,7 +390,8 @@ void AAaronCharacter::StopSprinting()
 {
 	if (MovementState != EMovementState::Slide)
 		MovementState = EMovementState::Run;
-}
+}*/
+
 
 void AAaronCharacter::Dodge()
 {

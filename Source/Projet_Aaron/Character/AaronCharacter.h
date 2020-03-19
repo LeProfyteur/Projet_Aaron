@@ -185,9 +185,12 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void EndJumping();
+    
+	void ToggleWalk();
 
-	void Walking();
-	void Crouching();
+	void ToggleSprint();
+
+	void ToggleCrouch();
 
 	void StartSprinting();
 	void StopSprinting();
