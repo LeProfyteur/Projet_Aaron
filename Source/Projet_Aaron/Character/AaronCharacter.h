@@ -141,6 +141,7 @@ protected:
 	FVector ClimbPosition = FVector::ZeroVector;
 	FVector LeftHandPosition = FVector::ZeroVector;
 	FVector RightHandPosition = FVector::ZeroVector;
+	FVector SlideRotation = FVector::ZeroVector;
 
 	float RightAxisMovement;
 	float ForwardAxisMovement;
@@ -192,8 +193,8 @@ protected:
 
 	void ToggleCrouch();
 
-	void StartSprinting();
-	void StopSprinting();
+	/*void StartSprinting();
+	void StopSprinting();*/
 
 	void Dodge();
 
