@@ -32,8 +32,11 @@ enum class EMovementState : uint8
 	Slide
 };
 
+USTRUCT(BlueprintType)
 struct FCharacterSkills
 {
+	GENERATED_BODY()
+
 	bool SuperJump;
 	bool Glider;
 	bool Gills;
@@ -59,6 +62,33 @@ struct FCharacterSkills
 		CocotteMinute = false;
 	}
 };
+//struct FCharacterSkills
+//{
+//	bool SuperJump;
+//	bool Glider;
+//	bool Gills;
+//	bool MagnetBoots;
+//	bool NightVision;
+//	bool Pheromone;
+//	bool Allergy;
+//	bool Hallucination;
+//	bool BioRegeneration;
+//	bool CocotteMinute;
+//
+//	FCharacterSkills()
+//	{
+//		SuperJump = false;
+//		Glider = false;
+//		Gills = false;
+//		MagnetBoots = false;
+//		NightVision = false;
+//		Pheromone = false;
+//		Allergy = false;
+//		Hallucination = false;
+//		BioRegeneration = false;
+//		CocotteMinute = false;
+//	}
+//};
 
 struct FVaultComponentAndTransform
 {

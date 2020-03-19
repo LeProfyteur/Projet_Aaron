@@ -266,6 +266,15 @@ void AAaronCharacter::StartJumping()
 	if (GetCharacterMovement()->IsFalling())
 	{
 		VaultCheck(FallingTraceSettings);
+		//CharacterMovement->SetMovementMode(EMovementMode::MOVE_Flying);
+		if(Skills.Glider)
+		{
+			IsGliding = true;
+			CharacterMovement->GravityScale = 0.15f;
+			CharacterMovement->AirControl = 1.0f;
+			CharacterMovement->FallingLateralFriction = 10.0f;
+			GetWorldTimerManager().SetTimer(GliderTimerHandle, this, &AAaronCharacter::EndJumping, MaxTimeGliding);
+		}
 	}
 	else
 	{
@@ -304,6 +313,13 @@ void AAaronCharacter::EndJumping()
 		}
 		else
 			Jump();
+	}
+	if (IsGliding)
+	{
+		CharacterMovement->GravityScale = 1.0f;
+		CharacterMovement->AirControl = 0.5f;
+		CharacterMovement->FallingLateralFriction = 0.0f;
+		IsGliding = false;
 	}
 }
 
