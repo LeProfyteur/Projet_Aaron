@@ -81,7 +81,7 @@ public:
 		float RaycastDistanceInventory = 1000.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float JumpMultPercent = 0.0f;
+		float JumpMultPercent = 0.0f;
 
 protected:
 
@@ -109,8 +109,11 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TSubclassOf<class UUInventoryCastObject> InventoryCastObjectClass;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TSubclassOf<class UMainHudFixedSizeCPP> MainHudFixedSizeCPPClass;
+
+	FCharacterSkills Skills;
 
 	bool bPressedAlt = false;
 	bool CrouchJumped = false;
@@ -134,9 +137,6 @@ protected:
 	FVector ClimbPosition = FVector::ZeroVector;
 	FVector LeftHandPosition = FVector::ZeroVector;
 	FVector RightHandPosition = FVector::ZeroVector;
-
-	float RightAxisMovement;
-	float ForwardAxisMovement;
 
 	float CurrentTimePressedItemWheel = 0.f;
 	bool WheelDisplayed = false;

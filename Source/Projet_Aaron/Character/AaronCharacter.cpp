@@ -32,6 +32,8 @@ AAaronCharacter::AAaronCharacter()
 	InventaireComponent = CreateDefaultSubobject<UInventaireComponent>(TEXT("InventaireComponent"));
 	InventaireComponent->PrepareInventory();
 
+	Skills = FCharacterSkills();
+
 	VaultTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Vault Timeline"));
 
 	UpdateTimeline.BindUFunction(this, FName("UpdateTimelineFunction"));
@@ -269,7 +271,7 @@ void AAaronCharacter::StartJumping()
 	{
 		if (GetCharacterDirection().Size() == 0.0f || !VaultCheck(GroundedTraceSettings))
 		{
-			if (MovementState != EMovementState::Climb && !CharacterMovement->IsSwimming() && StatManager->ConsumeStamina(StatManager->GetJumpStaminaCost()))
+			if (MovementState != EMovementState::Climb && !CharacterMovement->IsSwimming())
 			{
 				if (CharacterMovement->IsCrouching())
 				{
@@ -279,9 +281,8 @@ void AAaronCharacter::StartJumping()
 						MovementState = EMovementState::Run;
 					}
 					UnCrouch();
-					CrouchJumped = true;
 				}
-				else
+				else if (Skills.SuperJump)
 				{
 					bPressedJump = true;
 				}
@@ -292,12 +293,17 @@ void AAaronCharacter::StartJumping()
 
 void AAaronCharacter::EndJumping()
 {
-	if (bPressedJump)
+	if (!GetCharacterMovement()->IsFalling() && StatManager->ConsumeStamina(StatManager->GetJumpStaminaCost()))
 	{
-		GetCharacterMovement()->JumpZVelocity = StatManager->GetJumpForce() * (1.0f + 2.0f * JumpMultPercent);
-		Jump();
-		bPressedJump = false;
-		JumpMultPercent = 0.0f;
+		if (bPressedJump && Skills.SuperJump)
+		{
+			GetCharacterMovement()->JumpZVelocity = StatManager->GetJumpForce() * (1.0f + 2.0f * JumpMultPercent);
+			Jump();
+			bPressedJump = false;
+			JumpMultPercent = 0.0f;
+		}
+		else
+			Jump();
 	}
 }
 
