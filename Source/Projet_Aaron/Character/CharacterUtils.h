@@ -32,6 +32,34 @@ enum class EMovementState : uint8
 	Slide
 };
 
+struct FCharacterSkills
+{
+	bool SuperJump;
+	bool Glider;
+	bool Gills;
+	bool MagnetBoots;
+	bool NightVision;
+	bool Pheromone;
+	bool Allergy;
+	bool Hallucination;
+	bool BioRegeneration;
+	bool CocotteMinute;
+
+	FCharacterSkills()
+	{
+		SuperJump = false;
+		Glider = false;
+		Gills = false;
+		MagnetBoots = false;
+		NightVision = false;
+		Pheromone = false;
+		Allergy = false;
+		Hallucination = false;
+		BioRegeneration = false;
+		CocotteMinute = false;
+	}
+};
+
 struct FVaultComponentAndTransform
 {
 	UPrimitiveComponent* Component;

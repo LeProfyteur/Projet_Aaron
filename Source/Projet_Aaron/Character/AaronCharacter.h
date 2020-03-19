@@ -81,7 +81,7 @@ public:
 		float RaycastDistanceInventory = 1000.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float JumpMultPercent = 0.0f;
+		float JumpMultPercent = 0.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float MaxTimeGliding = 5.0f;
@@ -113,8 +113,11 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TSubclassOf<class UUInventoryCastObject> InventoryCastObjectClass;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TSubclassOf<class UMainHudFixedSizeCPP> MainHudFixedSizeCPPClass;
+
+	FCharacterSkills Skills;
 
 	bool bPressedAlt = false;
 	bool CrouchJumped = false;
