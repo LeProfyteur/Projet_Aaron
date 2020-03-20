@@ -279,9 +279,8 @@ void AAaronCharacter::StartJumping()
 {
 	if (GetCharacterMovement()->IsFalling())
 	{
-		VaultCheck(FallingTraceSettings);
 		//CharacterMovement->SetMovementMode(EMovementMode::MOVE_Flying);
-		if(Skills.Glider)
+		if(!VaultCheck(FallingTraceSettings) && Skills.Glider)
 		{
 			IsGliding = true;
 			CharacterMovement->GravityScale = 0.15f;
@@ -309,6 +308,10 @@ void AAaronCharacter::StartJumping()
 				{
 					bPressedJump = true;
 				}
+				else if (StatManager->ConsumeStamina(StatManager->GetJumpStaminaCost()))
+				{
+					Jump();
+				}
 			}
 		}
 	}
@@ -316,17 +319,15 @@ void AAaronCharacter::StartJumping()
 
 void AAaronCharacter::EndJumping()
 {
-	if (!GetCharacterMovement()->IsFalling() && StatManager->ConsumeStamina(StatManager->GetJumpStaminaCost()))
+	if (Skills.SuperJump && !GetCharacterMovement()->IsFalling() && StatManager->ConsumeStamina(StatManager->GetJumpStaminaCost()))
 	{
-		if (bPressedJump && Skills.SuperJump)
+		if (bPressedJump)
 		{
 			GetCharacterMovement()->JumpZVelocity = StatManager->GetJumpForce() * (1.0f + 2.0f * JumpMultPercent);
 			Jump();
 			bPressedJump = false;
 			JumpMultPercent = 0.0f;
 		}
-		else
-			Jump();
 	}
 	if (IsGliding)
 	{
