@@ -32,6 +32,10 @@ protected:
 		float SlideForce = 1000.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sliding)
 		float SlideStopVelocity = 25.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sliding)
+		float SlopeSlidingAngle = 0.3f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sliding)
+		float SlopeStoppingAngle = 0.3f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Dodging)
 		float DodgeStaminaCost = 5.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Dodging)
@@ -85,6 +89,10 @@ public:
 		float GetSlideStopVelocity() const { return SlideStopVelocity; }
 	UFUNCTION(BlueprintCallable)
 		float GetOxygeneRate() const { return Oxygene / OxygeneMax; }
+	UFUNCTION(BlueprintCallable)
+		float GetSlopeSlideAngle() const { return SlopeSlidingAngle; }
+	UFUNCTION(BlueprintCallable)
+		float GetSlopeStoppingAngle() const { return SlopeStoppingAngle; }
 
 	/*Setters*/
 	UFUNCTION(BlueprintCallable)

@@ -141,6 +141,7 @@ protected:
 	FVector ClimbPosition = FVector::ZeroVector;
 	FVector LeftHandPosition = FVector::ZeroVector;
 	FVector RightHandPosition = FVector::ZeroVector;
+	FVector SlideRotation = FVector::ZeroVector;
 
 	float RightAxisMovement;
 	float ForwardAxisMovement;
@@ -185,12 +186,15 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void EndJumping();
+    
+	void ToggleWalk();
 
-	void Walking();
-	void Crouching();
+	void ToggleSprint();
 
-	void StartSprinting();
-	void StopSprinting();
+	void ToggleCrouch();
+
+	/*void StartSprinting();
+	void StopSprinting();*/
 
 	void Dodge();
 
