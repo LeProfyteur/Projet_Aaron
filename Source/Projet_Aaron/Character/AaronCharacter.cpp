@@ -76,7 +76,7 @@ void AAaronCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (bPressedJump && JumpMultPercent < 1.0f)
+	if (Skills.SuperJump && bPressedJump && JumpMultPercent < 1.0f)
 	{
 		JumpMultPercent += 0.25f * DeltaTime;
 		if (JumpMultPercent > 1.0f)
@@ -84,7 +84,10 @@ void AAaronCharacter::Tick(float DeltaTime)
 	}
 
 	if (IsInWater && GetMesh()->GetSocketLocation(FName("head")).Z < WaterHeight)
-		StatManager->ConsumeOxygene(1.0f * DeltaTime);
+	{
+		if (!Skills.Gills)
+			StatManager->ConsumeOxygene(1.0f * DeltaTime);
+	}
 	else
 		StatManager->RecoveryOxygene(DeltaTime);
 
