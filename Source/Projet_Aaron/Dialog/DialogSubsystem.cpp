@@ -10,6 +10,10 @@ void UDialogSubsystem::Clear()
 	Metrics.Reset();
 	Knowledge.Reset();
 	Dialog.Reset();
+
+	DialogPlaying = false;
+
+	DialogQueue.~TQueue();
 }
 
 void UDialogSubsystem::SetMetric(FString MetricToUpdate, int32 NewValue)
@@ -75,21 +79,28 @@ bool UDialogSubsystem::GetKnowledge(FString KnowledgeToGet)
 	return false;
 }
 
+void PlayDialog(UObject* WorldContextObject, UDialog* DataAssetDialog)
+{
+	if (DataAssetDialog && DataAssetDialog->IsValid())
+	{
+		APawn* Pawn = WorldContextObject->GetWorld()->SpawnActor<APawn>(APawn::StaticClass());
+		Pawn->SpawnDefaultController();
+		if (AAIController* Controller = Cast<AAIController>(Pawn->GetController()))
+		{
+			Controller->RunBehaviorTree(DataAssetDialog->DialogBehaviourTree);
+		}
+	}
+}
+
 void UDialogSubsystem::QueueDialog(UObject* WorldContextObject, UDialog* DataAssetDialog)
 {
 	if (UDialogSubsystem* DialogSubsystem = GEngine->GetEngineSubsystem<UDialogSubsystem>())
 	{
 		if(DialogSubsystem->DialogPlaying == false)
 		{
-			if (DataAssetDialog && DataAssetDialog->IsValid())
-			{
-				APawn* Pawn = WorldContextObject->GetWorld()->SpawnActor<APawn>(APawn::StaticClass());
-				Pawn->SpawnDefaultController();
-				if (AAIController* Controller = Cast<AAIController>(Pawn->GetController()))
-				{
-					Controller->RunBehaviorTree(DataAssetDialog->DialogBehaviourTree);
-				}
-			}
+			UE_LOG(LogTemp, Warning, TEXT("Your message"));
+
+			PlayDialog(WorldContextObject, DataAssetDialog);
 		}
 		else
 		{
@@ -109,16 +120,5 @@ void UDialogSubsystem::UpdateQueue(UObject * WorldContextObject)
 	}
 }
 
-void PlayDialog(UObject* WorldContextObject, UDialog* DataAssetDialog)
-{
-	if (DataAssetDialog && DataAssetDialog->IsValid())
-	{
-		APawn* Pawn = WorldContextObject->GetWorld()->SpawnActor<APawn>(APawn::StaticClass());
-		Pawn->SpawnDefaultController();
-		if (AAIController* Controller = Cast<AAIController>(Pawn->GetController()))
-		{
-			Controller->RunBehaviorTree(DataAssetDialog->DialogBehaviourTree);
-		}
-	}
-}
+
 
