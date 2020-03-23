@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Subsystems/EngineSubsystem.h"
 #include "Dialog.h"
+#include "Containers/Queue.h"
 
 #include "DialogSubsystem.generated.h"
 
@@ -28,6 +29,12 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "metrics")
 	TMap<FString, bool> Dialog;
 
+	//UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "dialogqueue")
+	TQueue<UDialog*> DialogQueue;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "dialogqueue")
+	bool DialogPlaying;
+
 	UFUNCTION(BlueprintCallable)
 	void Clear();
 
@@ -48,5 +55,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
 	static void QueueDialog(UObject* WorldContextObject, UDialog* DataAssetDialog);
+
+	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
+	static void UpdateQueue(UObject* WorldContextObject);
+
+
 
 };

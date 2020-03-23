@@ -77,13 +77,48 @@ bool UDialogSubsystem::GetKnowledge(FString KnowledgeToGet)
 
 void UDialogSubsystem::QueueDialog(UObject* WorldContextObject, UDialog* DataAssetDialog)
 {
-	if( DataAssetDialog && DataAssetDialog->IsValid() )
+	if (UDialogSubsystem* DialogSubsystem = GEngine->GetEngineSubsystem<UDialogSubsystem>())
+	{
+		if(DialogSubsystem->DialogPlaying == false)
+		{
+			if (DataAssetDialog && DataAssetDialog->IsValid())
+			{
+				APawn* Pawn = WorldContextObject->GetWorld()->SpawnActor<APawn>(APawn::StaticClass());
+				Pawn->SpawnDefaultController();
+				if (AAIController* Controller = Cast<AAIController>(Pawn->GetController()))
+				{
+					Controller->RunBehaviorTree(DataAssetDialog->DialogBehaviourTree);
+				}
+			}
+		}
+		else
+		{
+			DialogSubsystem->DialogQueue.Enqueue(DataAssetDialog);
+		}
+	}
+}
+
+void UDialogSubsystem::UpdateQueue(UObject * WorldContextObject)
+{
+	if (UDialogSubsystem* DialogSubsystem = GEngine->GetEngineSubsystem<UDialogSubsystem>())
+	{
+		UDialog* DialogAsset;
+		DialogSubsystem->DialogQueue.Dequeue(DialogAsset);
+
+		PlayDialog(WorldContextObject, DialogAsset);
+	}
+}
+
+void PlayDialog(UObject* WorldContextObject, UDialog* DataAssetDialog)
+{
+	if (DataAssetDialog && DataAssetDialog->IsValid())
 	{
 		APawn* Pawn = WorldContextObject->GetWorld()->SpawnActor<APawn>(APawn::StaticClass());
 		Pawn->SpawnDefaultController();
-		if ( AAIController* Controller = Cast<AAIController>(Pawn->GetController()) )
+		if (AAIController* Controller = Cast<AAIController>(Pawn->GetController()))
 		{
 			Controller->RunBehaviorTree(DataAssetDialog->DialogBehaviourTree);
 		}
 	}
 }
+
