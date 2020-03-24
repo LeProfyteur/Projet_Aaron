@@ -3,16 +3,6 @@
 
 #include "StiltEquipment.h"
 
-AStiltEquipment::AStiltEquipment() : Super() {}
-
-AStiltEquipment::Activate_Implementation(bool isPressed)
-{
-	if (isPressed)
-	{
-
-	}
-}
-
 void AStiltEquipment::OnEquip_Implementation(FCharacterSkills Skills)
 {
 	Skills.Stilt = true;
