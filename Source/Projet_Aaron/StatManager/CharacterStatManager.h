@@ -95,6 +95,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 		float GetSlopeStoppingAngle() const { return SlopeStoppingAngle; }
 
+	UPROPERTY(BlueprintReadOnly)
 	FCharacterSkills Skills;
 
 	/*Setters*/

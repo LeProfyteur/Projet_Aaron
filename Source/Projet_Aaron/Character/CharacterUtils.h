@@ -37,12 +37,14 @@ struct FCharacterSkills
 {
 	GENERATED_BODY()
 
+public:
 	bool SuperJump;
 	bool Glider;
 	bool Gills;
 	bool MagnetBoots;
 	bool NightVision;
 	bool Pheromone;
+	UPROPERTY(BlueprintReadWrite)
 	bool Allergy;
 	bool Hallucination;
 	bool BioRegeneration;
