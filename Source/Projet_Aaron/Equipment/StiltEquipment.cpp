@@ -3,6 +3,7 @@
 
 #include "StiltEquipment.h"
 
+<<<<<<< HEAD
 AStiltEquipment::AStiltEquipment() : Super() {}
 
 void AStiltEquipment::Activate_Implementation(bool isPressed)
@@ -14,6 +15,9 @@ void AStiltEquipment::Activate_Implementation(bool isPressed)
 }
 
 void AStiltEquipment::OnEquip_Implementation(FCharacterSkills &Skills)
+=======
+void AStiltEquipment::OnEquip_Implementation(FCharacterSkills Skills)
+>>>>>>> dev
 {
 	Skills.Stilt = true;
 }
