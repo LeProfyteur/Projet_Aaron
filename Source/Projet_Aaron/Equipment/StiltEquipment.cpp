@@ -5,7 +5,7 @@
 
 AStiltEquipment::AStiltEquipment() : Super() {}
 
-AStiltEquipment::Activate_Implementation(bool isPressed)
+void AStiltEquipment::Activate_Implementation(bool isPressed)
 {
 	if (isPressed)
 	{
@@ -13,12 +13,12 @@ AStiltEquipment::Activate_Implementation(bool isPressed)
 	}
 }
 
-void AStiltEquipment::OnEquip_Implementation(FCharacterSkills Skills)
+void AStiltEquipment::OnEquip_Implementation(FCharacterSkills &Skills)
 {
 	Skills.Stilt = true;
 }
 
-void AStiltEquipment::OnUnequip_Implementation(FCharacterSkills Skills)
+void AStiltEquipment::OnUnequip_Implementation(FCharacterSkills &Skills)
 {
 	Skills.Stilt = false;
 }

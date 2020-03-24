@@ -18,14 +18,6 @@ void AHardBarkEquipment::Activate_Implementation(bool isPressed)
 	}
 }
 
-void AHardBarkEquipment::OnEquip_Implementation(FCharacterSkills Skills)
-{
-}
-
-void AHardBarkEquipment::OnUnequip_Implementation(FCharacterSkills Skills)
-{
-}
-
 void AHardBarkEquipment::StopEffect()
 {
 	AAaronCharacter* Character = Cast<AAaronCharacter>(GetParentActor());
