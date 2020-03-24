@@ -15,6 +15,6 @@ class PROJET_AARON_API AGliderEquipment : public AEquipmentBase
 	GENERATED_BODY()
 
 public:
-	void OnEquip_Implementation(FCharacterSkills Skills) override;
-	void OnUnequip_Implementation(FCharacterSkills Skills) override;
+	void OnEquip_Implementation(FCharacterSkills &Skills) override;
+	void OnUnequip_Implementation(FCharacterSkills &Skills) override;
 };

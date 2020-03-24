@@ -16,6 +16,13 @@ class PROJET_AARON_API AStiltEquipment : public AEquipmentBase
 
 public:
 
+<<<<<<< HEAD
+	AStiltEquipment();
+	virtual void Activate_Implementation(bool isPressed) override;
+	virtual void OnEquip_Implementation(FCharacterSkills &Skills) override;
+	virtual void OnUnequip_Implementation(FCharacterSkills &Skills) override;
+=======
 	virtual void OnEquip_Implementation(FCharacterSkills Skills) override;
 	virtual void OnUnequip_Implementation(FCharacterSkills Skills) override;
+>>>>>>> dev
 };

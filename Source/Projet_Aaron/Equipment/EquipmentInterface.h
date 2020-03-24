@@ -28,8 +28,8 @@ public:
 		void Activate(bool isPressed);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		void OnEquip(FCharacterSkills Skills);
+		void OnEquip(FCharacterSkills &Skills);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		void OnUnequip(FCharacterSkills Skills);
+		void OnUnequip(FCharacterSkills &Skills);
 };

@@ -24,8 +24,6 @@ public:
 
 	AHardBarkEquipment();
 	virtual void Activate_Implementation(bool isPressed) override;
-	virtual void OnEquip_Implementation(FCharacterSkills Skills) override;
-	virtual void OnUnequip_Implementation(FCharacterSkills Skills) override;
 	
 	UFUNCTION()
 		void StopEffect();

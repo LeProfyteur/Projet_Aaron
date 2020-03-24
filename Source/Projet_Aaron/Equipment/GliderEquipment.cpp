@@ -3,12 +3,12 @@
 
 #include "GliderEquipment.h"
 
-void AGliderEquipment::OnEquip_Implementation(FCharacterSkills Skills)
+void AGliderEquipment::OnEquip_Implementation(FCharacterSkills &Skills)
 {
 	Skills.Glider = true;
 }
 
-void AGliderEquipment::OnUnequip_Implementation(FCharacterSkills Skills)
+void AGliderEquipment::OnUnequip_Implementation(FCharacterSkills &Skills)
 {
 	Skills.Glider = false;
 }

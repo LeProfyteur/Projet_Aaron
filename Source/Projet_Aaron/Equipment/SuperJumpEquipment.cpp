@@ -3,12 +3,12 @@
 
 #include "SuperJumpEquipment.h"
 
-void ASuperJumpEquipment::OnEquip_Implementation(FCharacterSkills Skills)
+void ASuperJumpEquipment::OnEquip_Implementation(FCharacterSkills &Skills)
 {
 	Skills.SuperJump = true;
 }
 
-void ASuperJumpEquipment::OnUnequip_Implementation(FCharacterSkills Skills)
+void ASuperJumpEquipment::OnUnequip_Implementation(FCharacterSkills &Skills)
 {
 	Skills.SuperJump = false;
 }
