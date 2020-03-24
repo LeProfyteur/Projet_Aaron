@@ -32,8 +32,6 @@ AAaronCharacter::AAaronCharacter()
 	InventaireComponent = CreateDefaultSubobject<UInventaireComponent>(TEXT("InventaireComponent"));
 	InventaireComponent->PrepareInventory();
 
-	Skills = FCharacterSkills();
-
 	VaultTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Vault Timeline"));
 
 	UpdateTimeline.BindUFunction(this, FName("UpdateTimelineFunction"));
@@ -76,7 +74,7 @@ void AAaronCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (Skills.SuperJump && bPressedJump && JumpMultPercent < 1.0f)
+	if (StatManager->Skills.SuperJump && bPressedJump && JumpMultPercent < 1.0f)
 	{
 		JumpMultPercent += 0.25f * DeltaTime;
 		if (JumpMultPercent > 1.0f)
@@ -85,7 +83,7 @@ void AAaronCharacter::Tick(float DeltaTime)
 
 	if (IsInWater && GetMesh()->GetSocketLocation(FName("head")).Z < WaterHeight)
 	{
-		if (!Skills.Gills)
+		if (!StatManager->Skills.Gills)
 			StatManager->ConsumeOxygene(1.0f * DeltaTime);
 	}
 	else
@@ -280,7 +278,7 @@ void AAaronCharacter::StartJumping()
 	if (GetCharacterMovement()->IsFalling())
 	{
 		//CharacterMovement->SetMovementMode(EMovementMode::MOVE_Flying);
-		if(!VaultCheck(FallingTraceSettings) && Skills.Glider)
+		if(!VaultCheck(FallingTraceSettings) && StatManager->Skills.Glider)
 		{
 			IsGliding = true;
 			CharacterMovement->GravityScale = 0.15f;
@@ -304,7 +302,7 @@ void AAaronCharacter::StartJumping()
 					}
 					UnCrouch();
 				}
-				else if (Skills.SuperJump)
+				else if (StatManager->Skills.SuperJump)
 				{
 					bPressedJump = true;
 				}
@@ -319,7 +317,7 @@ void AAaronCharacter::StartJumping()
 
 void AAaronCharacter::EndJumping()
 {
-	if (Skills.SuperJump && !GetCharacterMovement()->IsFalling() && StatManager->ConsumeStamina(StatManager->GetJumpStaminaCost()))
+	if (StatManager->Skills.SuperJump && !GetCharacterMovement()->IsFalling() && StatManager->ConsumeStamina(StatManager->GetJumpStaminaCost()))
 	{
 		if (bPressedJump)
 		{

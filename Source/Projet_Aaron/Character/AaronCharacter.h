@@ -12,7 +12,6 @@
 #include "Projet_Aaron/Mechanisms/ClimbableInterface.h"
 #include "Projet_Aaron/Item/AnalyseObjectInterface.h"
 #include "Projet_Aaron/Item/Item.h"
-#include "CharacterUtils.h"
 
 #include "DrawDebugHelpers.h"
 #include "GameFramework/Controller.h"
@@ -85,6 +84,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float MaxTimeGliding = 5.0f;
+
 	bool IsGliding = false;
 
 protected:
@@ -116,8 +116,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TSubclassOf<class UMainHudFixedSizeCPP> MainHudFixedSizeCPPClass;
-
-	FCharacterSkills Skills;
 
 	bool bPressedAlt = false;
 	bool CrouchJumped = false;

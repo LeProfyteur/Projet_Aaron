@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Projet_Aaron/Character/CharacterUtils.h"
 #include "Materials/MaterialParameterCollection.h"
 #include "Materials/MaterialParameterCollectionInstance.h"
 #include "CoreMinimal.h"
@@ -93,6 +94,8 @@ public:
 		float GetSlopeSlideAngle() const { return SlopeSlidingAngle; }
 	UFUNCTION(BlueprintCallable)
 		float GetSlopeStoppingAngle() const { return SlopeStoppingAngle; }
+
+	FCharacterSkills Skills;
 
 	/*Setters*/
 	UFUNCTION(BlueprintCallable)
