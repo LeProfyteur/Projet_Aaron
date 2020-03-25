@@ -46,6 +46,13 @@ FSaveSlot::FSaveSlot()
 {
 }
 
+const FSaveSlot USaveManagerIndex::InvalidSave;
+
+USaveManagerIndex::USaveManagerIndex()
+	: LastSave(InvalidSave)
+{
+}
+
 USaveManagerIndex* USaveManagerSubsystem::GetIndex()
 {
 	//Index not Loaded or GarbageCollected
@@ -64,12 +71,23 @@ USaveManagerIndex* USaveManagerSubsystem::GetIndex()
 	return Index;
 }
 
-void USaveManagerSubsystem::SaveIndex()
+void USaveManagerSubsystem::SaveIndex() const
 {
 	if (Index)
 	{
 		UGameplayStatics::SaveGameToSlot(Index, IndexSlotName, IndexUserIndex);
 	}
+}
+
+USaveManagerSubsystem::USaveManagerSubsystem()
+{
+	GetIndex(); //Preload the Index
+	RefreshDateBeginPlay(); // not perfect, good enough for now, it should be called right after loading/starting a game
+}
+
+void USaveManagerSubsystem::RefreshDateBeginPlay()
+{
+	DateBeginPlay = FDateTime::Now();
 }
 
 void USaveManagerSubsystem::GetSaveSlotList(TArray<FSaveSlot>& List)
@@ -98,14 +116,20 @@ USaveGame* USaveManagerSubsystem::FindSaveGame(const FSaveSlot& SaveSlot)
 	return nullptr;
 }
 
-void USaveManagerSubsystem::SaveGame(const FSaveSlot& SaveSlot, const FSaveInfo& SaveInfo, USaveGame* SaveGame)
+void USaveManagerSubsystem::SaveGame(const FSaveSlot& SaveSlot, FString DisplayName, FString LevelName, USaveGame* SaveGame)
 {
 	if (UGameplayStatics::SaveGameToSlot(SaveGame, SaveSlot.SlotName, SaveSlot.UserIndex))
 	{
-		//New Save or Override Save, same operation.
-		FSaveInfo UpdatedSaveInfo = SaveInfo;
-		UpdatedSaveInfo.Date = FDateTime::Now();
-		GetIndex()->Saves.Add(SaveSlot, UpdatedSaveInfo);
+		FSaveInfo SaveInfo;
+
+		FindSaveInfo(SaveSlot, SaveInfo); // TODO : is it necessary ?
+
+		SaveInfo.DisplayName = DisplayName;
+		SaveInfo.LevelName = LevelName;
+		SaveInfo.Date = FDateTime::Now();
+		SaveInfo.PlayTime = FDateTime::Now() - DateBeginPlay;
+
+		GetIndex()->Saves.Add(SaveSlot, SaveInfo);
 		SaveIndex();
 	}
 }
