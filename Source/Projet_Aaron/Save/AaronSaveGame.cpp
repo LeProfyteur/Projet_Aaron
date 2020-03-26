@@ -123,8 +123,10 @@ void UAaronSaveGame::Load(UObject* WorldContextObject)
 		AActor* Actor = World->SpawnActor<AActor>(ActorClass, Record.Transform, SpawnParameters);
 		Deserialize(Actor, Record.ActorData);
 
+		
 		//Register using the Serialized ID (for reference resolving)
 		SerializationContext.Register(Record.UniqueID, Actor);
+		UE_LOG(LogLoad, Warning, TEXT("Deserialized %s"), *Actor->GetName());
 
 		//Find the subset of Component Records that were owned by this Actor
 		TArray<FComponentRecord> ActorSerializedComponents;
@@ -142,15 +144,19 @@ void UAaronSaveGame::Load(UObject* WorldContextObject)
 			{
 				UClass* Class = ComponentRecord.Class.Get();
 
-				//BROKEN : Crashes on load
 				Component = Cast<UActorComponent>(Actor->CreateDefaultSubobject(ComponentRecord.Name, UActorComponent::StaticClass(), Class, false, false));
 			}
 
 			//Deserialize Component
 			Deserialize(Component, ComponentRecord.ComponentData);
 			DeserializedComponents.Add(Component);
+
+			//Register using the Serialized ID (for reference resolving)
+			SerializationContext.Register(ComponentRecord.UniqueID, Component);
+			UE_LOG(LogLoad, Warning, TEXT("Deserialized Component %s"), *Component->GetName());
 		}
 
+		continue;
 		for (auto Component : Actor->GetComponents())
 		{
 			// Ignore already destroyed OR deserialized components

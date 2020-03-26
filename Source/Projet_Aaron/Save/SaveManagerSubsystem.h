@@ -61,9 +61,15 @@ class USaveManagerIndex : public USaveGame
 {
 	GENERATED_BODY()
 public:
+	static const FSaveSlot InvalidSave;
 	
 	UPROPERTY(SaveGame)
 		TMap<FSaveSlot, FSaveInfo> Saves;
+
+	UPROPERTY(SaveGame)
+		FSaveSlot LastSave;
+
+	USaveManagerIndex();
 };
 
 /**
@@ -77,10 +83,16 @@ class PROJET_AARON_API USaveManagerSubsystem : public UEngineSubsystem
 
 private:
 	USaveManagerIndex* Index;
+	FDateTime DateBeginPlay;
 	
 public:
 	USaveManagerIndex* GetIndex();
-	void SaveIndex();
+	void SaveIndex() const;
+
+	USaveManagerSubsystem();
+
+	UFUNCTION(BlueprintCallable)
+		void RefreshDateBeginPlay();
 
 	UFUNCTION(BlueprintCallable)
 		void GetSaveSlotList(TArray<FSaveSlot>& List);
@@ -92,7 +104,7 @@ public:
 		USaveGame* FindSaveGame(const FSaveSlot& SaveSlot);
 
 	UFUNCTION(BlueprintCallable)
-		void SaveGame(const FSaveSlot& SaveSlot, const FSaveInfo& SaveInfo, USaveGame* SaveGame);
+		void SaveGame(const FSaveSlot& SaveSlot, FString DisplayName, FString LevelName, USaveGame* SaveGame);
 
 	UFUNCTION(BlueprintCallable)
 		void DeleteGame(const FSaveSlot& SaveSlot);
