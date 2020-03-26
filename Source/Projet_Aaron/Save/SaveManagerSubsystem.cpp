@@ -127,7 +127,7 @@ void USaveManagerSubsystem::SaveGame(const FSaveSlot& SaveSlot, FString DisplayN
 		SaveInfo.DisplayName = DisplayName;
 		SaveInfo.LevelName = LevelName;
 		SaveInfo.Date = FDateTime::Now();
-		SaveInfo.PlayTime = FDateTime::Now() - DateBeginPlay;
+		SaveInfo.PlayTime += FDateTime::Now() - DateBeginPlay;
 
 		GetIndex()->Saves.Add(SaveSlot, SaveInfo);
 		SaveIndex();
