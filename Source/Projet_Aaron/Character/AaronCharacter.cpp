@@ -45,6 +45,8 @@ void AAaronCharacter::BeginPlay()
 	MovementState = EMovementState::Run;
 	VaultTimeline->AddInterpFloat(CurveFloat, UpdateTimeline);
 	VaultTimeline->SetTimelineFinishedFunc(FinishTimeLine);
+	CharacterMovement->AirControl = StatManager->GetAirControl();
+	CharacterMovement->GravityScale = StatManager->GetGravityScale();
 
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AAaronCharacter::OnBeginOverlap);
 	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AAaronCharacter::OnEndOverlap);
@@ -281,9 +283,9 @@ void AAaronCharacter::StartJumping()
 		if(!VaultCheck(FallingTraceSettings) && StatManager->Skills.Glider)
 		{
 			IsGliding = true;
-			CharacterMovement->GravityScale = 0.15f;
-			CharacterMovement->AirControl = 1.0f;
-			CharacterMovement->FallingLateralFriction = 10.0f;
+			CharacterMovement->GravityScale = StatManager->GetGlidingGravityScale();
+			CharacterMovement->AirControl = StatManager->GetGlidingAirControl();
+			CharacterMovement->FallingLateralFriction = StatManager->GetGlidingFallingLateralFriction();
 			GetWorldTimerManager().SetTimer(GliderTimerHandle, this, &AAaronCharacter::EndJumping, MaxTimeGliding);
 		}
 	}
@@ -329,8 +331,8 @@ void AAaronCharacter::EndJumping()
 	}
 	if (IsGliding)
 	{
-		CharacterMovement->GravityScale = 1.0f;
-		CharacterMovement->AirControl = 0.5f;
+		CharacterMovement->GravityScale = StatManager->GetGravityScale();
+		CharacterMovement->AirControl = StatManager->GetAirControl();
 		CharacterMovement->FallingLateralFriction = 0.0f;
 		IsGliding = false;
 	}

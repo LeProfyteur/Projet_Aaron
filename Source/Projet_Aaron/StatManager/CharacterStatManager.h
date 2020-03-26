@@ -18,7 +18,10 @@ class PROJET_AARON_API UCharacterStatManager : public UCreatureStatManager
 	GENERATED_BODY()
 
 protected:
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Default)
+		float GravityScale = 1.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Default)
+		float AirControl = 1.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Walking)
 		float SprintSpeed = 800.0f;	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Crouching)
@@ -51,6 +54,12 @@ protected:
 		float OxygeneMax = 60.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Jump)
 		float MaxJumpMulti = 3.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Glider)
+		float GlidingGravityScale = 0.15f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Glider)
+		float GlidingAirControl = 1.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Glider)
+		float GlidingFallingLateralFriction = 10.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		UMaterialParameterCollectionInstance* ParameterCollectionInstance;
@@ -66,6 +75,10 @@ public:
 	UCharacterStatManager();
 
 	/*Getters*/
+	UFUNCTION(BlueprintCallable)
+		float GetGravityScale() const { return GravityScale; }
+	UFUNCTION(BlueprintCallable)
+		float GetAirControl() const { return AirControl; }
 	UFUNCTION(BlueprintCallable)
 		float GetDodgeStaminaCost() const { return DodgeStaminaCost; }
 	UFUNCTION(BlueprintCallable)
@@ -94,6 +107,12 @@ public:
 		float GetSlopeSlideAngle() const { return SlopeSlidingAngle; }
 	UFUNCTION(BlueprintCallable)
 		float GetSlopeStoppingAngle() const { return SlopeStoppingAngle; }
+	UFUNCTION(BlueprintCallable)
+		float GetGlidingGravityScale() const { return GlidingGravityScale; }
+	UFUNCTION(BlueprintCallable)
+		float GetGlidingAirControl() const { return GlidingAirControl; }
+	UFUNCTION(BlueprintCallable)
+		float GetGlidingFallingLateralFriction() const { return GlidingFallingLateralFriction; }
 
 	UPROPERTY(BlueprintReadOnly)
 	FCharacterSkills Skills;
