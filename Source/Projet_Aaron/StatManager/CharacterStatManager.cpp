@@ -8,6 +8,9 @@ UCharacterStatManager::UCharacterStatManager() : Super()
 	static ConstructorHelpers::FObjectFinder<UMaterialParameterCollection> ParamCol(TEXT("/Game/Projet_Aaron/PostProcessingEffect/Helper/MPC_PostProcessing.MPC_PostProcessing"));
 	if (ParamCol.Succeeded())
 		ParameterCollection = ParamCol.Object;
+
+	Skills = FCharacterSkills();
+	Oxygene = OxygeneMax;
 }
 
 void UCharacterStatManager::BeginPlay()
@@ -19,14 +22,27 @@ void UCharacterStatManager::BeginPlay()
 
 void UCharacterStatManager::TakeDamage(float BioDamage, float TechDamage)
 {
-	Super::TakeDamage(BioDamage, TechDamage);
+	if (!Skills.HardBark)
+		Super::TakeDamage(BioDamage, TechDamage);
 
-	float rateHealth = HealthBio / HealthBioMax;
-	if(rateHealth <= 0.5f)
+	float RateHealth = HealthBio / HealthBioMax;
+	if(RateHealth <= 0.5f)
 	{
-		UE_LOG(LogActor, Error, TEXT("%f"), 1.0f - rateHealth);
-		ParameterCollectionInstance->SetScalarParameterValue(FName(TEXT("Damage")), 1.0f - rateHealth);
+		ParameterCollectionInstance->SetScalarParameterValue(FName(TEXT("Damage")), 1.0f - RateHealth);
 	}
 }
 
+void UCharacterStatManager::ConsumeOxygene(float OxygeneToConsume)
+{
+	if (Oxygene - OxygeneToConsume < 0.0f)
+		TakeDamage(OxygeneToConsume, 0.0f);
+	else
+		Oxygene -= OxygeneToConsume;
+}
 
+void UCharacterStatManager::RecoveryOxygene(float DeltaTime)
+{
+	Oxygene += 10.0f * DeltaTime;
+	if (Oxygene > OxygeneMax)
+		Oxygene = OxygeneMax;
+}

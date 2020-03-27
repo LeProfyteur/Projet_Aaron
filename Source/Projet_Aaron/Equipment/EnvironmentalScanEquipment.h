@@ -35,12 +35,6 @@ public :
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		UMaterial* environmentalScanMat;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		UMaterialInstanceDynamic* environmentalScanMatInstance;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		UMaterialParameterCollectionInstance* ParameterCollectionInstance;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		UMaterialParameterCollection* ParameterCollection;
@@ -55,12 +49,17 @@ public :
 		void FinishTimeline();
 	
 	virtual void Activate_Implementation(bool isPressed) override;
-	virtual void OnEquip_Implementation() override;
-	virtual void OnUnequip_Implementation() override;
 
 	virtual void Tick(float DeltaTime) override;
 
 protected:
+
+	UPROPERTY()
+		UMaterialParameterCollectionInstance* ParameterCollectionInstance;
+
+	UPROPERTY()
+		UMaterialInstanceDynamic* environmentalScanMatInstance;
+	
 	FOnTimelineFloat updateRadiusFunction{};
 	FOnTimelineFloat updateHighlightFunction{};
 	FOnTimelineEvent FinishTimeLIneFunction{};

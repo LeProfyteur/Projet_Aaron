@@ -16,7 +16,6 @@ enum ESyringeType
 	ST_Tech UMETA(DisplayName = "Tech"),
 	ST_AntiRadiation UMETA(DisplayName = "AntiRadiation"),
 	ST_None UMETA(DisplayName = "None"),
-	ST_None2 UMETA(DisplayName = "None2"),
 };
 
 // This class does not need to be modified.

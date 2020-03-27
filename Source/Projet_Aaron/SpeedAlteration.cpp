@@ -9,8 +9,6 @@ USpeedAlteration::USpeedAlteration()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-	TimeAlteration = TimeMutation;
-
 	// ...
 }
 
@@ -19,13 +17,12 @@ USpeedAlteration::USpeedAlteration()
 void USpeedAlteration::BeginPlay()
 {
 	Super::BeginPlay();
-
+	TimeAlteration = TimeMutation;
 	_CreatureStatManager = GetOwner()->FindComponentByClass<UCreatureStatManager>();
-	BaseSpeed = _CreatureStatManager->GetBaseSpeed();
-	SpeedReducted = BaseSpeed/4.0f;
-	_CreatureStatManager->SetActualSpeed(SpeedReducted);
-	GetWorld()->GetTimerManager().SetTimer(InputTimeHandle, this, &USpeedAlteration::ReductionSpeed, 1.0f, true, 0.5f);
-	
+	if (_CreatureStatManager)
+	{
+		_CreatureStatManager->AddSpeedMultiplier(SpeedReduction);
+	}
 }
 
 
@@ -33,16 +30,28 @@ void USpeedAlteration::BeginPlay()
 void USpeedAlteration::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
+	//UE_LOG(LogActor, Warning, TEXT("TimeAlteration : %f"), TimeAlteration);
 	// ...
 }
 
+void USpeedAlteration::OnComponentDestroyed(bool bDestroyingHierarchy)
+{
+	if (_CreatureStatManager)
+	{
+		_CreatureStatManager->AddSpeedMultiplier(-SpeedReduction);
+	}
+}
+
+/*
 void USpeedAlteration::ReductionSpeed()
 {
-	if (TimeAlteration <= 0)
+	UE_LOG(LogActor, Error, TEXT("TimeAlteration : %f"),TimeAlteration);
+	if (TimeAlteration <= 1.0)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(InputTimeHandle);
-		_CreatureStatManager->ResetSpeed();
+		_CreatureStatManager->AddSpeedMultiplier(-SpeedReduction);
 	}
 	TimeAlteration -= 1.0f;
+	
 }
+*/
