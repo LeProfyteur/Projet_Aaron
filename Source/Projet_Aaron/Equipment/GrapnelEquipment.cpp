@@ -81,16 +81,6 @@ void AGrapnelEquipment::Activate_Implementation(bool isPressed)
 	}
 }
 
-void AGrapnelEquipment::OnEquip_Implementation()
-{
-	
-}
-
-void AGrapnelEquipment::OnUnequip_Implementation()
-{
-	
-}
-
 void AGrapnelEquipment::TimelineCallback()
 {
 	FHitResult outHit;
