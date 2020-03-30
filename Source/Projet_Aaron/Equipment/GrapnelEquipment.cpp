@@ -2,7 +2,7 @@
 
 
 #include "GrapnelEquipment.h"
-#include "Projet_Aaron/Character/FPS_Character.h"
+#include "Projet_Aaron/Character/AaronCharacter.h"
 
 AGrapnelEquipment::AGrapnelEquipment()
 {
@@ -91,7 +91,7 @@ void AGrapnelEquipment::TimelineCallback()
 	if(playTLForLaser)
 	{
 		vStart = StaticMeshComponent->GetComponentLocation();
-		AFPS_Character *c = Cast<AFPS_Character>(GetParentActor());
+		AAaronCharacter *c = Cast<AAaronCharacter>(GetParentActor());
 		vEnd = vStart + c->FpsCamera->GetForwardVector() * Distance;
 		
 		bool haveHit = GetWorld()->LineTraceSingleByChannel(outHit, vStart, vEnd, ECC_Visibility, collisionParams);
@@ -147,7 +147,7 @@ void AGrapnelEquipment::PlayTimeline()
 
 void AGrapnelEquipment::Tick(float DeltaTime)
 {
-	AFPS_Character* c = Cast<AFPS_Character>(GetParentActor());
+	AAaronCharacter* c = Cast<AAaronCharacter>(GetParentActor());
 	if(FVector::PointsAreNear(locationToGrip, c->GetActorLocation(), 150.0f))
 	{
 		SetActorTickEnabled(false);

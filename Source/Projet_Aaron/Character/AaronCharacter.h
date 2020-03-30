@@ -28,7 +28,7 @@
 #include "Projet_Aaron/Item/UInventoryCastObject.h"
 #include "Projet_Aaron/Item/MainHudFixedSizeCPP.h"
 #include "Projet_Aaron/Item/HUDCPP.h"
-#include "Projet_Aaron/InventaireComponent.h"
+#include "Projet_Aaron/Item/InventaireComponent.h"
 #include "AaronCharacter.generated.h"
 
 UCLASS()

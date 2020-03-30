@@ -2,8 +2,8 @@
 
 
 #include "MudAlteration.h"
-#include "AIStimuliSourceModifier.h"
-#include "AISense_Smell.h"
+#include "Projet_Aaron/AIsense/AISense_Smell.h"
+#include "Projet_Aaron/AIsense/AIStimuliSourceModifier.h"
 
 UMudAlteration::UMudAlteration()
 {
@@ -34,11 +34,3 @@ void UMudAlteration::OnComponentDestroyed(bool bDestroyingHierarchy)
 		GetOwner()->FindComponentByClass<UAIStimuliSourceModifier>()->SetRegisterSource(UAISense_Smell::StaticClass());
 	}
 }
-
-
-
-
-
-
-
-
