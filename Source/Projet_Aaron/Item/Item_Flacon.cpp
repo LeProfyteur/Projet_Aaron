@@ -2,14 +2,13 @@
 
 
 #include "Item_Flacon.h"
-#include "Projet_Aaron/Character/FPS_Character.h"
+#include "Projet_Aaron/Character/AaronCharacter.h"
 
 bool AItem_FlaconCPP::UseItem_Implementation()
 {
-	UE_LOG(LogActor, Warning, TEXT("FlaconCPP::UseItem"));
 	FHitResult OutHit;
 	//APawn* character = GetWorld()->GetFirstPlayerController()->GetPawn();
-	AFPS_Character* Character = Cast<AFPS_Character>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	AAaronCharacter* Character = Cast<AAaronCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
 	FVector Start = Character->FpsCamera->GetComponentLocation();
 	FVector End = Start + Character->FpsCamera->GetForwardVector() * Character->RaycastDistanceInventory;
 	FCollisionQueryParams collisionParams;
