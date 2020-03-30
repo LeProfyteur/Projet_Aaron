@@ -32,10 +32,10 @@ public:
 		virtual void Activate_Implementation(bool isPressed) override; 
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		void OnEquip(FCharacterSkills Skills);
-		virtual void OnEquip_Implementation(FCharacterSkills Skills) override;
+		void OnEquip(FCharacterSkills &Skills);	
+	virtual void OnEquip_Implementation(FCharacterSkills &Skills) override;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		void OnUnequip(FCharacterSkills Skills);
-		virtual void OnUnequip_Implementation(FCharacterSkills Skills) override;
+		void OnUnequip(FCharacterSkills &Skills);
+	virtual void OnUnequip_Implementation(FCharacterSkills &Skills) override;
 };
