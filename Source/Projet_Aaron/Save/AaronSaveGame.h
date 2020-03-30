@@ -15,6 +15,9 @@ struct FComponentRecord
 	GENERATED_BODY()
 public:
 
+	UPROPERTY(Transient)
+		UActorComponent* Reference;
+
 	UPROPERTY(SaveGame)
 		TSubclassOf<UActorComponent> Class;
 
@@ -47,6 +50,9 @@ struct FActorRecord
 {
 	GENERATED_BODY()
 public:
+
+	UPROPERTY(Transient)
+		AActor* Reference;
 	
 	UPROPERTY(SaveGame)
 		TSubclassOf<AActor> Class;
@@ -76,17 +82,6 @@ public:
 		Ar << ActorData;
 		return Ar;
 	}
-};
-
-struct FSerializationContext
-{
-	TMap<uint32, AActor*> Actors;
-	TMap<uint32, UActorComponent*> Components;
-
-	bool Register(uint32 UniqueID, AActor* Actor);
-	bool Register(uint32 UniqueID, UActorComponent* Component);
-
-	void Reset();
 };
 
 UCLASS(BlueprintType)
@@ -122,14 +117,15 @@ private:
 	// AaronSaveGame Functions
 	//--------------------------------------------------------------------------//
 	void SaveActor(AActor* Actor);
+	void LoadActor(UObject* WorldContextObject, UPARAM(ref) FActorRecord& ActorRecord);
+
 	void SaveComponent(UActorComponent* Component);
-
+	void LoadComponent(UObject* WorldContextObject, AActor* Actor, UPARAM(ref) FComponentRecord& ComponentRecord);
+	
+	void Save(UObject* WorldContextObject);
 	void Load(UObject* WorldContextObject);
-	void FindComponentsForActor(uint32 ActorUniqueID, TArray<FComponentRecord>& Records); // MAYDO : optimize that to avoid copying data around
-
-	void PreLoad(UObject* WorldContextObject, FActorRecord& Record);
-	void PostLoad(AActor* Actor, FActorRecord& Record);
-
+	
+	void FindComponentsForActor(uint32 ActorUniqueID, TArray<FComponentRecord*>& Records); // MAYDO : optimize that to avoid copying data around
 public:
 	//--------------------------------------------------------------------------//
 	// Static Utility Functions
