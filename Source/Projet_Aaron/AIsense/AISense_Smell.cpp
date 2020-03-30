@@ -2,8 +2,8 @@
 
 
 #include "AISense_Smell.h"
-#include "Projet_Aaron/AISenseConfig_Smell.h"
-#include "Projet_Aaron/AISenseEvent_Smell.h"
+#include "Projet_Aaron/AIsense/AISenseConfig_Smell.h"
+#include "Projet_Aaron/AIsense/AISenseEvent_Smell.h"
 #include "DrawDebugHelpers.h"
 #include "Perception/AIPerceptionSystem.h"
 #include "Perception/AIPerceptionComponent.h"
