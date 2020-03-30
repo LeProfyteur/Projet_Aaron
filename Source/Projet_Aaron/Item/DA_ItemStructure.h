@@ -13,6 +13,8 @@ enum ECategoryEnum
 	CE_Consomable UMETA(DisplayName="Consomable"),
 	CE_Lore UMETA(DisplayName = "Item de Lore"),
 	CE_Seringue UMETA(DisplayName = "Seringue"),
+	CE_Tool UMETA(DisplayName = "Tool"),
+	CE_Exploration UMETA(DisplayName = "Exploration"),
 };
 
 class AItem;
