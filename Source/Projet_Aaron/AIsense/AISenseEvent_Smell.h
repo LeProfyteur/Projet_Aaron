@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Projet_Aaron/AISense_Smell.h"
+#include "AISense_Smell.h"
 #include "Perception/AISenseEvent.h"
 #include "AISenseEvent_Smell.generated.h"
 

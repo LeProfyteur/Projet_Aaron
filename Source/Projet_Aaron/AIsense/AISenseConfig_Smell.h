@@ -2,9 +2,10 @@
 
 #pragma once
 
+#include "AISense_Smell.h"
 #include "CoreMinimal.h"
 #include "Perception/AISenseConfig.h"
-#include "Projet_Aaron/AISense_Smell.h"
+#include "AISense_Smell.h"
 #include "AISenseConfig_Smell.generated.h"
 
 /**

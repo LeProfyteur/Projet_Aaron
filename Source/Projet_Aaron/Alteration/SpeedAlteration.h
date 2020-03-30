@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "../StatManager/CreatureStatManager.h"
 #include "ShapeAlteration.h"
-#include "StatManager/CreatureStatManager.h"
 #include "SpeedAlteration.generated.h"
 
 
