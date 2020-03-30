@@ -45,6 +45,8 @@ void AAaronCharacter::BeginPlay()
 	MovementState = EMovementState::Run;
 	VaultTimeline->AddInterpFloat(CurveFloat, UpdateTimeline);
 	VaultTimeline->SetTimelineFinishedFunc(FinishTimeLine);
+	CharacterMovement->AirControl = StatManager->GetAirControl();
+	CharacterMovement->GravityScale = StatManager->GetGravityScale();
 
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AAaronCharacter::OnBeginOverlap);
 	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AAaronCharacter::OnEndOverlap);
@@ -74,7 +76,7 @@ void AAaronCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (bPressedJump && JumpMultPercent < 1.0f)
+	if (StatManager->Skills.SuperJump && bPressedJump && JumpMultPercent < 1.0f)
 	{
 		JumpMultPercent += 0.25f * DeltaTime;
 		if (JumpMultPercent > 1.0f)
@@ -82,7 +84,10 @@ void AAaronCharacter::Tick(float DeltaTime)
 	}
 
 	if (IsInWater && GetMesh()->GetSocketLocation(FName("head")).Z < WaterHeight)
-		StatManager->ConsumeOxygene(1.0f * DeltaTime);
+	{
+		if (!StatManager->Skills.Gills)
+			StatManager->ConsumeOxygene(1.0f * DeltaTime);
+	}
 	else
 		StatManager->RecoveryOxygene(DeltaTime);
 
@@ -90,7 +95,9 @@ void AAaronCharacter::Tick(float DeltaTime)
 	{
 		if (!StatManager->ConsumeStamina(StatManager->GetSprintStaminaCost() * DeltaTime))
 			MovementState = EMovementState::Run;
-	} else
+	} else if (MovementState == EMovementState::Sprint && CharacterMovement->Velocity.Size() <= 0.0f)
+		MovementState = EMovementState::Run;
+	else
 		StatManager->RecoveryStamina(DeltaTime);
 
 	if (MovementState == EMovementState::Slide)
@@ -103,8 +110,15 @@ void AAaronCharacter::Tick(float DeltaTime)
 		if (HitResult.IsValidBlockingHit())
 		{
 			FVector GroundNormal = HitResult.ImpactNormal;
-			float GroundAngle = GetActorUpVector().CosineAngle2D(GroundNormal);
-			// Continue sliding if angle is enough
+			float GroundAngle = FVector::DotProduct(GroundNormal, SlideRotation);
+			if (GroundAngle >= StatManager->GetSlopeSlideAngle()) //We are on a slope steep enough
+			{
+				float SlideVelocity = StatManager->GetSprintSpeed();
+				CharacterMovement->Velocity = FVector(SlideVelocity * SlideRotation.X, SlideVelocity * SlideRotation.Y, 0.0f);
+			} else if (GroundAngle <= -(StatManager->GetSlopeStoppingAngle()))
+			{
+				CharacterMovement->Velocity = FVector::ZeroVector;
+			}
 		}
 	}
 
@@ -180,12 +194,14 @@ void AAaronCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AAaronCharacter::StartJumping);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AAaronCharacter::EndJumping);
 
-	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AAaronCharacter::StartSprinting);
-	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AAaronCharacter::StopSprinting);
+	/*PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AAaronCharacter::StartSprinting);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AAaronCharacter::StopSprinting);*/
 
-	PlayerInputComponent->BindAction("Walk", IE_Pressed, this, &AAaronCharacter::Walking);
+	PlayerInputComponent->BindAction("Walk", IE_Pressed, this, &AAaronCharacter::ToggleWalk);
 
-	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &AAaronCharacter::Crouching);
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AAaronCharacter::ToggleSprint);
+
+	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &AAaronCharacter::ToggleCrouch);
 
 	PlayerInputComponent->BindAction("Dodge", IE_Pressed, this, &AAaronCharacter::Dodge);
 	
@@ -263,13 +279,21 @@ void AAaronCharacter::StartJumping()
 {
 	if (GetCharacterMovement()->IsFalling())
 	{
-		VaultCheck(FallingTraceSettings);
+		//CharacterMovement->SetMovementMode(EMovementMode::MOVE_Flying);
+		if(!VaultCheck(FallingTraceSettings) && StatManager->Skills.Glider)
+		{
+			IsGliding = true;
+			CharacterMovement->GravityScale = StatManager->GetGlidingGravityScale();
+			CharacterMovement->AirControl = StatManager->GetGlidingAirControl();
+			CharacterMovement->FallingLateralFriction = StatManager->GetGlidingFallingLateralFriction();
+			GetWorldTimerManager().SetTimer(GliderTimerHandle, this, &AAaronCharacter::EndJumping, MaxTimeGliding);
+		}
 	}
 	else
 	{
 		if (GetCharacterDirection().Size() == 0.0f || !VaultCheck(GroundedTraceSettings))
 		{
-			if (MovementState != EMovementState::Climb && !CharacterMovement->IsSwimming() && StatManager->ConsumeStamina(StatManager->GetJumpStaminaCost()))
+			if (MovementState != EMovementState::Climb && !CharacterMovement->IsSwimming())
 			{
 				if (CharacterMovement->IsCrouching())
 				{
@@ -279,11 +303,14 @@ void AAaronCharacter::StartJumping()
 						MovementState = EMovementState::Run;
 					}
 					UnCrouch();
-					CrouchJumped = true;
 				}
-				else
+				else if (StatManager->Skills.SuperJump)
 				{
 					bPressedJump = true;
+				}
+				else if (StatManager->ConsumeStamina(StatManager->GetJumpStaminaCost()))
+				{
+					Jump();
 				}
 			}
 		}
@@ -292,24 +319,26 @@ void AAaronCharacter::StartJumping()
 
 void AAaronCharacter::EndJumping()
 {
-	if (bPressedJump)
+	if (StatManager->Skills.SuperJump && !GetCharacterMovement()->IsFalling() && StatManager->ConsumeStamina(StatManager->GetJumpStaminaCost()))
 	{
-		GetCharacterMovement()->JumpZVelocity = StatManager->GetJumpForce() * (1.0f + 2.0f * JumpMultPercent);
-		Jump();
-		bPressedJump = false;
-		JumpMultPercent = 0.0f;
+		if (bPressedJump)
+		{
+			GetCharacterMovement()->JumpZVelocity = StatManager->GetJumpForce() * (1.0f + 2.0f * JumpMultPercent);
+			Jump();
+			bPressedJump = false;
+			JumpMultPercent = 0.0f;
+		}
+	}
+	if (IsGliding)
+	{
+		CharacterMovement->GravityScale = StatManager->GetGravityScale();
+		CharacterMovement->AirControl = StatManager->GetAirControl();
+		CharacterMovement->FallingLateralFriction = 0.0f;
+		IsGliding = false;
 	}
 }
 
-void AAaronCharacter::Walking()
-{
-	if (MovementState == EMovementState::Run)
-		MovementState = EMovementState::Walk;
-	else if (MovementState == EMovementState::Walk)
-		MovementState = EMovementState::Run;
-}
-
-void AAaronCharacter::Crouching()
+void AAaronCharacter::ToggleCrouch()
 {
 	if (CanCrouch() && !CharacterMovement->IsSwimming())
 	{
@@ -317,6 +346,7 @@ void AAaronCharacter::Crouching()
 		{
 			Crouch();
 			CharacterMovement->GroundFriction = 0.f;
+			SlideRotation = GetActorRotation().Vector();
 			MovementState = EMovementState::Slide;
 		}
 		else
@@ -333,7 +363,28 @@ void AAaronCharacter::Crouching()
 	}
 }
 
-void AAaronCharacter::StartSprinting()
+void AAaronCharacter::ToggleWalk()
+{
+	if (MovementState == EMovementState::Run)
+		MovementState = EMovementState::Walk;
+	else if (MovementState == EMovementState::Walk)
+		MovementState = EMovementState::Run;
+}
+
+void AAaronCharacter::ToggleSprint()
+{
+	
+	if (MovementState == EMovementState::Sprint)
+		MovementState = EMovementState::Run;
+	else if (CharacterMovement->Velocity.Size() > 0.0f)
+	{
+		UnCrouch();
+		MovementState = EMovementState::Sprint;
+	}
+		
+}
+
+/*void AAaronCharacter::StartSprinting()
 {
 	UnCrouch();
 	MovementState = EMovementState::Sprint;
@@ -343,7 +394,8 @@ void AAaronCharacter::StopSprinting()
 {
 	if (MovementState != EMovementState::Slide)
 		MovementState = EMovementState::Run;
-}
+}*/
+
 
 void AAaronCharacter::Dodge()
 {

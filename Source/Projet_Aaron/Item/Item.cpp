@@ -3,6 +3,8 @@
 
 #include "Item.h"
 
+#include "InventaireComponent.h"
+
 // Sets default values
 AItem::AItem()
 {

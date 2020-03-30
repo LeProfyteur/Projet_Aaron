@@ -83,16 +83,6 @@ void AGrapnelEquipmentSuperAaron::Activate_Implementation(bool isPressed)
 	}
 }
 
-void AGrapnelEquipmentSuperAaron::OnEquip_Implementation()
-{
-
-}
-
-void AGrapnelEquipmentSuperAaron::OnUnequip_Implementation()
-{
-
-}
-
 void AGrapnelEquipmentSuperAaron::TimelineCallback()
 {
 	FHitResult outHit;
