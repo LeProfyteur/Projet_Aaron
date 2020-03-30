@@ -12,7 +12,6 @@
 #include "Projet_Aaron/Mechanisms/ClimbableInterface.h"
 #include "Projet_Aaron/Item/AnalyseObjectInterface.h"
 #include "Projet_Aaron/Item/Item.h"
-#include "CharacterUtils.h"
 
 #include "DrawDebugHelpers.h"
 #include "GameFramework/Controller.h"
@@ -29,7 +28,7 @@
 #include "Projet_Aaron/Item/UInventoryCastObject.h"
 #include "Projet_Aaron/Item/MainHudFixedSizeCPP.h"
 #include "Projet_Aaron/Item/HUDCPP.h"
-#include "Projet_Aaron/InventaireComponent.h"
+#include "Projet_Aaron/Item/InventaireComponent.h"
 #include "AaronCharacter.generated.h"
 
 UCLASS()
@@ -81,7 +80,12 @@ public:
 		float RaycastDistanceInventory = 1000.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float JumpMultPercent = 0.0f;
+		float JumpMultPercent = 0.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float MaxTimeGliding = 5.0f;
+
+	bool IsGliding = false;
 
 protected:
 
@@ -109,6 +113,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TSubclassOf<class UUInventoryCastObject> InventoryCastObjectClass;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TSubclassOf<class UMainHudFixedSizeCPP> MainHudFixedSizeCPPClass;
 
@@ -134,9 +139,13 @@ protected:
 	FVector ClimbPosition = FVector::ZeroVector;
 	FVector LeftHandPosition = FVector::ZeroVector;
 	FVector RightHandPosition = FVector::ZeroVector;
+	FVector SlideRotation = FVector::ZeroVector;
 
 	float RightAxisMovement;
 	float ForwardAxisMovement;
+
+	/* Handle to manage the timer */
+	FTimerHandle GliderTimerHandle;
 
 	float CurrentTimePressedItemWheel = 0.f;
 	bool WheelDisplayed = false;
@@ -175,12 +184,15 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void EndJumping();
+    
+	void ToggleWalk();
 
-	void Walking();
-	void Crouching();
+	void ToggleSprint();
 
-	void StartSprinting();
-	void StopSprinting();
+	void ToggleCrouch();
+
+	/*void StartSprinting();
+	void StopSprinting();*/
 
 	void Dodge();
 

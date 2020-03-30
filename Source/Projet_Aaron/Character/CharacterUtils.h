@@ -32,6 +32,43 @@ enum class EMovementState : uint8
 	Slide
 };
 
+USTRUCT(BlueprintType)
+struct FCharacterSkills
+{
+	GENERATED_BODY()
+
+public:
+	bool SuperJump;
+	bool Glider;
+	bool Gills;
+	bool MagnetBoots;
+	bool NightVision;
+	bool Pheromone;
+	UPROPERTY(BlueprintReadWrite)
+	bool Allergy;
+	bool Hallucination;
+	bool BioRegeneration;
+	bool CocotteMinute;
+	bool HardBark;
+	bool Stilt;
+
+	FCharacterSkills()
+	{
+		SuperJump = false;
+		Glider = false;
+		Gills = false;
+		MagnetBoots = false;
+		NightVision = false;
+		Pheromone = false;
+		Allergy = false;
+		Hallucination = false;
+		BioRegeneration = false;
+		CocotteMinute = false;
+		HardBark = false;
+		Stilt = false;
+	}
+};
+
 struct FVaultComponentAndTransform
 {
 	UPrimitiveComponent* Component;

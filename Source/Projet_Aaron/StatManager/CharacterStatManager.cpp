@@ -9,6 +9,7 @@ UCharacterStatManager::UCharacterStatManager() : Super()
 	if (ParamCol.Succeeded())
 		ParameterCollection = ParamCol.Object;
 
+	Skills = FCharacterSkills();
 	Oxygene = OxygeneMax;
 }
 
@@ -21,7 +22,8 @@ void UCharacterStatManager::BeginPlay()
 
 void UCharacterStatManager::TakeDamage(float BioDamage, float TechDamage)
 {
-	Super::TakeDamage(BioDamage, TechDamage);
+	if (!Skills.HardBark)
+		Super::TakeDamage(BioDamage, TechDamage);
 
 	float RateHealth = HealthBio / HealthBioMax;
 	if(RateHealth <= 0.5f)
