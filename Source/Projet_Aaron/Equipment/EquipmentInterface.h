@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
 #include "Components/TimelineComponent.h"
+#include "Projet_Aaron/Character/CharacterUtils.h"
 #include "EquipmentInterface.generated.h"
 
 // This class does not need to be modified.
@@ -27,8 +28,8 @@ public:
 		void Activate(bool isPressed);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		void OnEquip();
+		void OnEquip(FCharacterSkills &Skills);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		void OnUnequip();
+		void OnUnequip(FCharacterSkills &Skills);
 };

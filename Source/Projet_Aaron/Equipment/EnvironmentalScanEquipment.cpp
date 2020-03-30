@@ -17,16 +17,6 @@ void AEnvironmentalScanEquipment::Activate_Implementation(bool isPressed)
 		timeline->PlayFromStart();
 }
 
-void AEnvironmentalScanEquipment::OnEquip_Implementation()
-{
-	
-}
-
-void AEnvironmentalScanEquipment::OnUnequip_Implementation()
-{
-	
-}
-
 void AEnvironmentalScanEquipment::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
