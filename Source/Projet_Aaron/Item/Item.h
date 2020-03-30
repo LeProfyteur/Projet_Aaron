@@ -40,8 +40,8 @@ public:
 		bool UseItem();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		void Interact(bool IsPressed, UDA_ItemStructure *ItemStruct);
-		virtual void Interact_Implementation(bool IsPressed, UDA_ItemStructure* ItemStruct) override;
+		void Interact(bool IsPressed, AActor* RefToInteractActor);
+		virtual void Interact_Implementation(bool IsPressed, AActor* RefToInteractActor) override;
 
 	UFUNCTION(BlueprintNativeEvent)
 		FString GetLabel();

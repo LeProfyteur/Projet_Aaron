@@ -3,6 +3,8 @@
 
 #include "Item.h"
 
+#include "InventaireComponent.h"
+
 // Sets default values
 AItem::AItem()
 {
@@ -30,32 +32,27 @@ void AItem::Tick(float DeltaTime)
 
 bool AItem::UseItem_Implementation()
 {
-	UE_LOG(LogActor, Error, TEXT("UseItem : Item.CPP"));
 	return ItemStructure->IsConsomable;
 }
 
 FString AItem::GetLabel_Implementation()
 {
-	return ItemStructure->Name;
+	return (ItemStructure->Name + " [E]");
 }
 
-void AItem::Interact_Implementation(bool IsPressed, UDA_ItemStructure* ItemStruct)
+void AItem::Interact_Implementation(bool IsPressed, AActor* RefToInteractActor)
 {
 	//Copy
 	if(IsPressed)
 	{
-		ItemStruct->Name = ItemStructure->Name;
-		ItemStruct->IsConsomable = ItemStructure->IsConsomable;
-		ItemStruct->IsStackable = ItemStructure->IsStackable;
-		ItemStruct->Category = ItemStructure->Category;
-		ItemStruct->Class = ItemStructure->Class;
-		ItemStruct->Description = ItemStructure->Description;
-		ItemStruct->MaxStackSize = ItemStructure->MaxStackSize;
-		ItemStruct->Thumbnail = ItemStructure->Thumbnail;
+		UInventaireComponent* inventaire = RefToInteractActor->FindComponentByClass<UInventaireComponent>();
+
+		if(inventaire)
+		{
+			inventaire->AddToInventory(ItemStructure);
+		}
 
 		Destroy();
-
-		UE_LOG(LogActor, Warning, TEXT("Return itemStructure from AItem : %s"), *ItemStruct->Name);
 	}
 }
 
