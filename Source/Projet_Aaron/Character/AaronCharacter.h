@@ -12,7 +12,6 @@
 #include "Projet_Aaron/Mechanisms/ClimbableInterface.h"
 #include "Projet_Aaron/Item/AnalyseObjectInterface.h"
 #include "Projet_Aaron/Item/Item.h"
-#include "CharacterUtils.h"
 
 #include "DrawDebugHelpers.h"
 #include "GameFramework/Controller.h"
@@ -29,7 +28,7 @@
 #include "Projet_Aaron/Item/UInventoryCastObject.h"
 #include "Projet_Aaron/Item/MainHudFixedSizeCPP.h"
 #include "Projet_Aaron/Item/HUDCPP.h"
-#include "Projet_Aaron/InventaireComponent.h"
+#include "Projet_Aaron/Item/InventaireComponent.h"
 #include "AaronCharacter.generated.h"
 
 UCLASS()
@@ -85,6 +84,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float MaxTimeGliding = 5.0f;
+
 	bool IsGliding = false;
 
 protected:
@@ -117,8 +117,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TSubclassOf<class UMainHudFixedSizeCPP> MainHudFixedSizeCPPClass;
 
-	FCharacterSkills Skills;
-
 	bool bPressedAlt = false;
 	bool CrouchJumped = false;
 	bool IsClimbing = false;
@@ -141,6 +139,7 @@ protected:
 	FVector ClimbPosition = FVector::ZeroVector;
 	FVector LeftHandPosition = FVector::ZeroVector;
 	FVector RightHandPosition = FVector::ZeroVector;
+	FVector SlideRotation = FVector::ZeroVector;
 
 	float RightAxisMovement;
 	float ForwardAxisMovement;
@@ -185,12 +184,15 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void EndJumping();
+    
+	void ToggleWalk();
 
-	void Walking();
-	void Crouching();
+	void ToggleSprint();
 
-	void StartSprinting();
-	void StopSprinting();
+	void ToggleCrouch();
+
+	/*void StartSprinting();
+	void StopSprinting();*/
 
 	void Dodge();
 

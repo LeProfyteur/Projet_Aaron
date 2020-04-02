@@ -37,16 +37,20 @@ struct FCharacterSkills
 {
 	GENERATED_BODY()
 
+public:
 	bool SuperJump;
 	bool Glider;
 	bool Gills;
 	bool MagnetBoots;
 	bool NightVision;
 	bool Pheromone;
+	UPROPERTY(BlueprintReadWrite)
 	bool Allergy;
 	bool Hallucination;
 	bool BioRegeneration;
 	bool CocotteMinute;
+	bool HardBark;
+	bool Stilt;
 
 	FCharacterSkills()
 	{
@@ -60,35 +64,10 @@ struct FCharacterSkills
 		Hallucination = false;
 		BioRegeneration = false;
 		CocotteMinute = false;
+		HardBark = false;
+		Stilt = false;
 	}
 };
-//struct FCharacterSkills
-//{
-//	bool SuperJump;
-//	bool Glider;
-//	bool Gills;
-//	bool MagnetBoots;
-//	bool NightVision;
-//	bool Pheromone;
-//	bool Allergy;
-//	bool Hallucination;
-//	bool BioRegeneration;
-//	bool CocotteMinute;
-//
-//	FCharacterSkills()
-//	{
-//		SuperJump = false;
-//		Glider = false;
-//		Gills = false;
-//		MagnetBoots = false;
-//		NightVision = false;
-//		Pheromone = false;
-//		Allergy = false;
-//		Hallucination = false;
-//		BioRegeneration = false;
-//		CocotteMinute = false;
-//	}
-//};
 
 struct FVaultComponentAndTransform
 {

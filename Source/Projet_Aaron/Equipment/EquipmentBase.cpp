@@ -27,12 +27,12 @@ void AEquipmentBase::Activate_Implementation(bool isPressed)
 	UE_LOG(LogTemp, Warning, TEXT("Activated equipment"));
 }
 
-void AEquipmentBase::OnEquip_Implementation(FCharacterSkills Skills)
+void AEquipmentBase::OnEquip_Implementation(FCharacterSkills &Skills)
 {
-	
+	UE_LOG(LogTemp, Warning, TEXT("Equip equipment"));
 }
 
-void AEquipmentBase::OnUnequip_Implementation(FCharacterSkills Skills)
+void AEquipmentBase::OnUnequip_Implementation(FCharacterSkills &Skills)
 {
-	
+	UE_LOG(LogTemp, Warning, TEXT("Unequip equipment"));
 }

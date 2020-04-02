@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Projet_Aaron/DA_SlotStructure.h"
+#include "DA_SlotStructure.h"
 #include "HUDCPP.generated.h"
 
 /**
