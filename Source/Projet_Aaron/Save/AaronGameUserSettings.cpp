@@ -3,8 +3,6 @@
 #define MY_GAMEUSERSETTINGS_VERSION 8	// UE settings + 3
 #include "AaronGameUserSettings.h"
 
-#include "Kismet/GameplayStatics.h"
-
 float UAaronGameUserSettings::GetSFXSoundVolume()
 {
 	return SFXSoundVolume;
