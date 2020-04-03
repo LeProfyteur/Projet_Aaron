@@ -11,7 +11,9 @@
 #include "Projet_Aaron/StatManager/CharacterStatManager.h"
 #include "Projet_Aaron/Mechanisms/ClimbableInterface.h"
 #include "Projet_Aaron/Item/AnalyseObjectInterface.h"
+#include "HeadMountedDisplayFunctionLibrary.h"
 #include "Projet_Aaron/Item/Item.h"
+#include "IHeadMountedDisplay.h"
 
 #include "DrawDebugHelpers.h"
 #include "GameFramework/Controller.h"
@@ -191,6 +193,8 @@ protected:
     
 	void ToggleWalk();
 	void ToggleSprint();
+
+	UFUNCTION(BlueprintCallable)
 	void ToggleCrouch();
 
 	UFUNCTION(BlueprintCallable)
