@@ -41,10 +41,13 @@ public:
 	AAaronCharacter();
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly)
-		class UCameraComponent* FpsCamera;
+		USceneComponent* VRComponent;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly)
+		UCameraComponent* FpsCamera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		class UCharacterStatManager* StatManager;
+		UCharacterStatManager* StatManager;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UChildActorComponent* LeftArmEquipment;
@@ -56,7 +59,10 @@ public:
 		UChildActorComponent* HeadEquipment;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		class UInventaireComponent* InventaireComponent;
+		UChildActorComponent* ChestEquipment;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UInventaireComponent* InventaireComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UTimelineComponent* VaultTimeline;
@@ -94,6 +100,7 @@ protected:
 
 	UCharacterMovementComponent* CharacterMovement;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EMovementState MovementState;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -179,32 +186,32 @@ protected:
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 
-	UFUNCTION(BlueprintCallable)
 	void StartJumping();
-
-	UFUNCTION(BlueprintCallable)
 	void EndJumping();
     
 	void ToggleWalk();
-
 	void ToggleSprint();
-
 	void ToggleCrouch();
 
-	/*void StartSprinting();
-	void StopSprinting();*/
-
+	UFUNCTION(BlueprintCallable)
 	void Dodge();
 
 	void Interact();
 	void StopInteract();
 
+	UFUNCTION(BlueprintCallable)
 	void ActivateHeadEquipment();
 
+	UFUNCTION(BlueprintCallable)
 	void ActivatePressedLeft();
+
+	UFUNCTION(BlueprintCallable)
 	void ActivateReleasedLeft();
 
+	UFUNCTION(BlueprintCallable)
 	void ActivatePressedRight();
+
+	UFUNCTION(BlueprintCallable)
 	void ActivateReleasedRight();
 
 	void Climb(float DeltaTime);

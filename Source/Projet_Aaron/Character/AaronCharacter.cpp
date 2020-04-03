@@ -9,8 +9,11 @@ AAaronCharacter::AAaronCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	VRComponent = CreateDefaultSubobject<USceneComponent>(TEXT("VR Component"));
+	VRComponent->SetupAttachment(RootComponent);
+
 	FpsCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FPS_Camera"));
-	FpsCamera->SetupAttachment(RootComponent);
+	FpsCamera->SetupAttachment(VRComponent);
 	FpsCamera->SetRelativeLocation(FVector(0.0f, 0.0f, 50.0f + BaseEyeHeight));
 	FpsCamera->bUsePawnControlRotation = true;
 
@@ -28,6 +31,9 @@ AAaronCharacter::AAaronCharacter()
 
 	HeadEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Head Equipment"));
 	HeadEquipment->SetupAttachment(FpsCamera);
+
+	ChestEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Chest Equipment"));
+	ChestEquipment->SetupAttachment(FpsCamera);
 
 	InventaireComponent = CreateDefaultSubobject<UInventaireComponent>(TEXT("InventaireComponent"));
 	InventaireComponent->PrepareInventory();
