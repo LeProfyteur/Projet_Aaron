@@ -36,6 +36,11 @@ public:
     UFUNCTION(BlueprintCallable)
         void SetMouseSensivity(float NewSensivity);
 
+    UFUNCTION(BlueprintCallable)
+        bool GetIsToggleSprint();
+    UFUNCTION(BlueprintCallable)
+        void SetIsToggleSprint(bool IsToggle);
+
     // Wipes serialized data if version is invalid
 	bool IsVersionValid() override;
 	void UpdateVersion() override;
@@ -55,5 +60,8 @@ protected:
     //Scale on [0.01,5]
     UPROPERTY(config)
         float MouseSensivity = 1.0f;
+
+    UPROPERTY(config)
+        bool IsToggleSprint = false;
 	
 };

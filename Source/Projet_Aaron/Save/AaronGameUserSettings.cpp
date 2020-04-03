@@ -43,6 +43,16 @@ void UAaronGameUserSettings::SetMouseSensivity(float NewSensivity)
 	MouseSensivity = NewSensivity;
 }
 
+bool UAaronGameUserSettings::GetIsToggleSprint()
+{
+	return IsToggleSprint;
+}
+
+void UAaronGameUserSettings::SetIsToggleSprint(bool IsToggle)
+{
+	IsToggleSprint = IsToggle;
+}
+
 bool UAaronGameUserSettings::IsVersionValid()
 {
 	return (Version == MY_GAMEUSERSETTINGS_VERSION);
