@@ -167,6 +167,12 @@ public:
 	UFUNCTION()
 		void EndTimelineFunction();
 
+	/**
+	 * \brief Update binding after changing UserSettings that change how the binding works (ie. toggle sprint)
+	 */
+	UFUNCTION(BlueprintCallable)
+		void UpdateBindAction();
+
 protected:
 	void BeginPlay() override;
 

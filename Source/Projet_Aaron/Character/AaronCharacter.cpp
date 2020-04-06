@@ -38,6 +38,16 @@ AAaronCharacter::AAaronCharacter()
 
 	UpdateTimeline.BindUFunction(this, FName("UpdateTimelineFunction"));
 	FinishTimeLine.BindUFunction(this, FName("EndTimelineFunction"));
+
+	UserSettings = Cast<UAaronGameUserSettings>(GEngine->GetGameUserSettings());
+	if (UserSettings)
+	{
+		UE_LOG(LogActor, Error, TEXT("Begin User settings not null : %f"), UserSettings->GetMouseSensivity());
+	}
+	else
+	{
+		UE_LOG(LogActor, Error, TEXT("Begin User settings null"));
+	}
 }
 
 void AAaronCharacter::AddControllerYawInput(float Val)
@@ -59,7 +69,7 @@ void AAaronCharacter::BeginPlay()
 	VaultTimeline->SetTimelineFinishedFunc(FinishTimeLine);
 	CharacterMovement->AirControl = StatManager->GetAirControl();
 	CharacterMovement->GravityScale = StatManager->GetGravityScale();
-	UserSettings = Cast<UAaronGameUserSettings>(GEngine->GetGameUserSettings());
+	
 	
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AAaronCharacter::OnBeginOverlap);
 	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AAaronCharacter::OnEndOverlap);
@@ -703,6 +713,27 @@ void AAaronCharacter::EndTimelineFunction()
 {
 	CanVault = false;
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+}
+
+void AAaronCharacter::UpdateBindAction()
+{
+	auto PlayerInputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
+	if (PlayerInputComponent)
+	{
+		if (UserSettings->GetIsToggleSprint())
+		{
+			PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AAaronCharacter::ToggleSprint);
+		}
+		else
+		{
+			PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AAaronCharacter::StartSprinting);
+			PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AAaronCharacter::StopSprinting);
+		}
+	}else
+	{
+		UE_LOG(LogActor, Error, TEXT("PlayerInput null"));
+	}
+	
 }
 
 bool AAaronCharacter::VaultCheck(VaultTraceSettings TraceSettings)
