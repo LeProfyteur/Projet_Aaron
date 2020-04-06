@@ -52,7 +52,7 @@ protected:
 		float Oxygene;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oxygene)
 		float OxygeneMax = 60.0f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Jump)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Jumping)
 		float MaxJumpMulti = 3.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Glider)
 		float GlidingGravityScale = 0.15f;

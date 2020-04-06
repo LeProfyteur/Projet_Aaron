@@ -12,6 +12,7 @@
 #include "Projet_Aaron/Mechanisms/ClimbableInterface.h"
 #include "Projet_Aaron/Item/AnalyseObjectInterface.h"
 #include "Projet_Aaron/Item/Item.h"
+#include "Projet_Aaron/Save/AaronGameUserSettings.h"
 
 #include "DrawDebugHelpers.h"
 #include "GameFramework/Controller.h"
@@ -97,6 +98,8 @@ protected:
 	FHitResult* HitActor = nullptr;
 
 	UCharacterMovementComponent* CharacterMovement;
+
+	UAaronGameUserSettings* UserSettings;
 
 	EMovementState MovementState;
 
@@ -195,8 +198,8 @@ protected:
 
 	void ToggleCrouch();
 
-	/*void StartSprinting();
-	void StopSprinting();*/
+	void StartSprinting();
+	void StopSprinting();
 
 	void Dodge();
 
