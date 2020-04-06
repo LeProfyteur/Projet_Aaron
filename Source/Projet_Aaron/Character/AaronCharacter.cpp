@@ -3,6 +3,8 @@
 
 #include "AaronCharacter.h"
 
+#include "Projet_Aaron/Save/AaronGameUserSettings.h"
+
 // Sets default values
 AAaronCharacter::AAaronCharacter()
 {
@@ -36,6 +38,18 @@ AAaronCharacter::AAaronCharacter()
 
 	UpdateTimeline.BindUFunction(this, FName("UpdateTimelineFunction"));
 	FinishTimeLine.BindUFunction(this, FName("EndTimelineFunction"));
+}
+
+void AAaronCharacter::AddControllerYawInput(float Val)
+{
+	auto settings = Cast<UAaronGameUserSettings>(GEngine->GetGameUserSettings());
+	Super::AddControllerYawInput(Val*settings->GetMouseSensivity());
+}
+
+void AAaronCharacter::AddControllerPitchInput(float Val)
+{
+	auto settings = Cast<UAaronGameUserSettings>(GEngine->GetGameUserSettings());
+	Super::AddControllerPitchInput(Val * settings->GetMouseSensivity());
 }
 
 // Called when the game starts or when spawned
