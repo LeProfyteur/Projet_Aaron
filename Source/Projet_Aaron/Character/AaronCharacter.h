@@ -87,6 +87,10 @@ public:
 
 	bool IsGliding = false;
 
+	//Game settings : mouse sensivity
+	void AddControllerYawInput(float Val) override;
+	void AddControllerPitchInput(float Val) override;
+
 protected:
 
 	FHitResult* HitGrab = nullptr;
