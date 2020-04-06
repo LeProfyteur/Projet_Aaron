@@ -65,6 +65,16 @@ float UAIStatManager::GetPeripheralVision()
     else return 0.f;
 }
 
+float UAIStatManager::GetDamagesBio()
+{
+    return damagesBio;
+}
+
+float UAIStatManager::GetDamagesTech()
+{
+    return damagesTech;
+}
+
 void UAIStatManager::SetPeripheralVision(float PeripheralVision)
 {
     ACharacter* owner = Cast<ACharacter>(GetOwner());
