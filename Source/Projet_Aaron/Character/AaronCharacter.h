@@ -12,6 +12,7 @@
 #include "Projet_Aaron/Mechanisms/ClimbableInterface.h"
 #include "Projet_Aaron/Item/AnalyseObjectInterface.h"
 #include "Projet_Aaron/Item/Item.h"
+#include "Projet_Aaron/Save/AaronGameUserSettings.h"
 
 #include "DrawDebugHelpers.h"
 #include "GameFramework/Controller.h"
@@ -98,6 +99,8 @@ protected:
 
 	UCharacterMovementComponent* CharacterMovement;
 
+	UAaronGameUserSettings* UserSettings;
+
 	EMovementState MovementState;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -164,6 +167,12 @@ public:
 	UFUNCTION()
 		void EndTimelineFunction();
 
+	/**
+	 * \brief Update binding after changing UserSettings that change how the binding works (ie. toggle sprint)
+	 */
+	UFUNCTION(BlueprintCallable)
+		void UpdateBindAction();
+
 protected:
 	void BeginPlay() override;
 
@@ -195,8 +204,8 @@ protected:
 
 	void ToggleCrouch();
 
-	/*void StartSprinting();
-	void StopSprinting();*/
+	void StartSprinting();
+	void StopSprinting();
 
 	void Dodge();
 
