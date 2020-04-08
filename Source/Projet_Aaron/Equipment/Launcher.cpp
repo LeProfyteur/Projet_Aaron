@@ -38,11 +38,8 @@ void ALauncher::Activate_Implementation(bool isPressed)
 
 			GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility);
 
-			//Update character state if a climbable wall is hit
 			if (HitResult.IsValidBlockingHit())
-			{
 				TargetPosition = HitResult.ImpactPoint;
-			}
 			else
 				TargetPosition = End;
 
