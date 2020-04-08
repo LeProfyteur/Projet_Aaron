@@ -11,6 +11,8 @@
 #include "Projet_Aaron/StatManager/CharacterStatManager.h"
 #include "Projet_Aaron/Mechanisms/ClimbableInterface.h"
 #include "Projet_Aaron/Item/AnalyseObjectInterface.h"
+#include "Projet_Aaron/Equipment/NightVisionEquipment.h"
+#include "Projet_Aaron/Equipment/GrapnelEquipmentSuperAaron.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Projet_Aaron/Item/Item.h"
 #include "IHeadMountedDisplay.h"
@@ -51,6 +53,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		UCharacterStatManager* StatManager;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		UPostProcessComponent* PostProcessing;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UChildActorComponent* LeftArmEquipment;
 
@@ -62,6 +67,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UChildActorComponent* ChestEquipment;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UChildActorComponent* GrapnelEquipment;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UInventaireComponent* InventaireComponent;
@@ -133,6 +141,8 @@ protected:
 	bool IsRightHandGripping = false;
 	bool IsInWater = false;
 	bool bPressedJump = false;
+	bool IsGrapnelMod = false;
+	int IndexFireLeftAction;
 
 	float WaterHeight;
 
@@ -217,6 +227,18 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void ActivateReleasedRight();
+
+	UFUNCTION(BlueprintCallable)
+	void EnableDisableNightVision();
+
+	UFUNCTION(BlueprintCallable)
+		void EnableDisableGrapnel();
+
+	UFUNCTION(BlueprintCallable)
+		void ActivatePressedGrapnel();
+
+	UFUNCTION(BlueprintCallable)
+		void ActivateReleasedGrapnel();
 
 	void Climb(float DeltaTime);
 	void UpdateClimbingPosition();
