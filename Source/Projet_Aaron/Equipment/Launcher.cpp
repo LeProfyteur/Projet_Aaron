@@ -20,7 +20,33 @@ void ALauncher::Activate_Implementation(bool isPressed)
 	if (ProjectileClass->IsValidLowLevel() && !isPressed && ReadyToFire)
 	{
 		FVector loc = SphereComponent->GetComponentLocation();
-		FRotator rota = SphereComponent->GetComponentRotation();
+		FRotator rota;
+		
+		if (UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayConnected())
+		{
+			rota = SphereComponent->GetComponentRotation();
+		}
+		else
+		{
+			FHitResult HitResult;
+			FVector Start;
+			FVector End;
+			FVector TargetPosition;
+			Start = SphereComponent->GetComponentLocation();
+			AAaronCharacter* c = Cast<AAaronCharacter>(GetParentActor());
+			End = Start + c->FpsCamera->GetForwardVector() * Distance;
+
+			GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility);
+
+			if (HitResult.IsValidBlockingHit())
+				TargetPosition = HitResult.ImpactPoint;
+			else
+				TargetPosition = End;
+
+			FVector Forward = TargetPosition - SphereComponent->GetComponentLocation();
+			rota = UKismetMathLibrary::MakeRotFromXZ(Forward, FVector::UpVector);
+		}
+		
 		GetWorld()->SpawnActor(ProjectileClass, &loc, &rota);
 		Aiming = false;
 		ReadyToFire = false;

@@ -239,6 +239,8 @@ void AAaronCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	PlayerInputComponent->BindAction("Interact", IE_Released, this, &AAaronCharacter::StopInteract);
 
 	PlayerInputComponent->BindAction("Scan", IE_Repeat, this, &AAaronCharacter::Scan);
+	PlayerInputComponent->BindAction("Scan", IE_Pressed, this, &AAaronCharacter::Scan);
+	PlayerInputComponent->BindAction("Scan", IE_Released, this, &AAaronCharacter::ScanRelease);
 	
 	PlayerInputComponent->BindAction("ItemWheel", IE_Pressed, this, &AAaronCharacter::PressedItemWheel);
 	PlayerInputComponent->BindAction("ItemWheel", IE_Released, this, &AAaronCharacter::ReleaseItemWheel);
@@ -590,6 +592,12 @@ void AAaronCharacter::Scan()
 			}
 		}
 	}
+}
+
+void AAaronCharacter::ScanRelease()
+{
+	AMyHUD* PlayerHUD = Cast<AMyHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+	PlayerHUD->UpdateCircleRadius(0.0f);
 }
 
 void AAaronCharacter::PressedItemWheel()
