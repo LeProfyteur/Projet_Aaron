@@ -23,6 +23,7 @@ enum class VaultType : uint8
 	FallingCatch
 };
 
+UENUM(BlueprintType)
 enum class EMovementState : uint8
 {
 	Walk,
