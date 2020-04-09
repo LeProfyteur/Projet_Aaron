@@ -24,6 +24,10 @@ public:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Perception)
 		float RadiusPercetion = 1500.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Damages)
+		float damagesBio = 20.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Damages)
+		float damagesTech = 20.0f;
 	virtual void BeginPlay() override;
 
 public:
@@ -32,10 +36,16 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	/*Getters*/
 	float GetPeripheralVision();
+	UFUNCTION(BlueprintCallable)
+		float GetDamagesBio();
+	UFUNCTION(BlueprintCallable)
+		float GetDamagesTech();
+
 	/*Setters*/
 	void SetPeripheralVision(float PeripheralVision);
 
 private:
+	
 	void SetUpRadiusPerception();
 
 };
