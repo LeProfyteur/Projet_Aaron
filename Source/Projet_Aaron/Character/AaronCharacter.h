@@ -124,6 +124,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TSubclassOf<class UMainHudFixedSizeCPP> MainHudFixedSizeCPPClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float DisplayTimeTips = 10.0f;
+
 	bool bPressedAlt = false;
 	bool CrouchJumped = false;
 	bool IsClimbing = false;
@@ -225,6 +228,7 @@ protected:
 	bool SearchClimbPoint(FVector& ClimbPoint);
 
 	void Scan();
+	void ScanRelease();
 
 	void PressedItemWheel();
 	void ReleaseItemWheel();
