@@ -327,6 +327,7 @@ void AAaronCharacter::StartJumping()
 						MovementState = EMovementState::Run;
 					}
 					UnCrouch();
+					CrouchJumped = true;
 				}
 				else if (StatManager->Skills.SuperJump)
 				{
