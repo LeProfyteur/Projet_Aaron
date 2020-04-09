@@ -64,6 +64,8 @@ public:
 	UDialog* DialogAsset;
 	UObject* World;
 
+	float TimeBetweenDialog = 2.0f;
+
 	void ResetTimer();
 
 

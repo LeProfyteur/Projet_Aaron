@@ -102,8 +102,6 @@ void UDialogSubsystem::QueueDialog(UObject* WorldContextObject, UDialog* DataAss
 	{
 		if(DialogSubsystem->DialogPlaying == false)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("PlayDialog"));
-
 			PlayDialog(WorldContextObject, DataAssetDialog);
 		}
 		else
@@ -115,30 +113,23 @@ void UDialogSubsystem::QueueDialog(UObject* WorldContextObject, UDialog* DataAss
 
 void UDialogSubsystem::UpdateQueue(UObject* WorldContextObject)
 {
-	
 	if (UDialogSubsystem* DialogSubsystem = GEngine->GetEngineSubsystem<UDialogSubsystem>())
 	{
 		DialogSubsystem->DialogPlaying = false;
 	}
 	
-	
-
-	
 	if (UDialogSubsystem* DialogSubsystem = GEngine->GetEngineSubsystem<UDialogSubsystem>())
 	{
-		
-		
 		if (DialogSubsystem->DialogQueue.IsEmpty() == false)
 		{
-			
+			UE_LOG(LogTemp, Warning, TEXT("QueuePasVide"));
+
 			DialogSubsystem->DialogQueue.Peek(DialogSubsystem->DialogAsset);
-			DialogSubsystem->DialogQueue.Pop();
 
 			DialogSubsystem->World = WorldContextObject;
 
 			WorldContextObject->GetWorld()->GetTimerManager().SetTimer(TimeHandle, this, &UDialogSubsystem::ResetTimer, 2.0f, false);
 		}
-		
 	}
 }
 
