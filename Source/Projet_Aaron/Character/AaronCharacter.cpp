@@ -38,18 +38,18 @@ AAaronCharacter::AAaronCharacter()
 
 	UpdateTimeline.BindUFunction(this, FName("UpdateTimelineFunction"));
 	FinishTimeLine.BindUFunction(this, FName("EndTimelineFunction"));
+
+	
 }
 
 void AAaronCharacter::AddControllerYawInput(float Val)
 {
-	auto settings = Cast<UAaronGameUserSettings>(GEngine->GetGameUserSettings());
-	Super::AddControllerYawInput(Val*settings->GetMouseSensivity());
+	Super::AddControllerYawInput(Val * UserSettings->GetMouseSensivity());
 }
 
 void AAaronCharacter::AddControllerPitchInput(float Val)
 {
-	auto settings = Cast<UAaronGameUserSettings>(GEngine->GetGameUserSettings());
-	Super::AddControllerPitchInput(Val * settings->GetMouseSensivity());
+	Super::AddControllerPitchInput(Val * UserSettings->GetMouseSensivity());
 }
 
 // Called when the game starts or when spawned
@@ -62,8 +62,12 @@ void AAaronCharacter::BeginPlay()
 	CharacterMovement->AirControl = StatManager->GetAirControl();
 	CharacterMovement->GravityScale = StatManager->GetGravityScale();
 
+	UserSettings = Cast<UAaronGameUserSettings>(GEngine->GetGameUserSettings());
+	
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AAaronCharacter::OnBeginOverlap);
 	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AAaronCharacter::OnEndOverlap);
+
+	UpdateBindAction();
 }
 
 void AAaronCharacter::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -208,12 +212,16 @@ void AAaronCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AAaronCharacter::StartJumping);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AAaronCharacter::EndJumping);
 
-	/*PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AAaronCharacter::StartSprinting);
-	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AAaronCharacter::StopSprinting);*/
-
 	PlayerInputComponent->BindAction("Walk", IE_Pressed, this, &AAaronCharacter::ToggleWalk);
 
-	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AAaronCharacter::ToggleSprint);
+	/*if (UserSettings->GetIsToggleSprint())
+	{
+		PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AAaronCharacter::ToggleSprint);
+	} else
+	{
+		PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AAaronCharacter::StartSprinting);
+		PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AAaronCharacter::StopSprinting);
+	}*/
 
 	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &AAaronCharacter::ToggleCrouch);
 
@@ -398,7 +406,7 @@ void AAaronCharacter::ToggleSprint()
 		
 }
 
-/*void AAaronCharacter::StartSprinting()
+void AAaronCharacter::StartSprinting()
 {
 	UnCrouch();
 	MovementState = EMovementState::Sprint;
@@ -408,7 +416,7 @@ void AAaronCharacter::StopSprinting()
 {
 	if (MovementState != EMovementState::Slide)
 		MovementState = EMovementState::Run;
-}*/
+}
 
 
 void AAaronCharacter::Dodge()
@@ -700,6 +708,27 @@ void AAaronCharacter::EndTimelineFunction()
 {
 	CanVault = false;
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+}
+
+void AAaronCharacter::UpdateBindAction()
+{
+	auto PlayerInputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
+	if (PlayerInputComponent)
+	{
+		if (UserSettings->GetIsToggleSprint())
+		{
+			PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AAaronCharacter::ToggleSprint);
+		}
+		else
+		{
+			PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AAaronCharacter::StartSprinting);
+			PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AAaronCharacter::StopSprinting);
+		}
+	}else
+	{
+		UE_LOG(LogActor, Error, TEXT("PlayerInput null"));
+	}
+	
 }
 
 bool AAaronCharacter::VaultCheck(VaultTraceSettings TraceSettings)
