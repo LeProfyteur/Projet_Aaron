@@ -11,6 +11,7 @@
 #include "CableComponent.h"
 #include "CoreMinimal.h"
 #include "EquipmentBase.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "GrapnelEquipmentSuperAaron.generated.h"
 
 UCLASS()
@@ -53,19 +54,25 @@ protected:
 	bool foundHookSpot = false;
 	bool playTLForLaser = true;
 
+	float TimeInterpolation;
+
 	FVector locationToGrip;
 	FOnTimelineEvent updateFunction{};
 
 public:
 	virtual void Activate_Implementation(bool isPressed) override;
 
-	virtual void Tick(float DeltaTime) override;
-
 	UFUNCTION()
 		void TimelineCallback();
 
 	UFUNCTION()
 		void updatePointerLocation();
+
+	UFUNCTION()
+		void AfterHook();
+
+	UFUNCTION()
+		void Hook();
 
 	void PlayTimeline();
 

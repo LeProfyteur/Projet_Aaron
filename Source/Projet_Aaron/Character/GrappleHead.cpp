@@ -37,9 +37,8 @@ void AGrappleHead::Tick(float DeltaTime)
 
 	if(FVector::PointsAreNear(GetActorLocation(), locationToGo, 150.0f))
 	{
-		projectileMovement->SetVelocityInLocalSpace(FVector(0, 0, 0));
+		projectileMovement->SetVelocityInLocalSpace(FVector::ZeroVector);
 		SetActorEnableCollision(false);
-		equipment->SetActorTickEnabled(true);
 	}
 }
 

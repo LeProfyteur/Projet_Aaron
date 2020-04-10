@@ -31,8 +31,6 @@ public:
 	UPROPERTY(VisibleAnywhere)
 		UProjectileMovementComponent* projectileMovement;
 
-	class AActor* equipment;
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
