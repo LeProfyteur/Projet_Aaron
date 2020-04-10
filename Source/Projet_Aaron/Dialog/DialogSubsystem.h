@@ -57,8 +57,16 @@ public:
 	static void QueueDialog(UObject* WorldContextObject, UDialog* DataAssetDialog);
 
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
-	static void UpdateQueue(UObject* WorldContextObject);
+	void UpdateQueue(UObject* WorldContextObject);
 
+	FTimerHandle TimeHandle;
+
+	UDialog* DialogAsset;
+	UObject* World;
+
+	float TimeBetweenDialog = 2.0f;
+
+	void ResetTimer();
 
 
 };

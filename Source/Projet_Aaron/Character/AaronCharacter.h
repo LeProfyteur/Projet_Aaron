@@ -11,8 +11,12 @@
 #include "Projet_Aaron/StatManager/CharacterStatManager.h"
 #include "Projet_Aaron/Mechanisms/ClimbableInterface.h"
 #include "Projet_Aaron/Item/AnalyseObjectInterface.h"
+#include "Projet_Aaron/Equipment/NightVisionEquipment.h"
+#include "Projet_Aaron/Equipment/GrapnelEquipmentSuperAaron.h"
+#include "HeadMountedDisplayFunctionLibrary.h"
 #include "Projet_Aaron/Item/Item.h"
 #include "Projet_Aaron/Save/AaronGameUserSettings.h"
+#include "IHeadMountedDisplay.h"
 
 #include "DrawDebugHelpers.h"
 #include "GameFramework/Controller.h"
@@ -42,10 +46,16 @@ public:
 	AAaronCharacter();
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly)
-		class UCameraComponent* FpsCamera;
+		USceneComponent* VRComponent;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly)
+		UCameraComponent* FpsCamera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		class UCharacterStatManager* StatManager;
+		UCharacterStatManager* StatManager;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		UPostProcessComponent* PostProcessing;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UChildActorComponent* LeftArmEquipment;
@@ -57,7 +67,13 @@ public:
 		UChildActorComponent* HeadEquipment;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		class UInventaireComponent* InventaireComponent;
+		UChildActorComponent* ChestEquipment;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UChildActorComponent* GrapnelEquipment;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UInventaireComponent* InventaireComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UTimelineComponent* VaultTimeline;
@@ -101,6 +117,7 @@ protected:
 
 	UAaronGameUserSettings* UserSettings;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EMovementState MovementState;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -134,6 +151,8 @@ protected:
 	bool IsRightHandGripping = false;
 	bool IsInWater = false;
 	bool bPressedJump = false;
+	bool IsGrapnelMod = false;
+	int IndexFireLeftAction;
 
 	float WaterHeight;
 
@@ -195,16 +214,13 @@ protected:
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 
-	UFUNCTION(BlueprintCallable)
 	void StartJumping();
-
-	UFUNCTION(BlueprintCallable)
 	void EndJumping();
     
 	void ToggleWalk();
-
 	void ToggleSprint();
 
+	UFUNCTION(BlueprintCallable)
 	void ToggleCrouch();
 
 	void StartSprinting();
@@ -215,13 +231,32 @@ protected:
 	void Interact();
 	void StopInteract();
 
+	UFUNCTION(BlueprintCallable)
 	void ActivateHeadEquipment();
 
+	UFUNCTION(BlueprintCallable)
 	void ActivatePressedLeft();
+
+	UFUNCTION(BlueprintCallable)
 	void ActivateReleasedLeft();
 
+	UFUNCTION(BlueprintCallable)
 	void ActivatePressedRight();
+
+	UFUNCTION(BlueprintCallable)
 	void ActivateReleasedRight();
+
+	UFUNCTION(BlueprintCallable)
+	void EnableDisableNightVision();
+
+	UFUNCTION(BlueprintCallable)
+		void EnableDisableGrapnel();
+
+	UFUNCTION(BlueprintCallable)
+		void ActivatePressedGrapnel();
+
+	UFUNCTION(BlueprintCallable)
+		void ActivateReleasedGrapnel();
 
 	void Climb(float DeltaTime);
 	void UpdateClimbingPosition();
