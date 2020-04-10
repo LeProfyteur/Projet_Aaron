@@ -166,7 +166,7 @@ void AAaronCharacter::Tick(float DeltaTime)
 	if (CurrentTimePressedItemWheel > 0.f)
 	{
 		CurrentTimePressedItemWheel += DeltaTime;
-		if (!WheelDisplayed && CurrentTimePressedItemWheel >= HoldingTimeItemWheel)
+		if (!WheelDisplayed && CurrentTimePressedItemWheel >= UserSettings->GetHoldingTimeWheelSec())
 		{
 			DisplayWheel();
 			WheelDisplayed = true;

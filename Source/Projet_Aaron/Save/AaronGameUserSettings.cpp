@@ -53,6 +53,22 @@ void UAaronGameUserSettings::SetIsToggleSprint(bool IsToggle)
 	IsToggleSprint = IsToggle;
 }
 
+int UAaronGameUserSettings::GetHoldingTimeWheel()
+{
+	return HoldingTimeWheel;
+}
+
+float UAaronGameUserSettings::GetHoldingTimeWheelSec()
+{
+	float time = HoldingTimeWheel;
+	return (time / 1000.f);
+}
+
+void UAaronGameUserSettings::SetHoldingTimeWheel(int HoldingTime)
+{
+	HoldingTimeWheel = HoldingTime;
+}
+
 bool UAaronGameUserSettings::IsVersionValid()
 {
 	return (Version == MY_GAMEUSERSETTINGS_VERSION);
