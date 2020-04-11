@@ -177,7 +177,7 @@ int UInventaireComponent::GetIndexSlotConso(UDA_ItemStructure* ItemToSearch)
 
 	for (int i = 0; i < InventoryConsomable.Num(); i++)
 	{
-		UE_LOG(LogActor, Warning, TEXT("Item search : %d"), InventoryConsomable[i]->Quantity);
+		//UE_LOG(LogActor, Warning, TEXT("Item search : %d"), InventoryConsomable[i]->Quantity);
 		if (InventoryConsomable[i]->ItemStructure->Name == ItemToSearch->Name && InventoryConsomable[i]->ItemStructure->MaxStackSize > InventoryConsomable[i]->Quantity)
 		{
 			return i;
@@ -191,7 +191,7 @@ int UInventaireComponent::GetIndexSlotSeringue(UDA_ItemStructure* ItemToSearch)
 
 	for (int i = 0; i < InventoryFlacon.Num(); i++)
 	{
-		UE_LOG(LogActor, Warning, TEXT("Item search : %d"), InventoryFlacon[i]->Quantity);
+		//UE_LOG(LogActor, Warning, TEXT("Item search : %d"), InventoryFlacon[i]->Quantity);
 		if (InventoryFlacon[i]->ItemStructure->Name == ItemToSearch->Name && InventoryFlacon[i]->ItemStructure->MaxStackSize > InventoryFlacon[i]->Quantity)
 		{
 			return i;
