@@ -6,6 +6,8 @@
 #include "Components/SphereComponent.h"
 #include "EquipmentBase.h"
 #include "TimerManager.h"
+#include "HeadMountedDisplayFunctionLibrary.h"
+#include "Projet_Aaron/Character/AaronCharacter.h"
 #include "Launcher.generated.h"
 
 /**
@@ -27,6 +29,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 		float Cooldown = 1.0f;
+
+	UPROPERTY(EditAnywhere)
+		float Distance = 2000.0f;
 
 protected:
 	FTimerHandle CooldownTimerHandle;

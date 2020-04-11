@@ -3,18 +3,24 @@
 
 #include "AaronCharacter.h"
 
+#include "Projet_Aaron/Save/AaronGameUserSettings.h"
+
 // Sets default values
 AAaronCharacter::AAaronCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	VRComponent = CreateDefaultSubobject<USceneComponent>(TEXT("VR Component"));
+	VRComponent->SetupAttachment(RootComponent);
+
 	FpsCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FPS_Camera"));
-	FpsCamera->SetupAttachment(RootComponent);
+	FpsCamera->SetupAttachment(VRComponent);
 	FpsCamera->SetRelativeLocation(FVector(0.0f, 0.0f, 50.0f + BaseEyeHeight));
 	FpsCamera->bUsePawnControlRotation = true;
 
 	StatManager = CreateDefaultSubobject<UCharacterStatManager>(TEXT("StatManager"));
+	PostProcessing = CreateDefaultSubobject<UPostProcessComponent>(TEXT("Post Processing"));
 
 	CharacterMovement = GetCharacterMovement();
 	CharacterMovement->JumpZVelocity = StatManager->GetJumpForce();
@@ -29,6 +35,13 @@ AAaronCharacter::AAaronCharacter()
 	HeadEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Head Equipment"));
 	HeadEquipment->SetupAttachment(FpsCamera);
 
+	ChestEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Chest Equipment"));
+	ChestEquipment->SetupAttachment(FpsCamera);
+
+	GrapnelEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Grapnel Equipment"));
+	GrapnelEquipment->SetupAttachment(FpsCamera);
+	GrapnelEquipment->SetHiddenInGame(IsGrapnelMod, true);
+
 	InventaireComponent = CreateDefaultSubobject<UInventaireComponent>(TEXT("InventaireComponent"));
 	InventaireComponent->PrepareInventory();
 
@@ -36,6 +49,18 @@ AAaronCharacter::AAaronCharacter()
 
 	UpdateTimeline.BindUFunction(this, FName("UpdateTimelineFunction"));
 	FinishTimeLine.BindUFunction(this, FName("EndTimelineFunction"));
+
+	
+}
+
+void AAaronCharacter::AddControllerYawInput(float Val)
+{
+	Super::AddControllerYawInput(Val * UserSettings->GetMouseSensivity());
+}
+
+void AAaronCharacter::AddControllerPitchInput(float Val)
+{
+	Super::AddControllerPitchInput(Val * UserSettings->GetMouseSensivity());
 }
 
 // Called when the game starts or when spawned
@@ -48,8 +73,12 @@ void AAaronCharacter::BeginPlay()
 	CharacterMovement->AirControl = StatManager->GetAirControl();
 	CharacterMovement->GravityScale = StatManager->GetGravityScale();
 
+	UserSettings = Cast<UAaronGameUserSettings>(GEngine->GetGameUserSettings());
+	
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AAaronCharacter::OnBeginOverlap);
 	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AAaronCharacter::OnEndOverlap);
+
+	UpdateBindAction();
 }
 
 void AAaronCharacter::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -137,7 +166,7 @@ void AAaronCharacter::Tick(float DeltaTime)
 	if (CurrentTimePressedItemWheel > 0.f)
 	{
 		CurrentTimePressedItemWheel += DeltaTime;
-		if (!WheelDisplayed && CurrentTimePressedItemWheel >= HoldingTimeItemWheel)
+		if (!WheelDisplayed && CurrentTimePressedItemWheel >= UserSettings->GetHoldingTimeWheelSec())
 		{
 			DisplayWheel();
 			WheelDisplayed = true;
@@ -191,15 +220,20 @@ void AAaronCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	PlayerInputComponent->BindAxis("Turn", this, &AAaronCharacter::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &AAaronCharacter::AddControllerPitchInput);
 
+	 PlayerInputComponent->BindAction("SwitchGrapnelMod", IE_Pressed, this, &AAaronCharacter::EnableDisableGrapnel);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AAaronCharacter::StartJumping);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AAaronCharacter::EndJumping);
 
-	/*PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AAaronCharacter::StartSprinting);
-	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AAaronCharacter::StopSprinting);*/
-
 	PlayerInputComponent->BindAction("Walk", IE_Pressed, this, &AAaronCharacter::ToggleWalk);
 
-	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AAaronCharacter::ToggleSprint);
+	/*if (UserSettings->GetIsToggleSprint())
+	{
+		PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AAaronCharacter::ToggleSprint);
+	} else
+	{
+		PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AAaronCharacter::StartSprinting);
+		PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AAaronCharacter::StopSprinting);
+	}*/
 
 	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &AAaronCharacter::ToggleCrouch);
 
@@ -212,14 +246,56 @@ void AAaronCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	PlayerInputComponent->BindAction("FireRight", IE_Released, this, &AAaronCharacter::ActivateReleasedRight);
 
 	PlayerInputComponent->BindAction("HeadAction", IE_Pressed, this, &AAaronCharacter::ActivateHeadEquipment);
+	PlayerInputComponent->BindAction("NightVision", IE_Pressed, this, &AAaronCharacter::EnableDisableNightVision);
 
 	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AAaronCharacter::Interact);
 	PlayerInputComponent->BindAction("Interact", IE_Released, this, &AAaronCharacter::StopInteract);
 
 	PlayerInputComponent->BindAction("Scan", IE_Repeat, this, &AAaronCharacter::Scan);
+	PlayerInputComponent->BindAction("Scan", IE_Pressed, this, &AAaronCharacter::Scan);
+	PlayerInputComponent->BindAction("Scan", IE_Released, this, &AAaronCharacter::ScanRelease);
 	
 	PlayerInputComponent->BindAction("ItemWheel", IE_Pressed, this, &AAaronCharacter::PressedItemWheel);
 	PlayerInputComponent->BindAction("ItemWheel", IE_Released, this, &AAaronCharacter::ReleaseItemWheel);
+
+	for (int i = 0; i < PlayerInputComponent->GetNumActionBindings(); i++)
+	{
+		if (PlayerInputComponent->GetActionBinding(i).GetActionName().Compare(FName("FireLeft")) == 0)
+			IndexFireLeftAction = i;
+	}
+}
+
+void AAaronCharacter::EnableDisableNightVision()
+{
+	UE_LOG(LogActor, Error, TEXT("%s"), *PostProcessing->Settings.WeightedBlendables.Array[0].Object->GetName());
+	if (PostProcessing->Settings.WeightedBlendables.Array[0].Weight)
+		PostProcessing->Settings.WeightedBlendables.Array[0].Weight = 0.0f;
+	else
+		PostProcessing->Settings.WeightedBlendables.Array[0].Weight = 1.0f;
+}
+
+void AAaronCharacter::EnableDisableGrapnel()
+{
+	if (GrapnelEquipment->GetChildActorClass() == AGrapnelEquipmentSuperAaron::StaticClass()) 
+	{
+		IsGrapnelMod = !IsGrapnelMod;
+		UE_LOG(LogActor, Error, TEXT("%d"), IsGrapnelMod);
+		GrapnelEquipment->SetHiddenInGame(!IsGrapnelMod, true);
+	}
+}
+
+void AAaronCharacter::ActivatePressedGrapnel()
+{
+	AActor* ChildActor = GrapnelEquipment->GetChildActor();
+	if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
+		IEquipmentInterface::Execute_Activate(ChildActor, true);
+}
+
+void AAaronCharacter::ActivateReleasedGrapnel()
+{
+	AActor* ChildActor = GrapnelEquipment->GetChildActor();
+	if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
+		IEquipmentInterface::Execute_Activate(ChildActor, false);
 }
 
 void AAaronCharacter::Climb(float DeltaTime)
@@ -261,16 +337,24 @@ FVector AAaronCharacter::GetCharacterDirection() const
 
 void AAaronCharacter::MoveForward(float Value)
 {
+	FVector ForwardVector = FpsCamera->GetForwardVector();
+	if (UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled())
+		ForwardVector = GetActorForwardVector();
+
 	if (CharacterMovement->IsSwimming())
-		AddMovementInput(FpsCamera->GetForwardVector(), Value);
+		AddMovementInput(ForwardVector, Value);
 	else if (MovementState != EMovementState::Slide)
 		AddMovementInput(GetActorForwardVector(), Value);
 }
 
 void AAaronCharacter::MoveRight(float Value)
 {
+	FVector ForwardVector = FpsCamera->GetForwardVector();
+	if (UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled())
+		ForwardVector = GetActorForwardVector();
+
 	if (CharacterMovement->IsSwimming())
-		AddMovementInput(FpsCamera->GetRightVector(), Value);
+		AddMovementInput(ForwardVector, Value);
 	else if (MovementState != EMovementState::Slide)
 		AddMovementInput(GetActorRightVector(), Value);
 }
@@ -303,6 +387,7 @@ void AAaronCharacter::StartJumping()
 						MovementState = EMovementState::Run;
 					}
 					UnCrouch();
+					CrouchJumped = true;
 				}
 				else if (StatManager->Skills.SuperJump)
 				{
@@ -384,7 +469,7 @@ void AAaronCharacter::ToggleSprint()
 		
 }
 
-/*void AAaronCharacter::StartSprinting()
+void AAaronCharacter::StartSprinting()
 {
 	UnCrouch();
 	MovementState = EMovementState::Sprint;
@@ -394,7 +479,7 @@ void AAaronCharacter::StopSprinting()
 {
 	if (MovementState != EMovementState::Slide)
 		MovementState = EMovementState::Run;
-}*/
+}
 
 
 void AAaronCharacter::Dodge()
@@ -433,35 +518,50 @@ void AAaronCharacter::ActivateHeadEquipment()
 //Left arm button pressed
 void AAaronCharacter::ActivatePressedLeft()
 {
-	FVector ClimbPoint;
-	if (SearchClimbPoint(ClimbPoint)) {
-		MovementState = EMovementState::Climb;
-		IsLeftHandGripping = true;
-		LeftHandPosition = ClimbPoint;
-		UpdateClimbingPosition();
+	if (IsGrapnelMod)
+	{
+		UE_LOG(LogActor, Error, TEXT("Grapnel"));
+		ActivatePressedGrapnel();
 	}
 	else
 	{
-		AActor* ChildActor = LeftArmEquipment->GetChildActor();
-		if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
-			IEquipmentInterface::Execute_Activate(ChildActor, true);
+		FVector ClimbPoint;
+		if (SearchClimbPoint(ClimbPoint)) {
+			MovementState = EMovementState::Climb;
+			IsLeftHandGripping = true;
+			LeftHandPosition = ClimbPoint;
+			UpdateClimbingPosition();
+		}
+		else
+		{
+			AActor* ChildActor = LeftArmEquipment->GetChildActor();
+			if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
+				IEquipmentInterface::Execute_Activate(ChildActor, true);
+		}
 	}
 }
 
 //Left arm button released
 void AAaronCharacter::ActivateReleasedLeft()
 {
-	if (IsLeftHandGripping)
+	if (IsGrapnelMod)
 	{
-		IsLeftHandGripping = false;
-		LeftHandPosition = FVector::ZeroVector;
-		UpdateClimbingPosition();
+		ActivateReleasedGrapnel();
 	}
 	else
 	{
-		AActor* ChildActor = LeftArmEquipment->GetChildActor();
-		if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
-			IEquipmentInterface::Execute_Activate(ChildActor, false);
+		if (IsLeftHandGripping)
+		{
+			IsLeftHandGripping = false;
+			LeftHandPosition = FVector::ZeroVector;
+			UpdateClimbingPosition();
+		}
+		else
+		{
+			AActor* ChildActor = LeftArmEquipment->GetChildActor();
+			if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
+				IEquipmentInterface::Execute_Activate(ChildActor, false);
+		}
 	}
 }
 
@@ -568,6 +668,12 @@ void AAaronCharacter::Scan()
 			}
 		}
 	}
+}
+
+void AAaronCharacter::ScanRelease()
+{
+	AMyHUD* PlayerHUD = Cast<AMyHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+	PlayerHUD->UpdateCircleRadius(0.0f);
 }
 
 void AAaronCharacter::PressedItemWheel()
@@ -686,6 +792,27 @@ void AAaronCharacter::EndTimelineFunction()
 {
 	CanVault = false;
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+}
+
+void AAaronCharacter::UpdateBindAction()
+{
+	auto PlayerInputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
+	if (PlayerInputComponent)
+	{
+		if (UserSettings->GetIsToggleSprint())
+		{
+			PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AAaronCharacter::ToggleSprint);
+		}
+		else
+		{
+			PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AAaronCharacter::StartSprinting);
+			PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AAaronCharacter::StopSprinting);
+		}
+	}else
+	{
+		UE_LOG(LogActor, Error, TEXT("PlayerInput null"));
+	}
+	
 }
 
 bool AAaronCharacter::VaultCheck(VaultTraceSettings TraceSettings)
