@@ -122,7 +122,7 @@ void UDialogSubsystem::UpdateQueue(UObject* WorldContextObject)
 	{
 		if (DialogSubsystem->DialogQueue.IsEmpty() == false)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("QueuePasVide"));
+			//UE_LOG(LogTemp, Warning, TEXT("QueuePasVide"));
 
 			DialogSubsystem->DialogQueue.Peek(DialogSubsystem->DialogAsset);
 

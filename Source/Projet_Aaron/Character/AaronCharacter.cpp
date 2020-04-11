@@ -86,7 +86,7 @@ void AAaronCharacter::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor
 	APhysicsVolume* WaterVolume = Cast<APhysicsVolume>(OtherActor);
 	if(WaterVolume && WaterVolume->bWaterVolume)
 	{
-		UE_LOG(LogActor, Error, TEXT("In Water"));
+		//UE_LOG(LogActor, Error, TEXT("In Water"));
 		IsInWater = true;
 		FBoxSphereBounds WaterBounds = WaterVolume->GetBounds();
 		WaterHeight = WaterBounds.Origin.Z + WaterBounds.BoxExtent.Z;
@@ -267,7 +267,7 @@ void AAaronCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 void AAaronCharacter::EnableDisableNightVision()
 {
-	UE_LOG(LogActor, Error, TEXT("%s"), *PostProcessing->Settings.WeightedBlendables.Array[0].Object->GetName());
+	//UE_LOG(LogActor, Error, TEXT("%s"), *PostProcessing->Settings.WeightedBlendables.Array[0].Object->GetName());
 	if (PostProcessing->Settings.WeightedBlendables.Array[0].Weight)
 		PostProcessing->Settings.WeightedBlendables.Array[0].Weight = 0.0f;
 	else
@@ -279,7 +279,7 @@ void AAaronCharacter::EnableDisableGrapnel()
 	if (GrapnelEquipment->GetChildActorClass() == AGrapnelEquipmentSuperAaron::StaticClass()) 
 	{
 		IsGrapnelMod = !IsGrapnelMod;
-		UE_LOG(LogActor, Error, TEXT("%d"), IsGrapnelMod);
+		//UE_LOG(LogActor, Error, TEXT("%d"), IsGrapnelMod);
 		GrapnelEquipment->SetHiddenInGame(!IsGrapnelMod, true);
 	}
 }
@@ -520,7 +520,7 @@ void AAaronCharacter::ActivatePressedLeft()
 {
 	if (IsGrapnelMod)
 	{
-		UE_LOG(LogActor, Error, TEXT("Grapnel"));
+		//UE_LOG(LogActor, Error, TEXT("Grapnel"));
 		ActivatePressedGrapnel();
 	}
 	else
@@ -808,10 +808,10 @@ void AAaronCharacter::UpdateBindAction()
 			PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AAaronCharacter::StartSprinting);
 			PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AAaronCharacter::StopSprinting);
 		}
-	}else
+	}/*else
 	{
 		UE_LOG(LogActor, Error, TEXT("PlayerInput null"));
-	}
+	}*/
 	
 }
 
