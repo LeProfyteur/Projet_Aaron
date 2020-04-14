@@ -57,7 +57,7 @@ float UAISense_Smell::Update()
 						return 0.f;
 					}
 					bool isSmellSense = false;
-					for (size_t j = 0; j < stimuli->GetRegisterSource().Num(); j++)
+					for (int j = 0; j < stimuli->GetRegisterSource().Num(); j++)
 					{
 						if (stimuli->GetRegisterSource()[j]->GetName() == "AISense_Smell")
 							isSmellSense = true;
