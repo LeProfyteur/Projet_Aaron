@@ -13,7 +13,7 @@ void UDialogSubsystem::Clear()
 
 	DialogPlaying = false;
 
-	DialogQueue.~TQueue();
+	DialogQueue.Empty();
 }
 
 void UDialogSubsystem::SetMetric(FString MetricToUpdate, int32 NewValue)
@@ -88,6 +88,10 @@ void PlayDialog(UObject* WorldContextObject, UDialog* DataAssetDialog)
 		if (AAIController* Controller = Cast<AAIController>(Pawn->GetController()))
 		{
 			Controller->RunBehaviorTree(DataAssetDialog->DialogBehaviourTree);
+			if (UDialogSubsystem* DialogSubsystem = GEngine->GetEngineSubsystem<UDialogSubsystem>())
+			{
+				DialogSubsystem->DialogPlaying = true;
+			}
 		}
 	}
 }
@@ -98,8 +102,6 @@ void UDialogSubsystem::QueueDialog(UObject* WorldContextObject, UDialog* DataAss
 	{
 		if(DialogSubsystem->DialogPlaying == false)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Your message"));
-
 			PlayDialog(WorldContextObject, DataAssetDialog);
 		}
 		else
@@ -109,14 +111,33 @@ void UDialogSubsystem::QueueDialog(UObject* WorldContextObject, UDialog* DataAss
 	}
 }
 
-void UDialogSubsystem::UpdateQueue(UObject * WorldContextObject)
+void UDialogSubsystem::UpdateQueue(UObject* WorldContextObject)
 {
 	if (UDialogSubsystem* DialogSubsystem = GEngine->GetEngineSubsystem<UDialogSubsystem>())
 	{
-		UDialog* DialogAsset;
-		DialogSubsystem->DialogQueue.Dequeue(DialogAsset);
+		DialogSubsystem->DialogPlaying = false;
+	}
+	
+	if (UDialogSubsystem* DialogSubsystem = GEngine->GetEngineSubsystem<UDialogSubsystem>())
+	{
+		if (DialogSubsystem->DialogQueue.IsEmpty() == false)
+		{
+			//UE_LOG(LogTemp, Warning, TEXT("QueuePasVide"));
 
-		PlayDialog(WorldContextObject, DialogAsset);
+			DialogSubsystem->DialogQueue.Peek(DialogSubsystem->DialogAsset);
+
+			DialogSubsystem->World = WorldContextObject;
+
+			WorldContextObject->GetWorld()->GetTimerManager().SetTimer(TimeHandle, this, &UDialogSubsystem::ResetTimer, 2.0f, false);
+		}
+	}
+}
+
+void UDialogSubsystem::ResetTimer()
+{
+	if (UDialogSubsystem* DialogSubsystem = GEngine->GetEngineSubsystem<UDialogSubsystem>())
+	{
+		PlayDialog(DialogSubsystem->World, DialogSubsystem->DialogAsset);
 	}
 }
 
