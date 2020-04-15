@@ -20,13 +20,15 @@ void UParalysisAlteration::BeginPlay()
 		Controller = Cast<APawn>(GetOwner())->GetController();
 		
 		if (Cast<AAIController>(Controller))
+		{
 			Cast<AAIController>(Controller)->BrainComponent->StopLogic("Paralysed");
-		else
-			Controller->UnPossess();
-	} /*else
-	{
-		GetOwner()->DisableInput(GetWorld()->GetFirstPlayerController());
-	}*/
+			UE_LOG(LogActor, Warning, TEXT("Paralysed ai"));
+		} else if (Cast<APlayerController>(Controller))
+		{
+			GetOwner()->DisableInput(Cast<APlayerController>(Controller));
+			UE_LOG(LogActor, Warning, TEXT("Paralysed player"));
+		}
+	}
 }
 
 void UParalysisAlteration::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -39,11 +41,14 @@ void UParalysisAlteration::OnComponentDestroyed(bool bDestroyingHierarchy)
 	if (Cast<APawn>(GetOwner()))
 	{
 		if (Cast<AAIController>(Controller))
-			Cast<AAIController>(Controller)->BrainComponent->ResumeLogic("Unparalysed");
-		else
-			Controller->Possess(Cast<APawn>(GetOwner()));
-	} /*else
-	{
-		GetOwner()->EnableInput(GetWorld()->GetFirstPlayerController());
-	}*/
+		{
+			Cast<AAIController>(Controller)->BrainComponent->RestartLogic();
+			UE_LOG(LogActor, Warning, TEXT("Unparalysed ai"));
+		}
+		else if (Cast<APlayerController>(Controller))
+		{
+			GetOwner()->EnableInput(Cast<APlayerController>(Controller));
+			UE_LOG(LogActor, Warning, TEXT("Unparalysed player"));
+		}
+	}
 }
