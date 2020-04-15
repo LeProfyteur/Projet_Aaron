@@ -258,6 +258,9 @@ protected:
 	UFUNCTION(BlueprintCallable)
 		void ActivateReleasedGrapnel();
 
+	UFUNCTION(BlueprintCallable)
+		void ActivatePressedChest();
+
 	void Climb(float DeltaTime);
 	void UpdateClimbingPosition();
 	bool SearchClimbPoint(FVector& ClimbPoint);
