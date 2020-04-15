@@ -53,7 +53,7 @@ float UAISense_Smell::Update()
 
 					if (!Id.IsValid())
 					{
-						UE_LOG(LogTemp, Error, TEXT("Wrong Sense ID"));
+						//UE_LOG(LogTemp, Error, TEXT("Wrong Sense ID"));
 						return 0.f;
 					}
 					bool isSmellSense = false;
