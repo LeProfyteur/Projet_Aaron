@@ -17,6 +17,7 @@
 #include "Projet_Aaron/Item/Item.h"
 #include "Projet_Aaron/Save/AaronGameUserSettings.h"
 #include "IHeadMountedDisplay.h"
+#include "PlayerAdvancement.h"
 
 #include "DrawDebugHelpers.h"
 #include "GameFramework/Controller.h"
@@ -56,6 +57,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		UPostProcessComponent* PostProcessing;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		UPlayerAdvancement* PlayerAdvancement;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UChildActorComponent* LeftArmEquipment;
