@@ -71,7 +71,7 @@ void AGrapnelEquipmentSuperAaron::Activate_Implementation(bool isPressed)
 			laser->SetHiddenInGame(true, true);
 			cable->SetHiddenInGame(false, false);
 			hookMeshComponent->SetHiddenInGame(true);
-			myBullet = GetWorld()->SpawnActor<AGrappleHead>(hookMeshComponent->GetComponentLocation(), GetActorRotation());
+			myBullet = GetWorld()->SpawnActor<AGrappleHead>(AGrappleHead::StaticClass(), hookMeshComponent->GetComponentLocation(), GetActorRotation());
 			myBullet->locationToGo = locationToGrip;
 			cable->SetAttachEndTo(myBullet, NAME_None, NAME_None);
 			Hook();

@@ -245,6 +245,8 @@ void AAaronCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	PlayerInputComponent->BindAction("FireRight", IE_Pressed, this, &AAaronCharacter::ActivatePressedRight);
 	PlayerInputComponent->BindAction("FireRight", IE_Released, this, &AAaronCharacter::ActivateReleasedRight);
 
+	PlayerInputComponent->BindAction("TorsoAction", IE_Pressed, this, &AAaronCharacter::ActivatePressedChest);
+
 	PlayerInputComponent->BindAction("HeadAction", IE_Pressed, this, &AAaronCharacter::ActivateHeadEquipment);
 	PlayerInputComponent->BindAction("NightVision", IE_Pressed, this, &AAaronCharacter::EnableDisableNightVision);
 
@@ -598,6 +600,13 @@ void AAaronCharacter::ActivateReleasedRight()
 		if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
 			IEquipmentInterface::Execute_Activate(ChildActor, false);
 	}
+}
+
+void AAaronCharacter::ActivatePressedChest()
+{
+	AActor* ChildActor = ChestEquipment->GetChildActor();
+	if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
+		IEquipmentInterface::Execute_Activate(ChildActor, true);
 }
 
 bool AAaronCharacter::SearchClimbPoint(FVector& ClimbPoint)
