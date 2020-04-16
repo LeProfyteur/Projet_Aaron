@@ -196,8 +196,6 @@ void AAaronCharacter::Tick(float DeltaTime)
 	}
 	else if (HitActor)
 	{
-		UStaticMeshComponent* actorMeshComponent = HitActor->Actor->FindComponentByClass<UStaticMeshComponent>();
-		actorMeshComponent->SetCustomDepthStencilValue(1);
 		InventoryCastObject->nameTextItem = "";
 		HitActor = nullptr;
 	}
@@ -269,7 +267,6 @@ void AAaronCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 void AAaronCharacter::EnableDisableNightVision()
 {
-	//UE_LOG(LogActor, Error, TEXT("%s"), *PostProcessing->Settings.WeightedBlendables.Array[0].Object->GetName());
 	if (PostProcessing->Settings.WeightedBlendables.Array[0].Weight)
 		PostProcessing->Settings.WeightedBlendables.Array[0].Weight = 0.0f;
 	else
@@ -281,7 +278,6 @@ void AAaronCharacter::EnableDisableGrapnel()
 	if (GrapnelEquipment->GetChildActorClass() == AGrapnelEquipmentSuperAaron::StaticClass()) 
 	{
 		IsGrapnelMod = !IsGrapnelMod;
-		//UE_LOG(LogActor, Error, TEXT("%d"), IsGrapnelMod);
 		GrapnelEquipment->SetHiddenInGame(!IsGrapnelMod, true);
 	}
 }

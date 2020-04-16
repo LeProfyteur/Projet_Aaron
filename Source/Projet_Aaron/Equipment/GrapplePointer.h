@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Components/SphereComponent.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "GrapplePointer.generated.h"
@@ -15,7 +16,8 @@ public:
 	// Sets default values for this actor's properties
 	AGrapplePointer();
 
-	USceneComponent *Scene;
+	USphereComponent* SphereBox;
+	USceneComponent *SceneCompo;
 
 protected:
 	// Called when the game starts or when spawned
