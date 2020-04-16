@@ -40,7 +40,7 @@ AAaronCharacter::AAaronCharacter()
 
 	GrapnelEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Grapnel Equipment"));
 	GrapnelEquipment->SetupAttachment(FpsCamera);
-	GrapnelEquipment->SetHiddenInGame(IsGrapnelMod, true);
+	GrapnelEquipment->SetHiddenInGame(!IsGrapnelMod, true);
 
 	InventaireComponent = CreateDefaultSubobject<UInventaireComponent>(TEXT("InventaireComponent"));
 	InventaireComponent->PrepareInventory();
