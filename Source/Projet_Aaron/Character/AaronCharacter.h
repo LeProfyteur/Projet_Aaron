@@ -70,9 +70,6 @@ public:
 		UChildActorComponent* ChestEquipment;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UChildActorComponent* GrapnelEquipment;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UInventaireComponent* InventaireComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -89,6 +86,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FVaultAsset FallingVaultAsset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UClass* GrapnelClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool CanVault = false;
@@ -178,6 +178,8 @@ protected:
 
 	float CurrentTimePressedItemWheel = 0.f;
 	bool WheelDisplayed = false;
+
+	UClass* LeftArmEquipmentClass;
 	
 public:
 	// Called every frame
@@ -251,12 +253,6 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 		void EnableDisableGrapnel();
-
-	UFUNCTION(BlueprintCallable)
-		void ActivatePressedGrapnel();
-
-	UFUNCTION(BlueprintCallable)
-		void ActivateReleasedGrapnel();
 
 	UFUNCTION(BlueprintCallable)
 		void ActivatePressedChest();

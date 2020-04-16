@@ -20,14 +20,9 @@ void UParalysisAlteration::BeginPlay()
 		Controller = Cast<APawn>(GetOwner())->GetController();
 		
 		if (Cast<AAIController>(Controller))
-		{
 			Cast<AAIController>(Controller)->BrainComponent->StopLogic("Paralysed");
-			UE_LOG(LogActor, Warning, TEXT("Paralysed ai"));
-		} else if (Cast<APlayerController>(Controller))
-		{
+		else if (Cast<APlayerController>(Controller))
 			GetOwner()->DisableInput(Cast<APlayerController>(Controller));
-			UE_LOG(LogActor, Warning, TEXT("Paralysed player"));
-		}
 	}
 }
 
@@ -41,14 +36,8 @@ void UParalysisAlteration::OnComponentDestroyed(bool bDestroyingHierarchy)
 	if (Cast<APawn>(GetOwner()))
 	{
 		if (Cast<AAIController>(Controller))
-		{
 			Cast<AAIController>(Controller)->BrainComponent->RestartLogic();
-			UE_LOG(LogActor, Warning, TEXT("Unparalysed ai"));
-		}
 		else if (Cast<APlayerController>(Controller))
-		{
 			GetOwner()->EnableInput(Cast<APlayerController>(Controller));
-			UE_LOG(LogActor, Warning, TEXT("Unparalysed player"));
-		}
 	}
 }
