@@ -21,12 +21,9 @@ void UParalysisAlteration::BeginPlay()
 		
 		if (Cast<AAIController>(Controller))
 			Cast<AAIController>(Controller)->BrainComponent->StopLogic("Paralysed");
-		else
-			Controller->UnPossess();
-	} /*else
-	{
-		GetOwner()->DisableInput(GetWorld()->GetFirstPlayerController());
-	}*/
+		else if (Cast<APlayerController>(Controller))
+			GetOwner()->DisableInput(Cast<APlayerController>(Controller));
+	}
 }
 
 void UParalysisAlteration::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -39,11 +36,8 @@ void UParalysisAlteration::OnComponentDestroyed(bool bDestroyingHierarchy)
 	if (Cast<APawn>(GetOwner()))
 	{
 		if (Cast<AAIController>(Controller))
-			Cast<AAIController>(Controller)->BrainComponent->ResumeLogic("Unparalysed");
-		else
-			Controller->Possess(Cast<APawn>(GetOwner()));
-	} /*else
-	{
-		GetOwner()->EnableInput(GetWorld()->GetFirstPlayerController());
-	}*/
+			Cast<AAIController>(Controller)->BrainComponent->RestartLogic();
+		else if (Cast<APlayerController>(Controller))
+			GetOwner()->EnableInput(Cast<APlayerController>(Controller));
+	}
 }
