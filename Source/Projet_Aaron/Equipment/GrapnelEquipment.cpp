@@ -70,7 +70,6 @@ void AGrapnelEquipment::Activate_Implementation(bool isPressed)
 			cable->SetHiddenInGame(false, false);
 			hookMeshComponent->SetHiddenInGame(true);
 			myBullet = GetWorld()->SpawnActor<AGrappleHead>(hookMeshComponent->GetComponentLocation(), GetActorRotation());
-			myBullet->equipment = this;
 			myBullet->locationToGo = locationToGrip;
 			cable->SetAttachEndTo(myBullet, FName(), FName());
 		}
