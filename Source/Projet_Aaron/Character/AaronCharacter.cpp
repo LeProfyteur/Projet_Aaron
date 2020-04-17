@@ -11,11 +11,12 @@ AAaronCharacter::AAaronCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	VRComponent = CreateDefaultSubobject<USceneComponent>(TEXT("VR Component"));
-	VRComponent->SetupAttachment(RootComponent);
+	//VRComponent = CreateDefaultSubobject<USceneComponent>(TEXT("VR Component"));
+	//VRComponent->SetupAttachment(RootComponent);
 
 	FpsCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FPS_Camera"));
-	FpsCamera->SetupAttachment(VRComponent);
+	//FpsCamera->SetupAttachment(VRComponent);
+	FpsCamera->SetupAttachment(RootComponent);
 	FpsCamera->SetRelativeLocation(FVector(0.0f, 0.0f, 50.0f + BaseEyeHeight));
 	FpsCamera->bUsePawnControlRotation = true;
 
@@ -46,7 +47,7 @@ AAaronCharacter::AAaronCharacter()
 	UpdateTimeline.BindUFunction(this, FName("UpdateTimelineFunction"));
 	FinishTimeLine.BindUFunction(this, FName("EndTimelineFunction"));
 
-	
+	StatManager->Skills.Glider = true;
 }
 
 void AAaronCharacter::AddControllerYawInput(float Val)

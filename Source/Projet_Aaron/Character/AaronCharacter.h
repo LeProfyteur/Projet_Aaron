@@ -45,8 +45,8 @@ public:
 	// Sets default values for this character's properties
 	AAaronCharacter();
 
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly)
-		USceneComponent* VRComponent;
+	/*UPROPERTY(VisibleAnywhere, BluePrintReadOnly)
+		USceneComponent* VRComponent;*/
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly)
 		UCameraComponent* FpsCamera;
