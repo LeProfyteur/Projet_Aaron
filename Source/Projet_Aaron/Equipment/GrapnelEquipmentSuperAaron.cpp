@@ -15,7 +15,7 @@ AGrapnelEquipmentSuperAaron::AGrapnelEquipmentSuperAaron()
 	updateFunction.BindUFunction(this, FName("TimelineCallback"));
 
 	ConstructorHelpers::FObjectFinder<UStaticMesh> hookArmMesh(TEXT("/Game/Projet_Aaron/CC/FirstPersonBP/Blueprints/Grappnel/Grapple_Hook2.Grapple_Hook2"));
-	if (hookArmMesh.Succeeded())
+	if (hookArmMesh.Succeeded() && hookArmMesh.Object != nullptr)
 		StaticMeshComponent->SetStaticMesh(hookArmMesh.Object);
 
 	laser = CreateDefaultSubobject<UCableComponent>(TEXT("Laser"));
@@ -31,9 +31,10 @@ AGrapnelEquipmentSuperAaron::AGrapnelEquipmentSuperAaron()
 
 	hookMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Hook Mesh"));
 	hookMeshComponent->SetupAttachment(cable);
-	hookMeshComponent->SetRelativeLocation(FVector(60.0f, 0.0f, 7.0f), NULL);
+	hookMeshComponent->SetRelativeLocation(FVector(60.0f, 0.0f, 7.0f), false);
+
 	ConstructorHelpers::FObjectFinder<UStaticMesh> hookMesh(TEXT("/Game/Projet_Aaron/CC/FirstPersonBP/Blueprints/Grappnel/Hook.Hook"));
-	if (hookMesh.Succeeded())
+	if (hookMesh.Succeeded() && hookMesh.Object!=nullptr)
 		hookMeshComponent->SetStaticMesh(hookMesh.Object);
 }
 
@@ -100,15 +101,15 @@ void AGrapnelEquipmentSuperAaron::TimelineCallback()
 		if (haveHit && outHit.Actor->GetClass()->ImplementsInterface(UHookInterface::StaticClass()))
 		{
 			locationToGrip = outHit.Location;
-			TimeInterpolation = (outHit.Distance * 0.25f) / 100.0f;
+			TimeInterpolation = (outHit.Distance * 0.25f) / 250.0f;
 			foundHookSpot = true;
-			UMaterialInstance* mat = Cast<UMaterialInstance>(StaticLoadObject(UMaterialInstance::StaticClass(), NULL, TEXT("/Game/Projet_Aaron/CC/FirstPersonBP/Blueprints/Grappnel/Hook_Green.Hook_Green")));
+			UMaterialInstance* mat = Cast<UMaterialInstance>(StaticLoadObject(UMaterialInstance::StaticClass(), nullptr, TEXT("/Game/Projet_Aaron/CC/FirstPersonBP/Blueprints/Grappnel/Hook_Green.Hook_Green")));
 			laser->SetMaterial(0, mat);
 			updatePointerLocation();
 		}
 		else
 		{
-			UMaterialInstance* mat = Cast<UMaterialInstance>(StaticLoadObject(UMaterialInstance::StaticClass(), NULL, TEXT("/Game/Projet_Aaron/CC/FirstPersonBP/Blueprints/Grappnel/Hook_Red.Hook_Red")));
+			UMaterialInstance* mat = Cast<UMaterialInstance>(StaticLoadObject(UMaterialInstance::StaticClass(), nullptr, TEXT("/Game/Projet_Aaron/CC/FirstPersonBP/Blueprints/Grappnel/Hook_Red.Hook_Red")));
 			laser->SetMaterial(0, mat);
 
 			if (haveHit)
