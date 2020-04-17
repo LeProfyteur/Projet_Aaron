@@ -24,15 +24,15 @@ void AEquipmentBase::BeginPlay()
 
 void AEquipmentBase::Activate_Implementation(bool isPressed)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Activated equipment"));
+	//UE_LOG(LogTemp, Warning, TEXT("Activated equipment"));
 }
 
 void AEquipmentBase::OnEquip_Implementation(FCharacterSkills &Skills)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Equip equipment"));
+	//UE_LOG(LogTemp, Warning, TEXT("Equip equipment"));
 }
 
 void AEquipmentBase::OnUnequip_Implementation(FCharacterSkills &Skills)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Unequip equipment"));
+	//UE_LOG(LogTemp, Warning, TEXT("Unequip equipment"));
 }
