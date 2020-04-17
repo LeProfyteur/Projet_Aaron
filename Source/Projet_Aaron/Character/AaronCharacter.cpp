@@ -45,8 +45,6 @@ AAaronCharacter::AAaronCharacter()
 
 	UpdateTimeline.BindUFunction(this, FName("UpdateTimelineFunction"));
 	FinishTimeLine.BindUFunction(this, FName("EndTimelineFunction"));
-
-	
 }
 
 void AAaronCharacter::AddControllerYawInput(float Val)
@@ -376,11 +374,11 @@ void AAaronCharacter::StartJumping()
 					UnCrouch();
 					CrouchJumped = true;
 				}
-				else if (StatManager->Skills.SuperJump)
+				else if (StatManager->Skills.SuperJump && !StatManager->Skills.Stilt)
 				{
 					bPressedJump = true;
 				}
-				else if (StatManager->ConsumeStamina(StatManager->GetJumpStaminaCost()))
+				else if (!StatManager->Skills.Stilt && StatManager->ConsumeStamina(StatManager->GetJumpStaminaCost()))
 				{
 					Jump();
 				}

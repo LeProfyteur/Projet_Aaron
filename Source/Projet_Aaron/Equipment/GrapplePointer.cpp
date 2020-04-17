@@ -11,23 +11,6 @@ AGrapplePointer::AGrapplePointer()
 
 	SphereBox = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere Box"));
 	RootComponent = SphereBox;
-
-	/*Scene = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
-	Scene->SetupAttachment(RootComponent);*/
-
 }
 
-// Called when the game starts or when spawned
-void AGrapplePointer::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-// Called every frame
-void AGrapplePointer::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
 
