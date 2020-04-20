@@ -15,6 +15,12 @@ void UParalysisAlteration::BeginPlay()
 {
 	Super::BeginPlay();
 
+	_CreatureStatManager = GetOwner()->FindComponentByClass<UCreatureStatManager>();
+
+	if (_CreatureStatManager)
+	{
+		_CreatureStatManager->SetSpeedAlteration(true);
+	}
 	if (Cast<APawn>(GetOwner()))
 	{
 		Controller = Cast<APawn>(GetOwner())->GetController();
@@ -33,6 +39,7 @@ void UParalysisAlteration::TickComponent(float DeltaTime, ELevelTick TickType, F
 
 void UParalysisAlteration::OnComponentDestroyed(bool bDestroyingHierarchy)
 {
+
 	if (Cast<APawn>(GetOwner()))
 	{
 		if (Cast<AAIController>(Controller))

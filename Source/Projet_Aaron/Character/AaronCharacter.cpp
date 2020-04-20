@@ -22,6 +22,7 @@ AAaronCharacter::AAaronCharacter()
 
 	StatManager = CreateDefaultSubobject<UCharacterStatManager>(TEXT("StatManager"));
 	PostProcessing = CreateDefaultSubobject<UPostProcessComponent>(TEXT("Post Processing"));
+	PlayerAdvancement = CreateDefaultSubobject<UPlayerAdvancement>(TEXT("Player Advancement"));
 
 	CharacterMovement = GetCharacterMovement();
 	CharacterMovement->JumpZVelocity = StatManager->GetJumpForce();
@@ -642,6 +643,7 @@ void AAaronCharacter::Scan()
 			else
 			{
 				IAnalyseObjectInterface::Execute_ScanFinished(OutHit.GetActor());
+				//PlayerAdvancement->SetScannableItemStatus(OutHit.GetActor()->GetName(),true);
 				PlayerHUD->ResetCircleRadius();
 			}
 		}

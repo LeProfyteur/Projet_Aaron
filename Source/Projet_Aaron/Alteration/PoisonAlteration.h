@@ -32,8 +32,6 @@ protected:
 	virtual void BeginPlay() override;
 	
 	
-	
-	UPROPERTY() UStatManager* _statManager;
 
 	FTimerHandle InputTimeHandle;
 
@@ -54,5 +52,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Damage")
 	void TakeDamage();
 
-		
+	virtual void OnComponentDestroyed(bool bDestroyingHierarchy) override;
+
 };
