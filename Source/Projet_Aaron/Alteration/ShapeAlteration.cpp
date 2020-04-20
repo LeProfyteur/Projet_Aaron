@@ -38,7 +38,7 @@ UShapeAlteration::UShapeAlteration(int const Index_Mutation)
 UShapeAlteration::UShapeAlteration(float const Time_Mutation,int const Index_Mutation)
 {
 	TimeMutation = Time_Mutation;
-	IndexMutation =Index_Mutation;
+	IndexMutation = Index_Mutation;
 }
 
 // Called when the game starts
@@ -94,7 +94,6 @@ void UShapeAlteration::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 	if (TimeMutation <= 0.01f) 
 	{
-
 		UnregisterComponent();
 		DestroyComponent();
 	}

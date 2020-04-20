@@ -346,6 +346,18 @@ void AAaronCharacter::MoveRight(float Value)
 		AddMovementInput(GetActorRightVector(), Value);
 }
 
+void AAaronCharacter::AddEquipment(UChildActorComponent* PartChild, TSubclassOf<AEquipmentBase> ClassEquipment)
+{
+	PartChild->SetChildActorClass(ClassEquipment);
+	IEquipmentInterface::Execute_OnEquip(PartChild, StatManager->Skills);
+}
+
+void AAaronCharacter::RemoveEquipment(UChildActorComponent* PartChild, TSubclassOf<AEquipmentBase> ClassEquipment)
+{
+	PartChild->SetChildActorClass(ClassEquipment);
+	IEquipmentInterface::Execute_OnUnequip(PartChild, StatManager->Skills);
+}
+
 void AAaronCharacter::StartJumping()
 {
 	if (GetCharacterMovement()->IsFalling())
@@ -972,5 +984,4 @@ FTransform AAaronCharacter::GetVaultAnimatedStartOffset(FVaultParams& VaultParam
 	OutputTransform.SetRotation(Transform.GetRotation() - VaultTarget.GetRotation());
 	OutputTransform.SetScale3D(Transform.GetScale3D() - VaultTarget.GetScale3D());
 	return  OutputTransform;
-
 }
