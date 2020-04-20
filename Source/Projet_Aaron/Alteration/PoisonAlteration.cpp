@@ -20,9 +20,11 @@ void UPoisonAlteration::BeginPlay()
 {
 	Super::BeginPlay();
 	TimeAlteration = TimeMutation;
-	_statManager = GetOwner()->FindComponentByClass<UStatManager>();
-	if (_statManager)
+	_CreatureStatManager = GetOwner()->FindComponentByClass<UCreatureStatManager>();
+
+	if (_CreatureStatManager)
 	{
+		_CreatureStatManager->SetPoisonAlteration(true);
 		DamageOverTime();
 	}
 	
@@ -39,7 +41,7 @@ void UPoisonAlteration::DamageOverTime()
 {
 	UWorld* World = GetWorld();
 	World->GetTimerManager().SetTimer(InputTimeHandle, this, &UPoisonAlteration::TakeDamage, 1.0f, true, 0.5f);
-	_statManager->TakeDamage(PoisonDamageBio, PoisonDamageTech);
+	_CreatureStatManager->TakeDamage(PoisonDamageBio, PoisonDamageTech);
 }
 
 
@@ -51,5 +53,14 @@ void UPoisonAlteration::TakeDamage()
 	}
 	
 	TimeAlteration -= 1.0f;
-	_statManager->TakeDamage(PoisonDamageBio, PoisonDamageTech);
+	_CreatureStatManager->TakeDamage(PoisonDamageBio, PoisonDamageTech);
+}
+
+void UPoisonAlteration::OnComponentDestroyed(bool bDestroyingHierarchy)
+{
+	if (_CreatureStatManager)
+	{
+		_CreatureStatManager->SetPoisonAlteration(false);
+
+	}
 }

@@ -58,6 +58,8 @@ void UShapeAlteration::CheckComponent()
 	//Protect against Owner-less Calls
 	if (!GetOwner()) return;
 	
+	_CreatureStatManager = Cast<UCreatureStatManager>(GetOwner()->FindComponentByClass<UCreatureStatManager>());
+
 	//Fetch all Components from the Owner
 	TArray<UActorComponent*> OwnerComponents;
 	GetOwner()->GetComponents(OwnerComponents);
@@ -80,6 +82,7 @@ void UShapeAlteration::CheckComponent()
 		Component->DestroyComponent();
 		//DestroyComponent(Component);
 	}	
+
 }
 
 // Called every frame
@@ -91,6 +94,7 @@ void UShapeAlteration::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 	if (TimeMutation <= 0.01f) 
 	{
+
 		UnregisterComponent();
 		DestroyComponent();
 	}
