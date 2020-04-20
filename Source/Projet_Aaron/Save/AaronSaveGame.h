@@ -10,6 +10,22 @@
 #include "AaronSaveGame.generated.h"
 
 USTRUCT(BlueprintType)
+struct FDialogSubsystemRecord
+{
+	GENERATED_BODY()
+public:
+
+	UPROPERTY(SaveGame)
+		TMap<FString, int32> Metrics;
+
+	UPROPERTY(SaveGame)
+		TMap<FString, bool> Knowledge;
+
+	UPROPERTY(SaveGame)
+		TMap<FString, bool> Dialog;
+};
+
+USTRUCT(BlueprintType)
 struct FComponentRecord
 {
 	GENERATED_BODY()
@@ -94,6 +110,12 @@ public:
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ProjetAaron")
 		FString LevelName;
+
+	/**
+	 * Configuration of the Subsystems
+	 */
+	UPROPERTY(VisibleAnywhere, Category = "ProjetAaron")
+		FDialogSubsystemRecord DialogSubsystemRecord;
 
 	/**
 	 * Array of all the persisted Actors (without hierarchy)

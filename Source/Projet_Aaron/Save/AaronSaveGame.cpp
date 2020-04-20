@@ -8,6 +8,7 @@
 #include "Engine/World.h"
 #include "UObject/UObjectIterator.h"
 #include "AaronPersistentComponent.h"
+#include "Projet_Aaron/Dialog/DialogSubsystem.h"
 
 static inline UActorComponent* GetComponentByFName(AActor* Owner, const FName& Name)
 {
@@ -119,6 +120,9 @@ void UAaronSaveGame::LoadComponent(UObject* WorldContextObject, AActor* Actor, U
 
 void UAaronSaveGame::Save(UObject* WorldContextObject)
 {
+	//Persist all subsystems
+	UDialogSubsystem::SaveDialogSubsystem(this);
+	
 	//Persist all Actors
 	for (TObjectIterator<AActor> Itr; Itr; ++Itr)
 	{
@@ -131,6 +135,9 @@ void UAaronSaveGame::Save(UObject* WorldContextObject)
 
 void UAaronSaveGame::Load(UObject* WorldContextObject)
 {
+	//Load all subsystems
+	UDialogSubsystem::LoadDialogSubsystem(this);
+	
 	//Load Actors
 	for (auto& Record : Actors)
 	{
