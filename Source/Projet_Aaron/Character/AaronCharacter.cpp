@@ -11,11 +11,12 @@ AAaronCharacter::AAaronCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	VRComponent = CreateDefaultSubobject<USceneComponent>(TEXT("VR Component"));
-	VRComponent->SetupAttachment(RootComponent);
+	//VRComponent = CreateDefaultSubobject<USceneComponent>(TEXT("VR Component"));
+	//VRComponent->SetupAttachment(RootComponent);
 
 	FpsCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FPS_Camera"));
-	FpsCamera->SetupAttachment(VRComponent);
+	//FpsCamera->SetupAttachment(VRComponent);
+	FpsCamera->SetupAttachment(RootComponent);
 	FpsCamera->SetRelativeLocation(FVector(0.0f, 0.0f, 50.0f + BaseEyeHeight));
 	FpsCamera->bUsePawnControlRotation = true;
 
@@ -60,7 +61,6 @@ void AAaronCharacter::AddControllerPitchInput(float Val)
 // Called when the game starts or when spawned
 void AAaronCharacter::BeginPlay()
 {
-	Super::BeginPlay();
 	MovementState = EMovementState::Run;
 	VaultTimeline->AddInterpFloat(CurveFloat, UpdateTimeline);
 	VaultTimeline->SetTimelineFinishedFunc(FinishTimeLine);
@@ -75,6 +75,7 @@ void AAaronCharacter::BeginPlay()
 	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AAaronCharacter::OnEndOverlap);
 
 	UpdateBindAction();
+	Super::BeginPlay();
 }
 
 void AAaronCharacter::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
