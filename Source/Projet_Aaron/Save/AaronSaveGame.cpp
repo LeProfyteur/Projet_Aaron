@@ -41,7 +41,7 @@ void UAaronSaveGame::SaveActor(AActor* Actor)
 			return;
 	}
 	
-	UE_LOG(LogSerialization, Display, TEXT("Saving Actor %s %s"), *Actor->GetClass()->GetName(), *Actor->GetName());
+	//UE_LOG(LogSerialization, Display, TEXT("Saving Actor %s %s"), *Actor->GetClass()->GetName(), *Actor->GetName());
 
 	//Serialize the Actor
 	int32 Index = Actors.Emplace();
@@ -69,7 +69,7 @@ void UAaronSaveGame::LoadActor(UObject* WorldContextObject, UPARAM(ref) FActorRe
 	//Reject already Deserialized Record
 	if (ActorRecord.Reference) return;
 	
-	UE_LOG(LogSerialization, Display, TEXT("Loading Actor %s %s"), *ActorRecord.Class->GetName(), *ActorRecord.Name.ToString());
+	//UE_LOG(LogSerialization, Display, TEXT("Loading Actor %s %s"), *ActorRecord.Class->GetName(), *ActorRecord.Name.ToString());
 	
 	UWorld* World = WorldContextObject->GetWorld();
 
@@ -96,7 +96,7 @@ void UAaronSaveGame::SaveComponent(UActorComponent* Component)
 	if (!Component) return;
 	if (!Component->GetOwner()) return;
 	
-	UE_LOG(LogSerialization, Display, TEXT("Saving Component %s %s"), *Component->GetClass()->GetName(), *Component->GetName());
+	//UE_LOG(LogSerialization, Display, TEXT("Saving Component %s %s"), *Component->GetClass()->GetName(), *Component->GetName());
 
 	const int32 Index = Components.Emplace();
 	FComponentRecord& Record = Components[Index];
@@ -113,7 +113,7 @@ void UAaronSaveGame::LoadComponent(UObject* WorldContextObject, AActor* Actor, U
 	//Reject already deserialized Records
 	if (ComponentRecord.Reference) return;
 
-	UE_LOG(LogSerialization, Display, TEXT("Loading Component %s %s"), *ComponentRecord.Class->GetName(), *ComponentRecord.Name.ToString());
+	//UE_LOG(LogSerialization, Display, TEXT("Loading Component %s %s"), *ComponentRecord.Class->GetName(), *ComponentRecord.Name.ToString());
 
 	
 }

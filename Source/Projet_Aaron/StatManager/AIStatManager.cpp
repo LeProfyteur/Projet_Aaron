@@ -47,7 +47,7 @@ float UAIStatManager::GetPeripheralVision()
             FAISenseID Id = UAISense::GetSenseID(UAISense_Sight::StaticClass());
             if (!Id.IsValid())
             {
-                UE_LOG(LogTemp, Error, TEXT("Wrong Sense ID"));
+                //UE_LOG(LogTemp, Error, TEXT("Wrong Sense ID"));
                 return 0.f;
             }
 
@@ -89,7 +89,7 @@ void UAIStatManager::SetPeripheralVision(float PeripheralVision)
             FAISenseID Id = UAISense::GetSenseID(UAISense_Sight::StaticClass());
             if (!Id.IsValid())
             {
-                UE_LOG(LogTemp, Error, TEXT("Wrong Sense ID"));
+                //UE_LOG(LogTemp, Error, TEXT("Wrong Sense ID"));
                 return;
             }
 
@@ -122,7 +122,7 @@ void UAIStatManager::SetUpRadiusPerception()
             FAISenseID Id = UAISense::GetSenseID(UAISense_Sight::StaticClass());
             if (!Id.IsValid())
             {
-                UE_LOG(LogTemp, Error, TEXT("Wrong Sense ID"));
+                //UE_LOG(LogTemp, Error, TEXT("Wrong Sense ID"));
                 return;
             }
 

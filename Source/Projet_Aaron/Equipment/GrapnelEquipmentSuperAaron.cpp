@@ -15,7 +15,7 @@ AGrapnelEquipmentSuperAaron::AGrapnelEquipmentSuperAaron()
 	updateFunction.BindUFunction(this, FName("TimelineCallback"));
 
 	ConstructorHelpers::FObjectFinder<UStaticMesh> hookArmMesh(TEXT("/Game/Projet_Aaron/CC/FirstPersonBP/Blueprints/Grappnel/Grapple_Hook2.Grapple_Hook2"));
-	if (hookArmMesh.Succeeded())
+	if (hookArmMesh.Succeeded() && hookArmMesh.Object != nullptr)
 		StaticMeshComponent->SetStaticMesh(hookArmMesh.Object);
 
 	laser = CreateDefaultSubobject<UCableComponent>(TEXT("Laser"));
@@ -31,9 +31,10 @@ AGrapnelEquipmentSuperAaron::AGrapnelEquipmentSuperAaron()
 
 	hookMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Hook Mesh"));
 	hookMeshComponent->SetupAttachment(cable);
-	hookMeshComponent->SetRelativeLocation(FVector(60.0f, 0.0f, 7.0f), NULL);
+	hookMeshComponent->SetRelativeLocation(FVector(60.0f, 0.0f, 7.0f), false);
+
 	ConstructorHelpers::FObjectFinder<UStaticMesh> hookMesh(TEXT("/Game/Projet_Aaron/CC/FirstPersonBP/Blueprints/Grappnel/Hook.Hook"));
-	if (hookMesh.Succeeded())
+	if (hookMesh.Succeeded() && hookMesh.Object!=nullptr)
 		hookMeshComponent->SetStaticMesh(hookMesh.Object);
 }
 
@@ -71,10 +72,10 @@ void AGrapnelEquipmentSuperAaron::Activate_Implementation(bool isPressed)
 			laser->SetHiddenInGame(true, true);
 			cable->SetHiddenInGame(false, false);
 			hookMeshComponent->SetHiddenInGame(true);
-			myBullet = GetWorld()->SpawnActor<AGrappleHead>(hookMeshComponent->GetComponentLocation(), GetActorRotation());
-			myBullet->equipment = this;
+			myBullet = GetWorld()->SpawnActor<AGrappleHead>(AGrappleHead::StaticClass(), hookMeshComponent->GetComponentLocation(), GetActorRotation());
 			myBullet->locationToGo = locationToGrip;
-			cable->SetAttachEndTo(myBullet, FName(), FName());
+			cable->SetAttachEndTo(myBullet, NAME_None, NAME_None);
+			Hook();
 		}
 		else
 		{
@@ -99,27 +100,16 @@ void AGrapnelEquipmentSuperAaron::TimelineCallback()
 		bool haveHit = GetWorld()->LineTraceSingleByChannel(outHit, vStart, vEnd, ECC_Visibility, collisionParams);
 		if (haveHit && outHit.Actor->GetClass()->ImplementsInterface(UHookInterface::StaticClass()))
 		{
-			TArray<FVector> listOfHookSpot = IHookInterface::Execute_GiveMeHookSpot(outHit.GetActor());
-			for (FVector v : listOfHookSpot)
-			{
-				vEnd = outHit.Actor->GetActorLocation() + v;
-				collisionParams = FCollisionQueryParams(FName(TEXT("Laser")), false, outHit.GetActor());
-				collisionParams.AddIgnoredActor(this);
-				FHitResult test;
-				if (!GetWorld()->LineTraceSingleByChannel(test, vStart, vEnd, ECC_Visibility, collisionParams))
-				{
-					locationToGrip = outHit.Location + v;
-					foundHookSpot = true;
-					UMaterialInstance* mat = Cast<UMaterialInstance>(StaticLoadObject(UMaterialInstance::StaticClass(), NULL, TEXT("/Game/Projet_Aaron/CC/FirstPersonBP/Blueprints/Grappnel/Hook_Green.Hook_Green")));
-					laser->SetMaterial(0, mat);
-					updatePointerLocation();
-					break;
-				}
-			}
+			locationToGrip = outHit.Location;
+			TimeInterpolation = (outHit.Distance * 0.25f) / 250.0f;
+			foundHookSpot = true;
+			UMaterialInstance* mat = Cast<UMaterialInstance>(StaticLoadObject(UMaterialInstance::StaticClass(), nullptr, TEXT("/Game/Projet_Aaron/CC/FirstPersonBP/Blueprints/Grappnel/Hook_Green.Hook_Green")));
+			laser->SetMaterial(0, mat);
+			updatePointerLocation();
 		}
 		else
 		{
-			UMaterialInstance* mat = Cast<UMaterialInstance>(StaticLoadObject(UMaterialInstance::StaticClass(), NULL, TEXT("/Game/Projet_Aaron/CC/FirstPersonBP/Blueprints/Grappnel/Hook_Red.Hook_Red")));
+			UMaterialInstance* mat = Cast<UMaterialInstance>(StaticLoadObject(UMaterialInstance::StaticClass(), nullptr, TEXT("/Game/Projet_Aaron/CC/FirstPersonBP/Blueprints/Grappnel/Hook_Red.Hook_Red")));
 			laser->SetMaterial(0, mat);
 
 			if (haveHit)
@@ -147,27 +137,27 @@ void AGrapnelEquipmentSuperAaron::PlayTimeline()
 	}
 }
 
-void AGrapnelEquipmentSuperAaron::Tick(float DeltaTime)
+void AGrapnelEquipmentSuperAaron::Hook()
 {
-	AAaronCharacter* c = Cast<AAaronCharacter>(GetParentActor());
-	if (FVector::PointsAreNear(locationToGrip, c->GetActorLocation(), 150.0f))
+	cable->SetAttachEndTo(myBullet, NAME_None, FName("CableAttach"));
+	FLatentActionInfo LatentActionInfo = FLatentActionInfo(1, 1, TEXT("AfterHook"), this);
+	ACharacter* Character = GetWorld()->GetFirstPlayerController()->GetCharacter();
+	UKismetSystemLibrary::MoveComponentTo(Character->GetRootComponent(), locationToGrip, Character->GetActorRotation(), true, false, TimeInterpolation, false, EMoveComponentAction::Move, LatentActionInfo);
+}
+
+void AGrapnelEquipmentSuperAaron::AfterHook()
+{
+	cable->CableLength = 0.0f;
+	//cable->SetAttachEndTo(myBullet, NAME_None, FName("CableAttach"));
+	cable->SetHiddenInGame(true, true);
+	if (IsValid(myBullet))
 	{
-		SetActorTickEnabled(false);
-		timeline->Stop();
-		cable->CableLength = 0.0f;
-		cable->SetAttachEndTo(this, FName(), FName());
-		cable->SetHiddenInGame(true, false);
-		GetWorld()->DestroyActor(myBullet);
-		hookMeshComponent->SetHiddenInGame(false, false);
+		myBullet->Destroy();
+		myBullet = nullptr;
+		hookMeshComponent->SetHiddenInGame(false, true);
 		foundHookSpot = false;
 		playTLForLaser = true;
 		canHook = true;
 		EnableInput(GetWorld()->GetFirstPlayerController());
-	}
-	else
-	{
-		FVector launchVelocity = (locationToGrip - c->GetActorLocation()) * DeltaTime * 250.0f;
-		c->LaunchCharacter(launchVelocity, true, true);
-		laser->CableLength = FVector::Distance(GetActorLocation(), locationToGrip);
 	}
 }

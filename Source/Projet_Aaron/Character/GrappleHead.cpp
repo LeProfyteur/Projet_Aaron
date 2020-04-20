@@ -9,14 +9,15 @@ AGrappleHead::AGrappleHead()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	boxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Collision"));
+	RootComponent = boxCollision;
+
 	staticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	staticMesh->SetupAttachment(RootComponent);
+	staticMesh->AttachTo(RootComponent);
 
 	ConstructorHelpers::FObjectFinder<UStaticMesh> hookMesh(TEXT("/Game/Projet_Aaron/CC/FirstPersonBP/Blueprints/Grappnel/Hook.Hook"));
 	if(hookMesh.Succeeded())
 		staticMesh->SetStaticMesh(hookMesh.Object);
-
-	boxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Collision"));
 
 	projectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement"));
 	projectileMovement->InitialSpeed = 10000.0f;
@@ -37,9 +38,8 @@ void AGrappleHead::Tick(float DeltaTime)
 
 	if(FVector::PointsAreNear(GetActorLocation(), locationToGo, 150.0f))
 	{
-		projectileMovement->SetVelocityInLocalSpace(FVector(0, 0, 0));
+		projectileMovement->SetVelocityInLocalSpace(FVector::ZeroVector);
 		SetActorEnableCollision(false);
-		equipment->SetActorTickEnabled(true);
 	}
 }
 

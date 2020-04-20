@@ -92,7 +92,7 @@ void UIKLibrary::FootByGroupIK(UObject* Target, ACharacter* Character, const TAr
 
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("size footrotate %i"), RotateFoot.Num());
+	//UE_LOG(LogTemp, Warning, TEXT("size footrotate %i"), RotateFoot.Num());
 
 	float min = INFINITY;
 

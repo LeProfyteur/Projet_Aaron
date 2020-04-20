@@ -41,6 +41,13 @@ public:
     UFUNCTION(BlueprintCallable)
         void SetIsToggleSprint(bool IsToggle);
 
+    UFUNCTION(BlueprintCallable)
+        int GetHoldingTimeWheel();
+    UFUNCTION(BlueprintCallable)
+        float GetHoldingTimeWheelSec();
+    UFUNCTION(BlueprintCallable)
+        void SetHoldingTimeWheel(int HoldingTime);
+
     // Wipes serialized data if version is invalid
 	bool IsVersionValid() override;
 	void UpdateVersion() override;
@@ -63,5 +70,8 @@ protected:
 
     UPROPERTY(config)
         bool IsToggleSprint = false;
+
+    UPROPERTY(config)
+        int HoldingTimeWheel = 200;
 	
 };

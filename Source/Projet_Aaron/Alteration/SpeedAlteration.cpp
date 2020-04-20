@@ -19,8 +19,10 @@ void USpeedAlteration::BeginPlay()
 	Super::BeginPlay();
 	TimeAlteration = TimeMutation;
 	_CreatureStatManager = GetOwner()->FindComponentByClass<UCreatureStatManager>();
+
 	if (_CreatureStatManager)
 	{
+		_CreatureStatManager->SetSpeedAlteration(true);
 		_CreatureStatManager->AddSpeedMultiplier(SpeedReduction);
 	}
 }
@@ -38,6 +40,8 @@ void USpeedAlteration::OnComponentDestroyed(bool bDestroyingHierarchy)
 {
 	if (_CreatureStatManager)
 	{
+		_CreatureStatManager->SetSpeedAlteration(false);
+
 		_CreatureStatManager->AddSpeedMultiplier(-SpeedReduction);
 	}
 }
