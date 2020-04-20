@@ -19,10 +19,18 @@ UPoisonAlteration::UPoisonAlteration()
 void UPoisonAlteration::BeginPlay()
 {
 	Super::BeginPlay();
+	MaxTimeAlteration = TimeMutation;
 	TimeAlteration = TimeMutation;
 	_CreatureStatManager = GetOwner()->FindComponentByClass<UCreatureStatManager>();
+	CharacterStatManager = Cast<UCharacterStatManager>(_CreatureStatManager);
 
-	if (_CreatureStatManager)
+	if (CharacterStatManager)
+	{
+		CharacterStatManager->SetPoisonAlteration(true);
+		CharacterStatManager->SetPoisonEffect(1.0f);
+		DamageOverTime();
+	}
+	else if (_CreatureStatManager)
 	{
 		_CreatureStatManager->SetPoisonAlteration(true);
 		DamageOverTime();
@@ -34,7 +42,11 @@ void UPoisonAlteration::BeginPlay()
 void UPoisonAlteration::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	// ...
+	if (CharacterStatManager)
+	{
+		CharacterStatManager->SetPoisonEffect(TimeMutation / MaxTimeAlteration);
+		UE_LOG(LogActor, Error, TEXT("%f / %f = %f"), TimeMutation, MaxTimeAlteration, TimeMutation / MaxTimeAlteration);
+	}
 }
 
 void UPoisonAlteration::DamageOverTime()
@@ -50,6 +62,10 @@ void UPoisonAlteration::TakeDamage()
 	if (TimeAlteration <= 1.0f)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(InputTimeHandle);
+		if (CharacterStatManager)
+		{
+			CharacterStatManager->SetPoisonEffect(0.0f);
+		}
 	}
 	
 	TimeAlteration -= 1.0f;
@@ -61,6 +77,5 @@ void UPoisonAlteration::OnComponentDestroyed(bool bDestroyingHierarchy)
 	if (_CreatureStatManager)
 	{
 		_CreatureStatManager->SetPoisonAlteration(false);
-
 	}
 }

@@ -18,6 +18,7 @@
 #include "Projet_Aaron/Save/AaronGameUserSettings.h"
 #include "IHeadMountedDisplay.h"
 #include "PlayerAdvancement.h"
+#include "Projet_Aaron/Equipment/EquipmentBase.h"
 
 #include "DrawDebugHelpers.h"
 #include "GameFramework/Controller.h"
@@ -256,10 +257,16 @@ protected:
 	void EnableDisableNightVision();
 
 	UFUNCTION(BlueprintCallable)
-		void EnableDisableGrapnel();
+	void EnableDisableGrapnel();
 
 	UFUNCTION(BlueprintCallable)
-		void ActivatePressedChest();
+	void ActivatePressedChest();
+
+	UFUNCTION(BlueprintCallable)
+		void AddEquipment(UChildActorComponent* PartChild, TSubclassOf<AEquipmentBase> ClassEquipment);
+
+	UFUNCTION(BlueprintCallable)
+		void RemoveEquipment(UChildActorComponent* PartChild, TSubclassOf<AEquipmentBase> ClassEquipment);
 
 	void Climb(float DeltaTime);
 	void UpdateClimbingPosition();
