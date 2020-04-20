@@ -128,4 +128,6 @@ public:
 		void ConsumeOxygene(float OxygeneToConsume);
 
 		void RecoveryOxygene(float DeltaTime);
+
+		void SetPoisonEffect(float Value);
 };
