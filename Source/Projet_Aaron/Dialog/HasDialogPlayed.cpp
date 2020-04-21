@@ -3,7 +3,6 @@
 
 #include "HasDialogPlayed.h"
 #include "Engine/World.h"
-#include "Projet_Aaron/Character/AaronPlayerControllerCPP.h"
 #include "DialogSubsystem.h"
 
 bool UHasDialogPlayed::Verify()

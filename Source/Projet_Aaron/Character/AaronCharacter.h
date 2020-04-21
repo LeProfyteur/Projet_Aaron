@@ -17,6 +17,8 @@
 #include "Projet_Aaron/Item/Item.h"
 #include "Projet_Aaron/Save/AaronGameUserSettings.h"
 #include "IHeadMountedDisplay.h"
+#include "PlayerAdvancement.h"
+#include "Projet_Aaron/Equipment/EquipmentBase.h"
 
 #include "DrawDebugHelpers.h"
 #include "GameFramework/Controller.h"
@@ -45,8 +47,8 @@ public:
 	// Sets default values for this character's properties
 	AAaronCharacter();
 
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly)
-		USceneComponent* VRComponent;
+	/*UPROPERTY(VisibleAnywhere, BluePrintReadOnly)
+		USceneComponent* VRComponent;*/
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly)
 		UCameraComponent* FpsCamera;
@@ -56,6 +58,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		UPostProcessComponent* PostProcessing;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		UPlayerAdvancement* PlayerAdvancement;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UChildActorComponent* LeftArmEquipment;
@@ -68,9 +73,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UChildActorComponent* ChestEquipment;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UChildActorComponent* GrapnelEquipment;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UInventaireComponent* InventaireComponent;
@@ -89,6 +91,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FVaultAsset FallingVaultAsset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UClass* GrapnelClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool CanVault = false;
@@ -178,6 +183,8 @@ protected:
 
 	float CurrentTimePressedItemWheel = 0.f;
 	bool WheelDisplayed = false;
+
+	UClass* LeftArmEquipmentClass;
 	
 public:
 	// Called every frame
@@ -250,16 +257,16 @@ protected:
 	void EnableDisableNightVision();
 
 	UFUNCTION(BlueprintCallable)
-		void EnableDisableGrapnel();
+	void EnableDisableGrapnel();
 
 	UFUNCTION(BlueprintCallable)
-		void ActivatePressedGrapnel();
+	void ActivatePressedChest();
 
 	UFUNCTION(BlueprintCallable)
-		void ActivateReleasedGrapnel();
+		void AddEquipment(UChildActorComponent* PartChild, TSubclassOf<AEquipmentBase> ClassEquipment);
 
 	UFUNCTION(BlueprintCallable)
-		void ActivatePressedChest();
+		void RemoveEquipment(UChildActorComponent* PartChild, TSubclassOf<AEquipmentBase> ClassEquipment);
 
 	void Climb(float DeltaTime);
 	void UpdateClimbingPosition();
