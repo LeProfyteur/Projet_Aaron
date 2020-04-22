@@ -266,10 +266,10 @@ void AAaronCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 void AAaronCharacter::EnableDisableNightVision()
 {
-	if (PostProcessing->Settings.WeightedBlendables.Array[0].Weight)
-		PostProcessing->Settings.WeightedBlendables.Array[0].Weight = 0.0f;
+	if (StatManager->GetNightVisionEffect() == 0.0f)
+		StatManager->SetNightVisionEffect(1.0f);
 	else
-		PostProcessing->Settings.WeightedBlendables.Array[0].Weight = 1.0f;
+		StatManager->SetNightVisionEffect(0.0f);
 }
 
 void AAaronCharacter::EnableDisableGrapnel()
