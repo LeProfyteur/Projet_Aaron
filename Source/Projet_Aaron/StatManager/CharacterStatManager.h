@@ -113,6 +113,8 @@ public:
 		float GetGlidingAirControl() const { return GlidingAirControl; }
 	UFUNCTION(BlueprintCallable)
 		float GetGlidingFallingLateralFriction() const { return GlidingFallingLateralFriction; }
+	UFUNCTION(BlueprintCallable)
+		float GetNightVisionEffect();
 
 	UPROPERTY(BlueprintReadOnly)
 	FCharacterSkills Skills;
@@ -122,12 +124,13 @@ public:
 		void SetDodgeStaminaCost(float NewDodgeStaminaCost) { DodgeStaminaCost = NewDodgeStaminaCost; }
 	UFUNCTION(BlueprintCallable)
 		void SetDodgeForce(float NewDodgeForce) { DodgeForce = NewDodgeForce; }
-
-		void TakeDamage(float BioDamage, float TechDamage);
-
-		void ConsumeOxygene(float OxygeneToConsume);
-
-		void RecoveryOxygene(float DeltaTime);
-
+	UFUNCTION(BlueprintCallable)
 		void SetPoisonEffect(float Value);
+	UFUNCTION(BlueprintCallable)
+		void SetNightVisionEffect(float Value);
+
+	/*Others*/
+	void TakeDamage(float BioDamage, float TechDamage);
+	void ConsumeOxygene(float OxygeneToConsume);
+	void RecoveryOxygene(float DeltaTime);
 };
