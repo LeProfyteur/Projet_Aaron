@@ -46,3 +46,8 @@ void UCharacterStatManager::RecoveryOxygene(float DeltaTime)
 	if (Oxygene > OxygeneMax)
 		Oxygene = OxygeneMax;
 }
+
+void UCharacterStatManager::SetPoisonEffect(float Value)
+{
+	ParameterCollectionInstance->SetScalarParameterValue(FName(TEXT("Poison")), Value);
+}

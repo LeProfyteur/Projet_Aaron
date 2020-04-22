@@ -14,6 +14,8 @@ void UAdrenalineAlteration::BeginPlay()
 	_CreatureStatManager = GetOwner()->FindComponentByClass<UCreatureStatManager>();
 	if (_CreatureStatManager)
 	{
+
+		_CreatureStatManager->SetSpeedAlteration(true);
 		_CreatureStatManager->SetbAdrenalineBoost(true);
 	}
 
@@ -24,6 +26,7 @@ void UAdrenalineAlteration::OnComponentDestroyed(bool bDestroyingHierarchy)
 {
 	if (_CreatureStatManager)
 	{
+		_CreatureStatManager->SetAdrenalineAlteration(false);
 		_CreatureStatManager->SetbAdrenalineBoost(false);
 	}
 }

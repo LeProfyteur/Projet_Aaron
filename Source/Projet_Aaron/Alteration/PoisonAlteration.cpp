@@ -19,10 +19,20 @@ UPoisonAlteration::UPoisonAlteration()
 void UPoisonAlteration::BeginPlay()
 {
 	Super::BeginPlay();
+	MaxTimeAlteration = TimeMutation;
 	TimeAlteration = TimeMutation;
-	_statManager = GetOwner()->FindComponentByClass<UStatManager>();
-	if (_statManager)
+	_CreatureStatManager = GetOwner()->FindComponentByClass<UCreatureStatManager>();
+	CharacterStatManager = Cast<UCharacterStatManager>(_CreatureStatManager);
+
+	if (CharacterStatManager)
 	{
+		CharacterStatManager->SetPoisonAlteration(true);
+		CharacterStatManager->SetPoisonEffect(1.0f);
+		DamageOverTime();
+	}
+	else if (_CreatureStatManager)
+	{
+		_CreatureStatManager->SetPoisonAlteration(true);
 		DamageOverTime();
 	}
 	
@@ -32,14 +42,18 @@ void UPoisonAlteration::BeginPlay()
 void UPoisonAlteration::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	// ...
+	if (CharacterStatManager)
+	{
+		CharacterStatManager->SetPoisonEffect(TimeMutation / MaxTimeAlteration);
+		UE_LOG(LogActor, Error, TEXT("%f / %f = %f"), TimeMutation, MaxTimeAlteration, TimeMutation / MaxTimeAlteration);
+	}
 }
 
 void UPoisonAlteration::DamageOverTime()
 {
 	UWorld* World = GetWorld();
 	World->GetTimerManager().SetTimer(InputTimeHandle, this, &UPoisonAlteration::TakeDamage, 1.0f, true, 0.5f);
-	_statManager->TakeDamage(PoisonDamageBio, PoisonDamageTech);
+	_CreatureStatManager->TakeDamage(PoisonDamageBio, PoisonDamageTech);
 }
 
 
@@ -48,8 +62,20 @@ void UPoisonAlteration::TakeDamage()
 	if (TimeAlteration <= 1.0f)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(InputTimeHandle);
+		if (CharacterStatManager)
+		{
+			CharacterStatManager->SetPoisonEffect(0.0f);
+		}
 	}
 	
 	TimeAlteration -= 1.0f;
-	_statManager->TakeDamage(PoisonDamageBio, PoisonDamageTech);
+	_CreatureStatManager->TakeDamage(PoisonDamageBio, PoisonDamageTech);
+}
+
+void UPoisonAlteration::OnComponentDestroyed(bool bDestroyingHierarchy)
+{
+	if (_CreatureStatManager)
+	{
+		_CreatureStatManager->SetPoisonAlteration(false);
+	}
 }

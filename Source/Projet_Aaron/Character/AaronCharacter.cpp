@@ -22,6 +22,7 @@ AAaronCharacter::AAaronCharacter()
 
 	StatManager = CreateDefaultSubobject<UCharacterStatManager>(TEXT("StatManager"));
 	PostProcessing = CreateDefaultSubobject<UPostProcessComponent>(TEXT("Post Processing"));
+	PlayerAdvancement = CreateDefaultSubobject<UPlayerAdvancement>(TEXT("Player Advancement"));
 
 	CharacterMovement = GetCharacterMovement();
 	CharacterMovement->JumpZVelocity = StatManager->GetJumpForce();
@@ -46,8 +47,6 @@ AAaronCharacter::AAaronCharacter()
 
 	UpdateTimeline.BindUFunction(this, FName("UpdateTimelineFunction"));
 	FinishTimeLine.BindUFunction(this, FName("EndTimelineFunction"));
-
-	StatManager->Skills.Glider = true;
 }
 
 void AAaronCharacter::AddControllerYawInput(float Val)
@@ -347,6 +346,18 @@ void AAaronCharacter::MoveRight(float Value)
 		AddMovementInput(GetActorRightVector(), Value);
 }
 
+void AAaronCharacter::AddEquipment(UChildActorComponent* PartChild, TSubclassOf<AEquipmentBase> ClassEquipment)
+{
+	PartChild->SetChildActorClass(ClassEquipment);
+	IEquipmentInterface::Execute_OnEquip(PartChild, StatManager->Skills);
+}
+
+void AAaronCharacter::RemoveEquipment(UChildActorComponent* PartChild, TSubclassOf<AEquipmentBase> ClassEquipment)
+{
+	PartChild->SetChildActorClass(ClassEquipment);
+	IEquipmentInterface::Execute_OnUnequip(PartChild, StatManager->Skills);
+}
+
 void AAaronCharacter::StartJumping()
 {
 	if (GetCharacterMovement()->IsFalling())
@@ -377,11 +388,11 @@ void AAaronCharacter::StartJumping()
 					UnCrouch();
 					CrouchJumped = true;
 				}
-				else if (StatManager->Skills.SuperJump)
+				else if (StatManager->Skills.SuperJump && !StatManager->Skills.Stilt)
 				{
 					bPressedJump = true;
 				}
-				else if (StatManager->ConsumeStamina(StatManager->GetJumpStaminaCost()))
+				else if (!StatManager->Skills.Stilt && StatManager->ConsumeStamina(StatManager->GetJumpStaminaCost()))
 				{
 					Jump();
 				}
@@ -644,6 +655,7 @@ void AAaronCharacter::Scan()
 			else
 			{
 				IAnalyseObjectInterface::Execute_ScanFinished(OutHit.GetActor());
+				//PlayerAdvancement->SetScannableItemStatus(OutHit.GetActor()->GetName(),true);
 				PlayerHUD->ResetCircleRadius();
 			}
 		}
@@ -972,5 +984,4 @@ FTransform AAaronCharacter::GetVaultAnimatedStartOffset(FVaultParams& VaultParam
 	OutputTransform.SetRotation(Transform.GetRotation() - VaultTarget.GetRotation());
 	OutputTransform.SetScale3D(Transform.GetScale3D() - VaultTarget.GetScale3D());
 	return  OutputTransform;
-
 }
