@@ -46,3 +46,20 @@ void UCharacterStatManager::RecoveryOxygene(float DeltaTime)
 	if (Oxygene > OxygeneMax)
 		Oxygene = OxygeneMax;
 }
+
+float UCharacterStatManager::GetNightVisionEffect()
+{
+	float Res;
+	ParameterCollectionInstance->GetScalarParameterValue(FName("NightVision"), Res);
+	return Res;
+}
+
+void UCharacterStatManager::SetNightVisionEffect(float Value)
+{
+	ParameterCollectionInstance->SetScalarParameterValue(FName(TEXT("NightVision")), Value);
+}
+
+void UCharacterStatManager::SetPoisonEffect(float Value)
+{
+	ParameterCollectionInstance->SetScalarParameterValue(FName(TEXT("Poison")), Value);
+}

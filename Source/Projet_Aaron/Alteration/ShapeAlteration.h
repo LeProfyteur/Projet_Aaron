@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "GameFramework/Actor.h"
+#include "Projet_Aaron/StatManager/CreatureStatManager.h"
+
 #include "ShapeAlteration.generated.h"
 
 
@@ -36,6 +38,9 @@ protected:
 	//Mutation Event
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Event)
 		int IndexMutation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Event)
+		UCreatureStatManager* _CreatureStatManager;
 	
 public:	
 	// Called every frame

@@ -17,6 +17,8 @@
 #include "Projet_Aaron/Item/Item.h"
 #include "Projet_Aaron/Save/AaronGameUserSettings.h"
 #include "IHeadMountedDisplay.h"
+#include "PlayerAdvancement.h"
+#include "Projet_Aaron/Equipment/EquipmentBase.h"
 
 #include "DrawDebugHelpers.h"
 #include "GameFramework/Controller.h"
@@ -45,8 +47,8 @@ public:
 	// Sets default values for this character's properties
 	AAaronCharacter();
 
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly)
-		USceneComponent* VRComponent;
+	/*UPROPERTY(VisibleAnywhere, BluePrintReadOnly)
+		USceneComponent* VRComponent;*/
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly)
 		UCameraComponent* FpsCamera;
@@ -56,6 +58,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		UPostProcessComponent* PostProcessing;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		UPlayerAdvancement* PlayerAdvancement;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UChildActorComponent* LeftArmEquipment;
@@ -68,9 +73,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UChildActorComponent* ChestEquipment;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UChildActorComponent* GrapnelEquipment;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UInventaireComponent* InventaireComponent;
@@ -89,6 +91,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FVaultAsset FallingVaultAsset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UClass* GrapnelClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool CanVault = false;
@@ -110,7 +115,6 @@ public:
 
 protected:
 
-	FHitResult* HitGrab = nullptr;
 	FHitResult* HitActor = nullptr;
 
 	UCharacterMovementComponent* CharacterMovement;
@@ -156,6 +160,8 @@ protected:
 
 	float WaterHeight;
 
+	float VaultHeight;
+	VaultType VaultType;
 	FVaultParams VaultParams;
 	FVaultComponentAndTransform VaultLedgeLS;
 	FVaultComponentAndTransform VaultLedgeWS;
@@ -178,6 +184,8 @@ protected:
 
 	float CurrentTimePressedItemWheel = 0.f;
 	bool WheelDisplayed = false;
+
+	UClass* LeftArmEquipmentClass;
 	
 public:
 	// Called every frame
@@ -250,13 +258,16 @@ protected:
 	void EnableDisableNightVision();
 
 	UFUNCTION(BlueprintCallable)
-		void EnableDisableGrapnel();
+	void EnableDisableGrapnel();
 
 	UFUNCTION(BlueprintCallable)
-		void ActivatePressedGrapnel();
+	void ActivatePressedChest();
 
 	UFUNCTION(BlueprintCallable)
-		void ActivateReleasedGrapnel();
+		void AddEquipment(UChildActorComponent* PartChild, TSubclassOf<AEquipmentBase> ClassEquipment);
+
+	UFUNCTION(BlueprintCallable)
+		void RemoveEquipment(UChildActorComponent* PartChild, TSubclassOf<AEquipmentBase> ClassEquipment);
 
 	void Climb(float DeltaTime);
 	void UpdateClimbingPosition();
@@ -274,14 +285,14 @@ protected:
 	void PressedUseQuickItem();
 
 	bool VaultCheck(VaultTraceSettings TraceSettings);
-	void VaultStart(float VaultHeight, VaultType VaultType);
+	void VaultStart();
 
 	bool FindWallToClimb(VaultTraceSettings TraceSettings, FVector& InitialTraceImpactPoint, FVector& InitialTraceNormal);
-	bool CanClimbOnWall(VaultTraceSettings TraceSettings, FVector& InitialTraceImpactPoint, FVector& InitialTraceNormal, float& VaultHeight, VaultType& Vault);
+	bool CanClimbOnWall(VaultTraceSettings TraceSettings, FVector& InitialTraceImpactPoint, FVector& InitialTraceNormal);
 	bool CapsuleHasRoomCheck(FVector TargetLocation, float HeightOffset, float RadiusOffset);
 	FVaultComponentAndTransform ConvertWorldToLocal(FVaultComponentAndTransform WorldSpaceVault);
 	FVaultComponentAndTransform ConvertLocalToWorld(FVaultComponentAndTransform LocalSpaceVault);
-	FVaultParams GetVaultParam(VaultType Vault, float VaultHeight);
+	FVaultParams GetVaultParam();
 	FTransform GetVaultStartOffset(FTransform& VaultTarget);
 	FTransform GetVaultAnimatedStartOffset(FVaultParams& VaultParam, FTransform& VaultTarget);
 	FVector GetCapsuleBaseLocation(float ZOffset) const;
