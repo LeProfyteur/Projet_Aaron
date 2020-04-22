@@ -161,6 +161,8 @@ protected:
 
 	float WaterHeight;
 
+	float VaultHeight;
+	VaultType VaultType;
 	FVaultParams VaultParams;
 	FVaultComponentAndTransform VaultLedgeLS;
 	FVaultComponentAndTransform VaultLedgeWS;
@@ -284,14 +286,14 @@ protected:
 	void PressedUseQuickItem();
 
 	bool VaultCheck(VaultTraceSettings TraceSettings);
-	void VaultStart(float VaultHeight, VaultType VaultType);
+	void VaultStart();
 
 	bool FindWallToClimb(VaultTraceSettings TraceSettings, FVector& InitialTraceImpactPoint, FVector& InitialTraceNormal);
-	bool CanClimbOnWall(VaultTraceSettings TraceSettings, FVector& InitialTraceImpactPoint, FVector& InitialTraceNormal, float& VaultHeight, VaultType& Vault);
+	bool CanClimbOnWall(VaultTraceSettings TraceSettings, FVector& InitialTraceImpactPoint, FVector& InitialTraceNormal);
 	bool CapsuleHasRoomCheck(FVector TargetLocation, float HeightOffset, float RadiusOffset);
 	FVaultComponentAndTransform ConvertWorldToLocal(FVaultComponentAndTransform WorldSpaceVault);
 	FVaultComponentAndTransform ConvertLocalToWorld(FVaultComponentAndTransform LocalSpaceVault);
-	FVaultParams GetVaultParam(VaultType Vault, float VaultHeight);
+	FVaultParams GetVaultParam();
 	FTransform GetVaultStartOffset(FTransform& VaultTarget);
 	FTransform GetVaultAnimatedStartOffset(FVaultParams& VaultParam, FTransform& VaultTarget);
 	FVector GetCapsuleBaseLocation(float ZOffset) const;
