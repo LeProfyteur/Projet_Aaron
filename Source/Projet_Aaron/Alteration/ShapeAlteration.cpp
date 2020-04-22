@@ -38,7 +38,7 @@ UShapeAlteration::UShapeAlteration(int const Index_Mutation)
 UShapeAlteration::UShapeAlteration(float const Time_Mutation,int const Index_Mutation)
 {
 	TimeMutation = Time_Mutation;
-	IndexMutation =Index_Mutation;
+	IndexMutation = Index_Mutation;
 }
 
 // Called when the game starts
@@ -58,6 +58,8 @@ void UShapeAlteration::CheckComponent()
 	//Protect against Owner-less Calls
 	if (!GetOwner()) return;
 	
+	_CreatureStatManager = Cast<UCreatureStatManager>(GetOwner()->FindComponentByClass<UCreatureStatManager>());
+
 	//Fetch all Components from the Owner
 	TArray<UActorComponent*> OwnerComponents;
 	GetOwner()->GetComponents(OwnerComponents);
@@ -80,6 +82,7 @@ void UShapeAlteration::CheckComponent()
 		Component->DestroyComponent();
 		//DestroyComponent(Component);
 	}	
+
 }
 
 // Called every frame

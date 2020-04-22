@@ -17,13 +17,19 @@ class PROJET_AARON_API AHardBarkEquipment : public AEquipmentBase
 
 public:
 
-	UPROPERTY()
-		float TimeActivation = 1.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		float TimeActivation = 3.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		float MaxCouldown = 5.0f;
+
+	float Couldown;
 
 	FTimerHandle TimerHandle;
 
 	AHardBarkEquipment();
 	virtual void Activate_Implementation(bool isPressed) override;
+	virtual void Tick(float DeltaTime) override;
 	
 	UFUNCTION()
 		void StopEffect();

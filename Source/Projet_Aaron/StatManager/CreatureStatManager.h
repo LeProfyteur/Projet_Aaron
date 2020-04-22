@@ -38,6 +38,17 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stamina)
 		bool bAdrenalineBoost;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Alteration)
+		bool HasMudAlteration = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Alteration)
+		bool HasAdrenalineAlteration = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Alteration)
+		bool HasSpeedAlteration = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Alteration)
+		bool HasPoisonAlteration = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Alteration)
+		bool HasParalysisAlteration = false;
+
 	UPROPERTY(BlueprintReadWrite)
 		float ActualSpeed;
 
@@ -74,6 +85,16 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		float GetActualSpeed() const { return ActualSpeed; }
+	UFUNCTION(BlueprintCallable)
+		bool GetAdrenalineAlteration() const { return HasAdrenalineAlteration; }
+	UFUNCTION(BlueprintCallable)
+		bool GetPoisonAlteration() const { return HasPoisonAlteration; }
+	UFUNCTION(BlueprintCallable)
+		bool GetMudAlteration() const { return HasMudAlteration; }
+	UFUNCTION(BlueprintCallable)
+		bool GetParalysisAlteration() const { return HasParalysisAlteration; }
+	UFUNCTION(BlueprintCallable)
+		bool GetSpeedAlteration() const { return HasSpeedAlteration; }
 
 	/*Setters*/
 	UFUNCTION(BlueprintCallable)
@@ -106,4 +127,15 @@ public:
 		void RecoveryStamina(float DeltaTime);
 	UFUNCTION(BlueprintCallable)
 		void ResetSpeed();
+
+	UFUNCTION(BlueprintCallable)
+		void SetAdrenalineAlteration(bool hasAlteration)  {  HasAdrenalineAlteration = hasAlteration; }
+	UFUNCTION(BlueprintCallable)
+		void SetPoisonAlteration(bool hasAlteration)  {  HasPoisonAlteration = hasAlteration; }
+	UFUNCTION(BlueprintCallable)
+		void SetMudAlteration(bool hasAlteration)  {  HasMudAlteration = hasAlteration; }
+	UFUNCTION(BlueprintCallable)
+		void SetParalysisAlteration(bool hasAlteration)  {  HasParalysisAlteration = hasAlteration; }
+	UFUNCTION(BlueprintCallable)
+		void SetSpeedAlteration(bool hasAlteration)  {  HasSpeedAlteration = hasAlteration; }
 };

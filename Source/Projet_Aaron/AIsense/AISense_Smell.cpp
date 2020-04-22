@@ -57,7 +57,7 @@ float UAISense_Smell::Update()
 						return 0.f;
 					}
 					bool isSmellSense = false;
-					for (size_t j = 0; j < stimuli->GetRegisterSource().Num(); j++)
+					for (int j = 0; j < stimuli->GetRegisterSource().Num(); j++)
 					{
 						if (stimuli->GetRegisterSource()[j]->GetName() == "AISense_Smell")
 							isSmellSense = true;
@@ -120,33 +120,3 @@ UAISense_Smell::FDigestedAquaProperties::FDigestedAquaProperties(const UAISenseC
 	PhobiaRadius = SenseConfig.PhobiaRadius;
 	bDisplayDebugSphere = SenseConfig.bDisplayDebugSphere;
 }
-/*UAIPerceptionStimuliSourceComponent* stimuli = Cast<UAIPerceptionStimuliSourceComponent>(HitResult.GetActor()->GetComponentByClass(UAIPerceptionStimuliSourceComponent::StaticClass()));
-if (stimuli) {
-	UE_LOG(LogTemp, Warning, TEXT("stimuli :"));
-	//check if there is the aquaphobia sense in the stimuli
-	/*TArray<TSubclassOf<UAISense>> StimuliSenses = stimuli->RegisterAsSourceForSenses;
-	FAISenseID Id = UAISense::GetSenseID(UAISense_Smell::StaticClass());
-
-	if (!Id.IsValid())
-	{
-		UE_LOG(LogTemp, Error, TEXT("Wrong Sense ID"));
-		return 0.f;
-	}
-
-	bool isSmellSense = false;
-	for (int j = 0; j < StimuliSenses.Num(); j++)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Sense Name : %s"), *StimuliSenses[j].Get()->GetName());
-		if (StimuliSenses[j].Get()->GetName() == "AISense_Smell")
-			isSmellSense = true;
-	}
-
-	if (isSmellSense)
-	{
-		if (FVector::DistSquared(HitResult.GetActor()->GetActorLocation(), Listener.CachedLocation) <= Properties.SmellingRange * Properties.SmellingRange)
-		{
-			Listener.RegisterStimulus(HitResult.GetActor(), FAIStimulus(*this, 1.f, HitResult.GetActor()->GetActorLocation(), Listener.CachedLocation));
-			GLog->Log("registered stimulus!");
-		}
-	}
-}*/
