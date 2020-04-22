@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Projet_Aaron/StatManager/CharacterStatManager.h"
 #include "Components/ActorComponent.h"
 #include "ShapeAlteration.h"
 #include "Projet_Aaron/StatManager/StatManager.h"
@@ -32,15 +33,15 @@ protected:
 	virtual void BeginPlay() override;
 	
 	
-	
-	UPROPERTY() UStatManager* _statManager;
 
 	FTimerHandle InputTimeHandle;
 
 private:
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Time)
-	float TimeAlteration;
 
+	float TimeAlteration;
+	float MaxTimeAlteration;
+
+	UCharacterStatManager* CharacterStatManager;
 	
 public:
 
@@ -54,5 +55,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Damage")
 	void TakeDamage();
 
-		
+	virtual void OnComponentDestroyed(bool bDestroyingHierarchy) override;
+
 };

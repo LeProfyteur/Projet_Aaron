@@ -3,7 +3,12 @@
 
 #include "HardBarkEquipment.h"
 
-AHardBarkEquipment::AHardBarkEquipment() : Super() {}
+AHardBarkEquipment::AHardBarkEquipment() : Super() 
+{
+	PrimaryActorTick.bCanEverTick = true;
+	SetActorTickEnabled(false);
+	Couldown = MaxCouldown;
+}
 
 void AHardBarkEquipment::Activate_Implementation(bool isPressed)
 {
@@ -24,6 +29,19 @@ void AHardBarkEquipment::StopEffect()
 	if (Character)
 	{
 		Character->StatManager->Skills.HardBark = false;
+	}
+	SetActorTickEnabled(true);
+}
+
+void AHardBarkEquipment::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	Couldown -= DeltaTime;
+
+	if (Couldown <= 0)
+	{
+		Couldown = MaxCouldown;
+		SetActorTickEnabled(false);
 	}
 }
 
