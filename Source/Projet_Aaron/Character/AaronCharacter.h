@@ -18,6 +18,7 @@
 #include "Projet_Aaron/Save/AaronGameUserSettings.h"
 #include "IHeadMountedDisplay.h"
 #include "PlayerAdvancement.h"
+#include "Projet_Aaron/Mutation/UMutationBase.h"
 #include "Projet_Aaron/Equipment/EquipmentBase.h"
 
 #include "DrawDebugHelpers.h"
@@ -115,7 +116,7 @@ public:
 
 protected:
 
-	FHitResult* HitGrab = nullptr;
+	TArray<UUMutationBase*> Mutations;
 	FHitResult* HitActor = nullptr;
 
 	UCharacterMovementComponent* CharacterMovement;
@@ -269,6 +270,12 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 		void RemoveEquipment(UChildActorComponent* PartChild, TSubclassOf<AEquipmentBase> ClassEquipment);
+
+	UFUNCTION(BlueprintCallable)
+		void AddMutation(UUMutationBase *Mutation);
+
+	UFUNCTION(BlueprintCallable)
+		void RemoveMutation(UClass *ClassMutation);
 
 	void Climb(float DeltaTime);
 	void UpdateClimbingPosition();
