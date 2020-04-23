@@ -124,7 +124,7 @@ void UDialogSubsystem::UpdateQueue(UObject* WorldContextObject)
 		{
 			//UE_LOG(LogTemp, Warning, TEXT("QueuePasVide"));
 
-			DialogSubsystem->DialogQueue.Peek(DialogSubsystem->DialogAsset);
+			DialogSubsystem->DialogQueue.Dequeue(DialogSubsystem->DialogAsset);
 
 			DialogSubsystem->World = WorldContextObject;
 
