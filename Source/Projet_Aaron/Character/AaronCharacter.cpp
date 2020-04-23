@@ -84,7 +84,6 @@ void AAaronCharacter::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor
 	APhysicsVolume* WaterVolume = Cast<APhysicsVolume>(OtherActor);
 	if(WaterVolume && WaterVolume->bWaterVolume)
 	{
-		//UE_LOG(LogActor, Error, TEXT("In Water"));
 		IsInWater = true;
 		FBoxSphereBounds WaterBounds = WaterVolume->GetBounds();
 		WaterHeight = WaterBounds.Origin.Z + WaterBounds.BoxExtent.Z;
@@ -278,7 +277,8 @@ void AAaronCharacter::EnableDisableGrapnel()
 	{
 		IsGrapnelMod = true;
 		LeftArmEquipment->SetChildActorClass(GrapnelClass);
-	} else if (IsGrapnelMod)
+	} 
+	else if (IsGrapnelMod)
 	{
 		IsGrapnelMod = false;
 		LeftArmEquipment->SetChildActorClass(LeftArmEquipmentClass);
@@ -362,6 +362,7 @@ void AAaronCharacter::StartJumping()
 {
 	if (GetCharacterMovement()->IsFalling())
 	{
+		//CharacterMovement->SetMovementMode(EMovementMode::MOVE_Flying);
 		if (VaultCheck(FallingTraceSettings))
 		{
 			VaultStart();
@@ -381,7 +382,7 @@ void AAaronCharacter::StartJumping()
 		{
 			VaultStart();
 		}
-		else 
+		else
 		{
 			if (MovementState != EMovementState::Climb && !CharacterMovement->IsSwimming())
 			{
@@ -472,7 +473,6 @@ void AAaronCharacter::ToggleSprint()
 		UnCrouch();
 		MovementState = EMovementState::Sprint;
 	}
-		
 }
 
 void AAaronCharacter::StartSprinting()
@@ -774,7 +774,7 @@ FVector AAaronCharacter::GetCapsuleBaseLocationFromBase(FVector BaseLocation, fl
 
 void AAaronCharacter::UpdateTimelineFunction(float value)
 {
-	FTransform VaultTarget = VaultLedgeWS.Transform;//ConvertLocalToWorld(VaultLedgeLS).Transform;
+	FTransform VaultTarget = VaultLedgeWS.Transform;
 	FVector VectorOfCurve = VaultParams.PositionCurve->GetVectorValue(VaultTimeline->GetPlaybackPosition() + VaultParams.StartingPosition);
 	FTransform BlendTrans = FTransform(VaultAnimatedStartOffset.GetRotation(), FVector(VaultAnimatedStartOffset.GetLocation().X, VaultAnimatedStartOffset.GetLocation().Y, VaultStartOffset.GetLocation().Z));
 	FTransform XYCorrectionTrans = UKismetMathLibrary::TLerp(VaultStartOffset, BlendTrans, VectorOfCurve.Y);
@@ -808,7 +808,6 @@ void AAaronCharacter::UpdateBindAction()
 			PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AAaronCharacter::StopSprinting);
 		}
 	}
-	
 }
 
 bool AAaronCharacter::VaultCheck(VaultTraceSettings TraceSettings)
