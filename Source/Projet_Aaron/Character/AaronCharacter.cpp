@@ -842,7 +842,7 @@ void AAaronCharacter::VaultStart()
 	VaultStartOffset = GetVaultStartOffset(VaultLedgeWS.Transform);
 	VaultAnimatedStartOffset = GetVaultAnimatedStartOffset(VaultParams, VaultLedgeWS.Transform);
 
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	CharacterMovement->SetMovementMode(EMovementMode::MOVE_None);
 	float MaxTime, MinTime;
 	VaultParams.PositionCurve->GetTimeRange(MinTime, MaxTime);
 	VaultTimeline->SetTimelineLength(MaxTime - VaultParams.StartingPosition);
@@ -970,7 +970,6 @@ FVaultParams AAaronCharacter::GetVaultParam()
 	float StartingPos = UKismetMathLibrary::MapRangeClamped(VaultHeight, VaultAsset.LowHeight, VaultAsset.HightHeight, VaultAsset.LowStartPosition, VaultAsset.HightStartPosition);
 
 	return FVaultParams(VaultAsset, PlayRate, StartingPos);
-
 }
 
 FTransform AAaronCharacter::GetVaultStartOffset(FTransform& VaultTarget)
