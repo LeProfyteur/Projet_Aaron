@@ -340,12 +340,12 @@ void AAaronCharacter::RemoveEquipment(UChildActorComponent* PartChild, TSubclass
 	IEquipmentInterface::Execute_OnUnequip(PartChild, StatManager->Skills);
 }
 
-void AAaronCharacter::AddMutation(UUMutationBase *Mutation)
+void AAaronCharacter::AddMutation(TSubclassOf<UUMutationBase> Mutation)
 {
 	bool FindRef = false;
 	for (int i = 0; i < Mutations.Num(); i++)
 	{
-		if (Mutations[i]->GetClass() == Mutation->StaticClass())
+		if (Mutations[i]->GetClass() == Mutation.Get()->StaticClass())
 		{
 			FindRef = true;
 			break;
@@ -354,7 +354,7 @@ void AAaronCharacter::AddMutation(UUMutationBase *Mutation)
 
 	if (FindRef)
 	{
-		int index = Mutations.Add(Mutation);
+		int index = Mutations.Add(Mutation.GetDefaultObject());
 		Mutations[index]->OnEquip(StatManager->Skills);
 	}
 }

@@ -272,7 +272,7 @@ protected:
 		void RemoveEquipment(UChildActorComponent* PartChild, TSubclassOf<AEquipmentBase> ClassEquipment);
 
 	UFUNCTION(BlueprintCallable)
-		void AddMutation(UUMutationBase *Mutation);
+		void AddMutation(TSubclassOf<UUMutationBase> Mutation);
 
 	UFUNCTION(BlueprintCallable)
 		void RemoveMutation(UClass *ClassMutation);
