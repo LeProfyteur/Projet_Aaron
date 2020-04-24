@@ -7,34 +7,40 @@
 #include "PlayerAdvancement.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class PROJET_AARON_API UPlayerAdvancement : public UActorComponent
 {
 	GENERATED_BODY()
 
 	TMap <FString, bool> scannableItems = { {"LightPlant",false}, {"PoisonPlant",false} ,{"BlockingPlant",false} ,{"Creature1",false} ,{"Creature2",false} ,{"Creature3",false} ,{"Creature4",false} };
-	TMap <FString, bool> unlockableAbilities = { {"LightPlant",false}, {"PoisonPlant",false} ,{"BlockPlant",false} ,{"Creature1",false} ,{"Creature2",false} ,{"Creature3",false} ,{"Creature4",false} };
-	TMap <FString, bool> metroidvaniaAbilities{ {"NightVision",false}, {"PoisonPlant",false} ,{"BlockPlant",false} ,{"Creature1",false} ,{"Creature2",false} ,{"Creature3",false} ,{"Creature4",false} };;
+	TMap <FString, bool> unlockableAbilities = { {"EnvironmentalScan",true}, {"MovementDetector",false} ,{"ParalysingDartGun",true} ,{"WeakeningDartGun",false} ,{"SoundImitation",false} ,{"OpticCamouflage",false} ,{"FertilizerGun",false},{"Hound",false},{"GrowingRoots",false},{"BarkCovering",true},{"Tracker",false},{"TimeSlow",false},{"Glider",true},{"PoweredBoots",false},{"EmpoweredDash",false},{"PheromonesRelease",false},{"Allergy",true},{"Hallucination",false},{"FastSwimming",false},{"BiologicalRegeneration",false},{"ToughSkin",false},{"HeartContractrion",false} };
+	TMap <FString, bool> metroidvaniaAbilities{ {"NightVision",true}, {"Grapnel",true} ,{"Gills",true},{"ExtremeTemperaturesResistance",false},{"StickyFeet",false} };
 
-
-public:	
+public:
 	// Sets default values for this component's properties
 	UPlayerAdvancement();
 
 protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+public:
 
 public:
 	UFUNCTION(BlueprintCallable)
-		void SetScannableItemStatus(FString entryName, bool isScanned) { scannableItems[entryName] = isScanned; UE_LOG(LogActor, Error, TEXT("Scan successful"));}
+		void SetScannableItemStatus(FString entryName, bool isScanned) { scannableItems[entryName] = isScanned; }
+
+	UFUNCTION(BlueprintCallable)
+		void SetUnlockableAbilities(FString entryName, bool isUnlocked) { unlockableAbilities[entryName] = isUnlocked; }
+
+	UFUNCTION(BlueprintCallable)
+		void SetMetroidvaniaAbilities(FString entryName, bool isUnlocked) { metroidvaniaAbilities[entryName] = isUnlocked; }
 
 public:
 	UFUNCTION(BlueprintCallable)
-	bool GetScannableItemStatus(FString entryName) {return scannableItems[entryName];}
-		
+		bool GetScannableItemStatus(FString entryName) { return scannableItems[entryName]; }
+
+	UFUNCTION(BlueprintCallable)
+		bool GetUnlockableAbilities(FString entryName) { return unlockableAbilities[entryName]; }
+
+	UFUNCTION(BlueprintCallable)
+		bool GetMetroidvaniaAbilities(FString entryName) { return metroidvaniaAbilities[entryName]; }
 };
