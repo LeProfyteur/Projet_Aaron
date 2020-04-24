@@ -5,7 +5,7 @@
 
 UUMutationBase::UUMutationBase() {}
 
-UUMutationBase::UUMutationBase(UUMutationBase& Mutation) {}
+//UUMutationBase::UUMutationBase(UUMutationBase& Mutation) {}
 
 void UUMutationBase::OnEquip(FCharacterSkills &Skills) {}
 

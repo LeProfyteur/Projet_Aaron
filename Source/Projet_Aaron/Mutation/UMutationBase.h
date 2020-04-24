@@ -19,7 +19,7 @@ public:
 	
 	UUMutationBase();
 
-	UUMutationBase(UUMutationBase& Mutation);
+	//UUMutationBase(UUMutationBase& Mutation);
 
 	virtual void OnEquip(FCharacterSkills& Skills);
 	virtual void OnUnEquip(FCharacterSkills& Skills);

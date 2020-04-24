@@ -13,8 +13,8 @@ class PROJET_AARON_API UPlayerAdvancement : public UActorComponent
 	GENERATED_BODY()
 
 	TMap <FString, bool> scannableItems = { {"LightPlant",false}, {"PoisonPlant",false} ,{"BlockingPlant",false} ,{"Creature1",false} ,{"Creature2",false} ,{"Creature3",false} ,{"Creature4",false} };
-	TMap <FString, bool> unlockableAbilities = { {"EnvironmentalScan",false}, {"MovementDetector",false} ,{"BlockPlant",false} ,{"Creature1",false} ,{"Creature2",false} ,{"Creature3",false} ,{"Creature4",false} };
-	TMap <FString, bool> metroidvaniaAbilities{ {"NightVision",false}, {"Grapnel",false} ,{"Gills",false}};
+	TMap <FString, bool> unlockableAbilities = { {"EnvironmentalScan",true}, {"MovementDetector",false} ,{"ParalysingDartGun",true} ,{"WeakeningDartGun",false} ,{"SoundImitation",false} ,{"OpticCamouflage",false} ,{"FertilizerGun",false},{"Hound",false},{"GrowingRoots",false},{"BarkCovering",true},{"Tracker",false},{"TimeSlow",false},{"Glider",true},{"PoweredBoots",false},{"EmpoweredDash",false},{"PheromonesRelease",false},{"Allergy",true},{"Hallucination",false},{"FastSwimming",false},{"BiologicalRegeneration",false},{"ToughSkin",false},{"HeartContractrion",false} };
+	TMap <FString, bool> metroidvaniaAbilities{ {"NightVision",false}, {"Grapnel",false} ,{"Gills",false},{"ExtremeTemperaturesResistance",false},{"StickyFeet",false} };
 
 public:
 	// Sets default values for this component's properties
