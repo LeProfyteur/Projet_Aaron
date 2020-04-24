@@ -5,7 +5,6 @@
 
 UAllergyMutation::UAllergyMutation()
 {
-	Super();
 }
 
 void UAllergyMutation::OnEquip(FCharacterSkills& Skills)

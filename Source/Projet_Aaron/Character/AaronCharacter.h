@@ -60,7 +60,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		UPostProcessComponent* PostProcessing;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UPlayerAdvancement* PlayerAdvancement;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
