@@ -11,11 +11,7 @@ AAaronCharacter::AAaronCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	//VRComponent = CreateDefaultSubobject<USceneComponent>(TEXT("VR Component"));
-	//VRComponent->SetupAttachment(RootComponent);
-
 	FpsCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FPS_Camera"));
-	//FpsCamera->SetupAttachment(VRComponent);
 	FpsCamera->SetupAttachment(RootComponent);
 	FpsCamera->SetRelativeLocation(FVector(0.0f, 0.0f, 50.0f + BaseEyeHeight));
 	FpsCamera->bUsePawnControlRotation = true;
@@ -47,6 +43,8 @@ AAaronCharacter::AAaronCharacter()
 
 	UpdateTimeline.BindUFunction(this, FName("UpdateTimelineFunction"));
 	FinishTimeLine.BindUFunction(this, FName("EndTimelineFunction"));
+
+	Mutations = TArray<UUMutationBase*>();
 }
 
 void AAaronCharacter::AddControllerYawInput(float Val)
@@ -219,16 +217,6 @@ void AAaronCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AAaronCharacter::EndJumping);
 
 	PlayerInputComponent->BindAction("Walk", IE_Pressed, this, &AAaronCharacter::ToggleWalk);
-
-	/*if (UserSettings->GetIsToggleSprint())
-	{
-		PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AAaronCharacter::ToggleSprint);
-	} else
-	{
-		PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AAaronCharacter::StartSprinting);
-		PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AAaronCharacter::StopSprinting);
-	}*/
-
 	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &AAaronCharacter::ToggleCrouch);
 
 	PlayerInputComponent->BindAction("Dodge", IE_Pressed, this, &AAaronCharacter::Dodge);
@@ -255,12 +243,6 @@ void AAaronCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	
 	PlayerInputComponent->BindAction("ItemWheel", IE_Pressed, this, &AAaronCharacter::PressedItemWheel);
 	PlayerInputComponent->BindAction("ItemWheel", IE_Released, this, &AAaronCharacter::ReleaseItemWheel);
-
-	for (int i = 0; i < PlayerInputComponent->GetNumActionBindings(); i++)
-	{
-		if (PlayerInputComponent->GetActionBinding(i).GetActionName().Compare(FName("FireLeft")) == 0)
-			IndexFireLeftAction = i;
-	}
 }
 
 void AAaronCharacter::EnableDisableNightVision()
@@ -356,6 +338,38 @@ void AAaronCharacter::RemoveEquipment(UChildActorComponent* PartChild, TSubclass
 {
 	PartChild->SetChildActorClass(ClassEquipment);
 	IEquipmentInterface::Execute_OnUnequip(PartChild, StatManager->Skills);
+}
+
+void AAaronCharacter::AddMutation(TSubclassOf<UUMutationBase> Mutation)
+{
+	bool FindRef = false;
+	for (int i = 0; i < Mutations.Num(); i++)
+	{
+		if (Mutations[i]->GetClass() == Mutation.Get()->StaticClass())
+		{
+			FindRef = true;
+			break;
+		}
+	}
+
+	if (FindRef)
+	{
+		int index = Mutations.Add(Mutation.GetDefaultObject());
+		Mutations[index]->OnEquip(StatManager->Skills);
+	}
+}
+
+void AAaronCharacter::RemoveMutation(UClass *ClassMutation)
+{
+	for (int i = 0; i < Mutations.Num(); i++)
+	{
+		if (Mutations[i]->StaticClass() == ClassMutation->StaticClass())
+		{
+			Mutations[i]->OnUnEquip(StatManager->Skills);
+			Mutations.RemoveAt(i);
+			break;
+		}
+	}
 }
 
 void AAaronCharacter::StartJumping()
