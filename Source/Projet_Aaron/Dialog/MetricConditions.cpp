@@ -6,24 +6,24 @@
 
 bool UIsMetricLowerThan::Verify()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Verify %s"), MetricName);
-	UE_LOG(LogTemp, Warning, TEXT("Value %b"), UDialogSubsystem::GetMetric(MetricName) );
+	UE_LOG(LogTemp, Warning, TEXT("Verify %s"), *MetricName);
+	UE_LOG(LogTemp, Warning, TEXT("Value %d"), UDialogSubsystem::GetMetric(MetricName) );
 
 	return UDialogSubsystem::GetMetric(MetricName) < Value;
 }
 
 bool UIsMetricEqual::Verify()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Verify %s"), MetricName);
-	UE_LOG(LogTemp, Warning, TEXT("Value %b"), UDialogSubsystem::GetMetric(MetricName) );
+	UE_LOG(LogTemp, Warning, TEXT("Verify %s"), *MetricName);
+	UE_LOG(LogTemp, Warning, TEXT("Value %d"), UDialogSubsystem::GetMetric(MetricName) );
 
 	return UDialogSubsystem::GetMetric(MetricName) == Value;
 }
 
 bool UIsMetricGreaterThan::Verify()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Verify %s"), MetricName);
-	UE_LOG(LogTemp, Warning, TEXT("Value %b"), UDialogSubsystem::GetMetric(MetricName) );
+	UE_LOG(LogTemp, Warning, TEXT("Verify %s"), *MetricName);
+	UE_LOG(LogTemp, Warning, TEXT("Value %d"), UDialogSubsystem::GetMetric(MetricName) );
 
 	return UDialogSubsystem::GetMetric(MetricName) > Value;
 }

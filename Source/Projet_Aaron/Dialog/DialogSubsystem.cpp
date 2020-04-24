@@ -132,7 +132,7 @@ void UDialogSubsystem::UpdateQueue(UObject* WorldContextObject)
 	if (UDialogSubsystem* DialogSubsystem = GEngine->GetEngineSubsystem<UDialogSubsystem>())
 	{
 		DialogSubsystem->DialogPlaying = false;
-	
+		
 		if (DialogSubsystem->DialogQueue.IsEmpty() == false)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("QueuePasVide"));
