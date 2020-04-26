@@ -320,4 +320,6 @@ protected:
 	FOnTimelineFloat UpdateTimeline{};
 	FOnTimelineEvent FinishTimeLine{};
 	FOnTimelineFloat UpdateTimelinePoison{};
+
+	AActor* LastScannedActor = nullptr;
 };

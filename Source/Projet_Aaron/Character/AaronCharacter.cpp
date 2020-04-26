@@ -668,7 +668,7 @@ void AAaronCharacter::Scan()
 
 	if (GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECC_Visibility, collisionParams))
 	{
-		if (OutHit.GetActor()->Implements<UAnalyseObjectInterface>())
+		if (OutHit.GetActor()->Implements<UAnalyseObjectInterface>() && (LastScannedActor==nullptr || LastScannedActor!=OutHit.GetActor()))
 		{
 			float ScanPercent = 0.0f;
 			AMyHUD* PlayerHUD = Cast<AMyHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
@@ -680,6 +680,7 @@ void AAaronCharacter::Scan()
 			{
 				IAnalyseObjectInterface::Execute_ScanFinished(OutHit.GetActor());
 				//PlayerAdvancement->SetScannableItemStatus(OutHit.GetActor()->GetName(),true);
+				LastScannedActor = OutHit.GetActor();
 				PlayerHUD->ResetCircleRadius();
 			}
 		}
