@@ -94,6 +94,12 @@ public:
 		FVaultAsset FallingVaultAsset;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UTimelineComponent* PoisonTimeline;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UCurveFloat* CurvePoison;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UClass* GrapnelClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -197,6 +203,9 @@ public:
 		void UpdateTimelineFunction(float value);
 
 	UFUNCTION()
+		void UpdateTimelinePoisonFunction(float value);
+
+	UFUNCTION()
 		void EndTimelineFunction();
 
 	/**
@@ -204,6 +213,8 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable)
 		void UpdateBindAction();
+
+	void OnPoisonAlteration();
 
 protected:
 	void BeginPlay() override;
@@ -308,4 +319,5 @@ protected:
 
 	FOnTimelineFloat UpdateTimeline{};
 	FOnTimelineEvent FinishTimeLine{};
+	FOnTimelineFloat UpdateTimelinePoison{};
 };

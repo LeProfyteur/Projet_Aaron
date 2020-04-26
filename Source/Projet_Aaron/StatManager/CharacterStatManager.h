@@ -76,6 +76,8 @@ public:
 
 	/*Getters*/
 	UFUNCTION(BlueprintCallable)
+		UMaterialParameterCollectionInstance* GetParameterCollectionInstance() const { return ParameterCollectionInstance; }
+	UFUNCTION(BlueprintCallable)
 		float GetGravityScale() const { return GravityScale; }
 	UFUNCTION(BlueprintCallable)
 		float GetAirControl() const { return AirControl; }

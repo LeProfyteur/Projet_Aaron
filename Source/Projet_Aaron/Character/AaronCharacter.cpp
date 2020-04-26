@@ -40,9 +40,11 @@ AAaronCharacter::AAaronCharacter()
 	InventaireComponent->PrepareInventory();
 
 	VaultTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Vault Timeline"));
+	PoisonTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Poison Timeline"));
 
 	UpdateTimeline.BindUFunction(this, FName("UpdateTimelineFunction"));
 	FinishTimeLine.BindUFunction(this, FName("EndTimelineFunction"));
+	UpdateTimelinePoison.BindUFunction(this, FName("UpdateTimelinePoisonFunction"));
 
 	Mutations = TArray<UUMutationBase*>();
 }
@@ -63,6 +65,7 @@ void AAaronCharacter::BeginPlay()
 	MovementState = EMovementState::Run;
 	VaultTimeline->AddInterpFloat(CurveFloat, UpdateTimeline);
 	VaultTimeline->SetTimelineFinishedFunc(FinishTimeLine);
+	PoisonTimeline->AddInterpFloat(CurvePoison, UpdateTimelinePoison);
 	CharacterMovement->AirControl = StatManager->GetAirControl();
 	CharacterMovement->GravityScale = StatManager->GetGravityScale();
 
@@ -784,6 +787,18 @@ FVector AAaronCharacter::GetCapsuleBaseLocation(float ZOffset) const
 FVector AAaronCharacter::GetCapsuleBaseLocationFromBase(FVector BaseLocation, float ZOffset) const
 {
 	return FVector(BaseLocation.X, BaseLocation.Y, BaseLocation.Z + GetCapsuleComponent()->GetScaledCapsuleHalfHeight() + ZOffset);
+}
+
+void AAaronCharacter::OnPoisonAlteration()
+{
+	PoisonTimeline->SetTimelineLength(4.0f);
+	PoisonTimeline->SetPlayRate(1.0f);
+	PoisonTimeline->PlayFromStart();
+}
+
+void AAaronCharacter::UpdateTimelinePoisonFunction(float value)
+{
+	StatManager->GetParameterCollectionInstance()->SetScalarParameterValue(FName(TEXT("Poison")), value);
 }
 
 void AAaronCharacter::UpdateTimelineFunction(float value)
