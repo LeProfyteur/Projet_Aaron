@@ -309,24 +309,16 @@ FVector AAaronCharacter::GetCharacterDirection() const
 
 void AAaronCharacter::MoveForward(float Value)
 {
-	FVector ForwardVector = FpsCamera->GetForwardVector();
-	if (UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled())
-		ForwardVector = GetActorForwardVector();
-
 	if (CharacterMovement->IsSwimming())
-		AddMovementInput(ForwardVector, Value);
+		AddMovementInput(FpsCamera->GetForwardVector(), Value);
 	else if (MovementState != EMovementState::Slide)
 		AddMovementInput(GetActorForwardVector(), Value);
 }
 
 void AAaronCharacter::MoveRight(float Value)
 {
-	FVector ForwardVector = FpsCamera->GetForwardVector();
-	if (UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled())
-		ForwardVector = GetActorForwardVector();
-
 	if (CharacterMovement->IsSwimming())
-		AddMovementInput(ForwardVector, Value);
+		AddMovementInput(FpsCamera->GetRightVector(), Value);
 	else if (MovementState != EMovementState::Slide)
 		AddMovementInput(GetActorRightVector(), Value);
 }
