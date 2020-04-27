@@ -60,6 +60,20 @@ void UCharacterStatManager::RecoveryOxygene(float DeltaTime)
 		Oxygene = OxygeneMax;
 }
 
+void UCharacterStatManager::Heal(float BioHeal, float TechHeal)
+{
+	Super::Heal(BioHeal, TechHeal);
+	//remove des post process
+	float RateHealth = (HealthBio + HealthTech) / (HealthBioMax + HealthTechMax);
+	if (RateHealth <= 0.5f)
+	{
+		ParameterCollectionInstance->SetScalarParameterValue(FName(TEXT("Damage")), 1.0f - RateHealth);
+	}else
+	{
+		ParameterCollectionInstance->SetScalarParameterValue(FName(TEXT("Damage")), 0.0f);
+	}
+}
+
 float UCharacterStatManager::GetNightVisionEffect()
 {
 	float Res;

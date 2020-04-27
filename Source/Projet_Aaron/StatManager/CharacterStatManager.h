@@ -76,6 +76,8 @@ public:
 
 	/*Getters*/
 	UFUNCTION(BlueprintCallable)
+		UMaterialParameterCollectionInstance* GetParameterCollectionInstance() const { return ParameterCollectionInstance; }
+	UFUNCTION(BlueprintCallable)
 		float GetGravityScale() const { return GravityScale; }
 	UFUNCTION(BlueprintCallable)
 		float GetAirControl() const { return AirControl; }
@@ -134,4 +136,5 @@ public:
 	void Heal(float BioHeal, float TechHeal);
 	void ConsumeOxygene(float OxygeneToConsume);
 	void RecoveryOxygene(float DeltaTime);
+	void Heal(float BioHeal, float TechHeal) override;
 };

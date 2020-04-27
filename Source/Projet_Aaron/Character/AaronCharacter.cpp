@@ -40,9 +40,11 @@ AAaronCharacter::AAaronCharacter()
 	InventaireComponent->PrepareInventory();
 
 	VaultTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Vault Timeline"));
+	PoisonTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Poison Timeline"));
 
 	UpdateTimeline.BindUFunction(this, FName("UpdateTimelineFunction"));
 	FinishTimeLine.BindUFunction(this, FName("EndTimelineFunction"));
+	UpdateTimelinePoison.BindUFunction(this, FName("UpdateTimelinePoisonFunction"));
 
 	Mutations = TArray<UUMutationBase*>();
 }
@@ -63,6 +65,7 @@ void AAaronCharacter::BeginPlay()
 	MovementState = EMovementState::Run;
 	VaultTimeline->AddInterpFloat(CurveFloat, UpdateTimeline);
 	VaultTimeline->SetTimelineFinishedFunc(FinishTimeLine);
+	PoisonTimeline->AddInterpFloat(CurvePoison, UpdateTimelinePoison);
 	CharacterMovement->AirControl = StatManager->GetAirControl();
 	CharacterMovement->GravityScale = StatManager->GetGravityScale();
 
@@ -306,24 +309,16 @@ FVector AAaronCharacter::GetCharacterDirection() const
 
 void AAaronCharacter::MoveForward(float Value)
 {
-	FVector ForwardVector = FpsCamera->GetForwardVector();
-	if (UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled())
-		ForwardVector = GetActorForwardVector();
-
 	if (CharacterMovement->IsSwimming())
-		AddMovementInput(ForwardVector, Value);
+		AddMovementInput(FpsCamera->GetForwardVector(), Value);
 	else if (MovementState != EMovementState::Slide)
 		AddMovementInput(GetActorForwardVector(), Value);
 }
 
 void AAaronCharacter::MoveRight(float Value)
 {
-	FVector ForwardVector = FpsCamera->GetForwardVector();
-	if (UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled())
-		ForwardVector = GetActorForwardVector();
-
 	if (CharacterMovement->IsSwimming())
-		AddMovementInput(ForwardVector, Value);
+		AddMovementInput(FpsCamera->GetRightVector(), Value);
 	else if (MovementState != EMovementState::Slide)
 		AddMovementInput(GetActorRightVector(), Value);
 }
@@ -665,7 +660,7 @@ void AAaronCharacter::Scan()
 
 	if (GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECC_Visibility, collisionParams))
 	{
-		if (OutHit.GetActor()->Implements<UAnalyseObjectInterface>())
+		if (OutHit.GetActor()->Implements<UAnalyseObjectInterface>() && (LastScannedActor==nullptr || LastScannedActor!=OutHit.GetActor()))
 		{
 			float ScanPercent = 0.0f;
 			AMyHUD* PlayerHUD = Cast<AMyHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
@@ -677,6 +672,7 @@ void AAaronCharacter::Scan()
 			{
 				IAnalyseObjectInterface::Execute_ScanFinished(OutHit.GetActor());
 				//PlayerAdvancement->SetScannableItemStatus(OutHit.GetActor()->GetName(),true);
+				LastScannedActor = OutHit.GetActor();
 				PlayerHUD->ResetCircleRadius();
 			}
 		}
@@ -784,6 +780,18 @@ FVector AAaronCharacter::GetCapsuleBaseLocation(float ZOffset) const
 FVector AAaronCharacter::GetCapsuleBaseLocationFromBase(FVector BaseLocation, float ZOffset) const
 {
 	return FVector(BaseLocation.X, BaseLocation.Y, BaseLocation.Z + GetCapsuleComponent()->GetScaledCapsuleHalfHeight() + ZOffset);
+}
+
+void AAaronCharacter::OnPoisonAlteration()
+{
+	PoisonTimeline->SetTimelineLength(4.0f);
+	PoisonTimeline->SetPlayRate(1.0f);
+	PoisonTimeline->PlayFromStart();
+}
+
+void AAaronCharacter::UpdateTimelinePoisonFunction(float value)
+{
+	StatManager->GetParameterCollectionInstance()->SetScalarParameterValue(FName(TEXT("Poison")), value);
 }
 
 void AAaronCharacter::UpdateTimelineFunction(float value)
