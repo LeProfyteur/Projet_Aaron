@@ -53,15 +53,6 @@ void AEnvironmentalScanEquipment::BeginPlay()
 	}
 }
 
-void AEnvironmentalScanEquipment::OnEquip_Implementation(FCharacterSkills& Skills)
-{
-	
-}
-
-void AEnvironmentalScanEquipment::OnUnequip_Implementation(FCharacterSkills& Skills)
-{
-}
-
 
 
 
