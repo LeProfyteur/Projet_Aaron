@@ -25,11 +25,24 @@ void UCharacterStatManager::TakeDamage(float BioDamage, float TechDamage)
 	if (!Skills.HardBark)
 		Super::TakeDamage(BioDamage, TechDamage);
 
-	float RateHealth = HealthBio / HealthBioMax;
+	
+	float RateHealth = GetHealthBioRate();
 	if(RateHealth <= 0.5f)
 	{
 		ParameterCollectionInstance->SetScalarParameterValue(FName(TEXT("Damage")), 1.0f - RateHealth);
 	}
+}
+
+void UCharacterStatManager::Heal(float BioHeal, float TechHeal)
+{
+	Super::Heal(BioHeal, TechHeal);
+
+	float RateHealth = GetHealthBioRate();
+	if (RateHealth <= 0.5f)
+		ParameterCollectionInstance->SetScalarParameterValue(FName(TEXT("Damage")), 1.0f - RateHealth);
+	else 
+		ParameterCollectionInstance->SetScalarParameterValue(FName(TEXT("Damage")), 1.0f);
+
 }
 
 void UCharacterStatManager::ConsumeOxygene(float OxygeneToConsume)
