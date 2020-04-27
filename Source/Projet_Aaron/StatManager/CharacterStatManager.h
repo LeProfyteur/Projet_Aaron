@@ -135,4 +135,5 @@ public:
 	void TakeDamage(float BioDamage, float TechDamage);
 	void ConsumeOxygene(float OxygeneToConsume);
 	void RecoveryOxygene(float DeltaTime);
+	void Heal(float BioHeal, float TechHeal) override;
 };

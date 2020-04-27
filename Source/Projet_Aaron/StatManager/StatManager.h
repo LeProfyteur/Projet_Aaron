@@ -69,7 +69,7 @@ public:
 	virtual void TakeDamage(float BioDamage, float TechDamage);
 
 	UFUNCTION(BlueprintCallable, Category = "Damage")
-	void Heal(float BioHeal, float TechHeal);
+	virtual void Heal(float BioHeal, float TechHeal);
 
 	UFUNCTION(BlueprintCallable, Category = "Damage")
 	void Die();
