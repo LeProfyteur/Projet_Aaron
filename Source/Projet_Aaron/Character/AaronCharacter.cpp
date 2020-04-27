@@ -36,6 +36,9 @@ AAaronCharacter::AAaronCharacter()
 	ChestEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Chest Equipment"));
 	ChestEquipment->SetupAttachment(FpsCamera);
 
+	LegsEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Legs Equipment"));
+	LegsEquipment->SetupAttachment(FpsCamera);
+
 	InventaireComponent = CreateDefaultSubobject<UInventaireComponent>(TEXT("InventaireComponent"));
 	InventaireComponent->PrepareInventory();
 
@@ -330,8 +333,8 @@ void AAaronCharacter::MoveRight(float Value)
 
 void AAaronCharacter::AddEquipment(UChildActorComponent* PartChild, TSubclassOf<AEquipmentBase> ClassEquipment)
 {
-	PartChild->SetChildActorClass(ClassEquipment);
-	IEquipmentInterface::Execute_OnEquip(PartChild, StatManager->Skills);
+		PartChild->SetChildActorClass(ClassEquipment);
+		IEquipmentInterface::Execute_OnEquip(PartChild, StatManager->Skills);
 }
 
 void AAaronCharacter::RemoveEquipment(UChildActorComponent* PartChild, TSubclassOf<AEquipmentBase> ClassEquipment)
