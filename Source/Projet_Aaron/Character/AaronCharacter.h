@@ -280,7 +280,7 @@ protected:
 	void ActivatePressedChest();
 
 	UFUNCTION(BlueprintCallable)
-		void AddEquipment(UChildActorComponent* PartChild, UClass *ClassEquipment);
+		void AddEquipment(UChildActorComponent* PartChild, TSubclassOf<AEquipmentBase> ClassEquipment);
 
 	UFUNCTION(BlueprintCallable)
 		void RemoveEquipment(UChildActorComponent* PartChild, TSubclassOf<AEquipmentBase> ClassEquipment);

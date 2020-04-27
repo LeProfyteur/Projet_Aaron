@@ -326,7 +326,7 @@ void AAaronCharacter::MoveRight(float Value)
 		AddMovementInput(GetActorRightVector(), Value);
 }
 
-void AAaronCharacter::AddEquipment(UChildActorComponent* PartChild, UClass *ClassEquipment)
+void AAaronCharacter::AddEquipment(UChildActorComponent* PartChild, TSubclassOf<AEquipmentBase> ClassEquipment)
 {
 	PartChild->SetChildActorClass(ClassEquipment);
 	IEquipmentInterface::Execute_OnEquip(PartChild->GetChildActor(), StatManager->Skills);
