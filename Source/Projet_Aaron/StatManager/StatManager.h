@@ -49,6 +49,9 @@ public:
 		FString GetHealthBioRateText() const;
 	UFUNCTION(BlueprintCallable)
 		float GetHealthTechRate() const { return HealthTech / HealthTechMax; }
+
+	UFUNCTION(BlueprintCallable)
+		float GetHealthRate() const { return (HealthBio + HealthTech) / (HealthBioMax + HealthTechMax); }
 	UFUNCTION(BlueprintCallable)
 		FString GetHealthTechRateText() const;
 	
@@ -73,7 +76,4 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Damage")
 	void Die();
-	
-
-		
 };

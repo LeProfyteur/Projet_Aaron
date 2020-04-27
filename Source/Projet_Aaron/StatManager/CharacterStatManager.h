@@ -133,7 +133,6 @@ public:
 
 	/*Others*/
 	void TakeDamage(float BioDamage, float TechDamage);
-	void Heal(float BioHeal, float TechHeal);
 	void ConsumeOxygene(float OxygeneToConsume);
 	void RecoveryOxygene(float DeltaTime);
 	void Heal(float BioHeal, float TechHeal) override;

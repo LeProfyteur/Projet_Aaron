@@ -33,18 +33,6 @@ void UCharacterStatManager::TakeDamage(float BioDamage, float TechDamage)
 	}
 }
 
-void UCharacterStatManager::Heal(float BioHeal, float TechHeal)
-{
-	Super::Heal(BioHeal, TechHeal);
-
-	float RateHealth = GetHealthBioRate();
-	if (RateHealth <= 0.5f)
-		ParameterCollectionInstance->SetScalarParameterValue(FName(TEXT("Damage")), 1.0f - RateHealth);
-	else 
-		ParameterCollectionInstance->SetScalarParameterValue(FName(TEXT("Damage")), 1.0f);
-
-}
-
 void UCharacterStatManager::ConsumeOxygene(float OxygeneToConsume)
 {
 	if (Oxygene - OxygeneToConsume < 0.0f)
