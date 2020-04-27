@@ -326,16 +326,16 @@ void AAaronCharacter::MoveRight(float Value)
 		AddMovementInput(GetActorRightVector(), Value);
 }
 
-void AAaronCharacter::AddEquipment(UChildActorComponent* PartChild, TSubclassOf<AEquipmentBase> ClassEquipment)
+void AAaronCharacter::AddEquipment(UChildActorComponent* PartChild, UClass *ClassEquipment)
 {
 	PartChild->SetChildActorClass(ClassEquipment);
-	IEquipmentInterface::Execute_OnEquip(PartChild, StatManager->Skills);
+	IEquipmentInterface::Execute_OnEquip(PartChild->GetChildActor(), StatManager->Skills);
 }
 
 void AAaronCharacter::RemoveEquipment(UChildActorComponent* PartChild, TSubclassOf<AEquipmentBase> ClassEquipment)
 {
 	PartChild->SetChildActorClass(ClassEquipment);
-	IEquipmentInterface::Execute_OnUnequip(PartChild, StatManager->Skills);
+	IEquipmentInterface::Execute_OnUnequip(PartChild->GetChildActor(), StatManager->Skills);
 }
 
 void AAaronCharacter::AddMutation(TSubclassOf<UUMutationBase> Mutation)

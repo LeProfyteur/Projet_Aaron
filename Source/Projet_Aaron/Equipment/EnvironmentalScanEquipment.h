@@ -49,8 +49,8 @@ public :
 		void FinishTimeline();
 	
 	virtual void Activate_Implementation(bool isPressed) override;
-	void OnEquip_Implementation(FCharacterSkills& Skills) override;
-	void OnUnequip_Implementation(FCharacterSkills& Skills) override;
+	virtual void OnEquip_Implementation(FCharacterSkills& Skills) override;
+	virtual void OnUnequip_Implementation(FCharacterSkills& Skills) override;
 
 	virtual void Tick(float DeltaTime) override;
 
