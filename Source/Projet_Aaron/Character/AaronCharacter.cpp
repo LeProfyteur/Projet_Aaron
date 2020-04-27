@@ -36,6 +36,9 @@ AAaronCharacter::AAaronCharacter()
 	ChestEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Chest Equipment"));
 	ChestEquipment->SetupAttachment(FpsCamera);
 
+	LegsEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Legs Equipment"));
+	LegsEquipment->SetupAttachment(FpsCamera);
+
 	InventaireComponent = CreateDefaultSubobject<UInventaireComponent>(TEXT("InventaireComponent"));
 	InventaireComponent->PrepareInventory();
 

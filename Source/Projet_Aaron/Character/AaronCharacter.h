@@ -76,6 +76,9 @@ public:
 		UChildActorComponent* ChestEquipment;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UChildActorComponent* LegsEquipment;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UInventaireComponent* InventaireComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
