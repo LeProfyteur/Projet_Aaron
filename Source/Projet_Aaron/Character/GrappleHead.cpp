@@ -15,7 +15,7 @@ AGrappleHead::AGrappleHead()
 	staticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	staticMesh->SetupAttachment(RootComponent);
 
-	ConstructorHelpers::FObjectFinder<UStaticMesh> hookMesh(TEXT("/Game/Projet_Aaron/CC/FirstPersonBP/Blueprints/Grappnel/Hook.Hook"));
+	ConstructorHelpers::FObjectFinder<UStaticMesh> hookMesh(TEXT("/Game/Projet_Aaron/CC/Equipment/Grapnel/Hook.Hook"));
 	if(hookMesh.Succeeded())
 		staticMesh->SetStaticMesh(hookMesh.Object);
 

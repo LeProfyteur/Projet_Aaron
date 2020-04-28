@@ -29,6 +29,9 @@ public:
 		bool IsUnlock(FString EntryName);
 
 	UFUNCTION(BlueprintCallable)
+		bool IsUnlockAbilities(FString EntryName);
+
+	UFUNCTION(BlueprintCallable)
 		void UnlockItem(FString EntryName);
 
 public:

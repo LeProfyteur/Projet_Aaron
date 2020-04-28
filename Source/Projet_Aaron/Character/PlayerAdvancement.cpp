@@ -27,6 +27,15 @@ bool UPlayerAdvancement::IsUnlock(FString EntryName)
 	return false;
 }
 
+bool UPlayerAdvancement::IsUnlockAbilities(FString EntryName)
+{
+	if (unlockableAbilities.Contains(EntryName))
+		return unlockableAbilities[EntryName];
+	else if (metroidvaniaAbilities.Contains(EntryName))
+		return metroidvaniaAbilities[EntryName];
+	return false;
+}
+
 void UPlayerAdvancement::UnlockItem(FString EntryName)
 {
 	if (scannableItems.Contains(EntryName))
