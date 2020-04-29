@@ -35,7 +35,7 @@ void AMyHUD::DrawHUD()
 	FVector2D viewportSize(0, 0);
 	GEngine->GameViewport->GetViewportSize(viewportSize);
 	
-	DrawMaterialSimple(BarMatInstance, viewportSize.X / 2.0f, viewportSize.Y / 2.0f, 50.0f, 50.0f);
+	DrawMaterialSimple(BarMatInstance, (viewportSize.X / 2.0f)-25.0f, (viewportSize.Y / 2.0f)-25.0f, 50.0f, 50.0f);
 }
 
 void AMyHUD::UpdateCircleRadius(float RadiusBar)

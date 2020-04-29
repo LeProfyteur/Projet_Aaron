@@ -3,6 +3,8 @@
 
 #include "PoisonAlteration.h"
 
+#include "Projet_Aaron/Character/AaronCharacter.h"
+
 // Sets default values for this component's properties
 UPoisonAlteration::UPoisonAlteration()
 {
@@ -35,6 +37,9 @@ void UPoisonAlteration::BeginPlay()
 		_CreatureStatManager->SetPoisonAlteration(true);
 		DamageOverTime();
 	}
+
+	AAaronCharacter* Character = Cast<AAaronCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	Character->OnPoisonAlteration();
 	
 }
 
@@ -42,11 +47,11 @@ void UPoisonAlteration::BeginPlay()
 void UPoisonAlteration::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	if (CharacterStatManager)
-	{
-		CharacterStatManager->SetPoisonEffect(TimeMutation / MaxTimeAlteration);
-		UE_LOG(LogActor, Error, TEXT("%f / %f = %f"), TimeMutation, MaxTimeAlteration, TimeMutation / MaxTimeAlteration);
-	}
+	//if (CharacterStatManager)
+	//{
+	//	CharacterStatManager->SetPoisonEffect(TimeMutation / MaxTimeAlteration);
+	//	//UE_LOG(LogActor, Error, TEXT("%f / %f = %f"), TimeMutation, MaxTimeAlteration, TimeMutation / MaxTimeAlteration);
+	//}
 }
 
 void UPoisonAlteration::DamageOverTime()
@@ -62,10 +67,10 @@ void UPoisonAlteration::TakeDamage()
 	if (TimeAlteration <= 1.0f)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(InputTimeHandle);
-		if (CharacterStatManager)
+		/*if (CharacterStatManager)
 		{
 			CharacterStatManager->SetPoisonEffect(0.0f);
-		}
+		}*/
 	}
 	
 	TimeAlteration -= 1.0f;

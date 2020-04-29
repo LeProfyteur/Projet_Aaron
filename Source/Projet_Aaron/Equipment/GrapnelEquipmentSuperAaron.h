@@ -24,22 +24,19 @@ public:
 	AGrapnelEquipmentSuperAaron();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		class AGrappleHead* myBullet;
+		AGrappleHead* myBullet;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		class UCableComponent* laser;
+		UStaticMeshComponent* hookMeshComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		class UStaticMeshComponent* hookMeshComponent;
+		UCableComponent* cable;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		class UChildActorComponent* pointer;
+		UTimelineComponent* timeline;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		class UCableComponent* cable;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		class UTimelineComponent* timeline;
+		UParticleSystemComponent* ParticleSystem;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		float Distance = 5000.0f;
@@ -64,9 +61,6 @@ public:
 
 	UFUNCTION()
 		void TimelineCallback();
-
-	UFUNCTION()
-		void updatePointerLocation();
 
 	UFUNCTION()
 		void AfterHook();
