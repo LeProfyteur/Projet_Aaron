@@ -2,72 +2,176 @@
 
 
 #include "PlayerAdvancement.h"
-#include <Runtime\CoreUObject\Public\UObject\ConstructorHelpers.h>
+#include "Engine/Engine.h"
 
-// Sets default values for this component's properties
-UPlayerAdvancement::UPlayerAdvancement()
+void UPlayerAdvancement::ResetAdvancement()
 {
-	PrimaryComponentTick.bCanEverTick = false;
+	scannableItems = { {"LightPlantScan",false}, {"PoisonPlantScan",false} ,{"BlockingPlantScan",false}  ,{"PuncturePlantScan",false} ,{"CarnivorousPlantScan",false} ,{"PakurvaScan",false},{"LumeilScan",false} ,{"KorvaifScan",false} ,{"GrosHerbivoreScan",false} };
+	collectableItems={ {"ParalysingDartBlackBox",false}, {"GrapnelItem",false} ,{"WeakeningDartDocument",false},{"EnvironmentalScanBeacon",false},{"MovementDetectorBeacon",false}, {"GliderBlackBox",false}, {"PoweredBootsBlackBox",false}, {"GillsDoc",false}, {"NightVisionBlackBox",false}, {"TrackerBlackBox",false} };
+	unlockableAbilities = { {"EnvironmentalScan",false}, {"MovementDetector",false} ,{"ParalysingDartGun",false} ,{"WeakeningDartGun",false} ,{"SoundImitation",false} ,{"OpticCamouflage",false} ,{"FertilizerGun",false},{"Hound",false},{"GrowingRoots",false},{"BarkCovering",false},{"Tracker",false},{"TimeSlow",false},{"Glider",false},{"PoweredBoots",false},{"EmpoweredDash",false},{"PheromonesRelease",false},{"Allergy",false},{"Hallucination",false},{"FastSwimming",false},{"BiologicalRegeneration",false},{"ToughSkin",false},{"HeartContractrion",false} };
+	metroidvaniaAbilities={ {"NightVision",false}, {"Grapnel",false} ,{"Gills",false},{"ExtremeTemperaturesResistance",false},{"StickyFeet",false} };
 }
 
 void UPlayerAdvancement::UnlockAbilities(FString EntryName)
 {
-	if (unlockableAbilities.Contains(EntryName))
-		unlockableAbilities[EntryName] = true;
-	else if (metroidvaniaAbilities.Contains(EntryName))
-		metroidvaniaAbilities[EntryName] = true;
+	if (GEngine)
+	{
+		if (UPlayerAdvancement* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancement>())
+		{
+			if (PlayerAdvancemntSubsystem->unlockableAbilities.Contains(EntryName))
+				PlayerAdvancemntSubsystem->unlockableAbilities[EntryName] = true;
+			else if (PlayerAdvancemntSubsystem->metroidvaniaAbilities.Contains(EntryName))
+				PlayerAdvancemntSubsystem->metroidvaniaAbilities[EntryName] = true;
+		}
+	}
 }
 
 bool UPlayerAdvancement::IsUnlock(FString EntryName)
 {
-	if (scannableItems.Contains(EntryName))
-		return scannableItems[EntryName];
-	else if (collectableItems.Contains(EntryName))
-		return collectableItems[EntryName];
+	if (GEngine)
+	{
+		if (UPlayerAdvancement* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancement>())
+		{
+			if (PlayerAdvancemntSubsystem->scannableItems.Contains(EntryName))
+				return PlayerAdvancemntSubsystem->scannableItems[EntryName];
+			else if (PlayerAdvancemntSubsystem->collectableItems.Contains(EntryName))
+				return PlayerAdvancemntSubsystem->collectableItems[EntryName];
+			return false;
+		}
+	}
 	return false;
+
 }
 
 bool UPlayerAdvancement::IsUnlockAbilities(FString EntryName)
 {
-	if (unlockableAbilities.Contains(EntryName))
-		return unlockableAbilities[EntryName];
-	else if (metroidvaniaAbilities.Contains(EntryName))
-		return metroidvaniaAbilities[EntryName];
+	if (GEngine)
+	{
+		if (UPlayerAdvancement* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancement>())
+		{
+			if (PlayerAdvancemntSubsystem->unlockableAbilities.Contains(EntryName))
+				return PlayerAdvancemntSubsystem->unlockableAbilities[EntryName];
+			else if (PlayerAdvancemntSubsystem->metroidvaniaAbilities.Contains(EntryName))
+				return PlayerAdvancemntSubsystem->metroidvaniaAbilities[EntryName];
+			return false;
+		}
+	}
 	return false;
+
 }
 
 void UPlayerAdvancement::UnlockItem(FString EntryName)
 {
-	if (scannableItems.Contains(EntryName))
-		scannableItems[EntryName] = true;
-	else if (collectableItems.Contains(EntryName))
-		collectableItems[EntryName] = true;
+	if (GEngine)
+	{
+		if (UPlayerAdvancement* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancement>())
+		{
+			if (PlayerAdvancemntSubsystem->scannableItems.Contains(EntryName))
+				PlayerAdvancemntSubsystem->scannableItems[EntryName] = true;
+			else if (PlayerAdvancemntSubsystem->collectableItems.Contains(EntryName))
+				PlayerAdvancemntSubsystem->collectableItems[EntryName] = true;
+		}
+	}
 }
 
 bool UPlayerAdvancement::GetScannableItemStatus(FString EntryName)
 {
-	if (scannableItems.Contains(EntryName)) 
-		return scannableItems[EntryName];
+	if (GEngine)
+	{
+		if (UPlayerAdvancement* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancement>())
+		{
+			if (PlayerAdvancemntSubsystem->scannableItems.Contains(EntryName))
+				return PlayerAdvancemntSubsystem->scannableItems[EntryName];
+			return false;
+		}
+	}
 	return false;
 }
 
 bool UPlayerAdvancement::GetUnlockableAbilities(FString EntryName)
 {
-	if (unlockableAbilities.Contains(EntryName)) 
-		return unlockableAbilities[EntryName];
+	if (GEngine)
+	{
+		if (UPlayerAdvancement* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancement>())
+		{
+			if (PlayerAdvancemntSubsystem->unlockableAbilities.Contains(EntryName))
+				return PlayerAdvancemntSubsystem->unlockableAbilities[EntryName];
+			return false;
+		}
+	}
 	return false;
+
 }
 
 bool UPlayerAdvancement::GetMetroidvaniaAbilities(FString EntryName)
 {
-	if (metroidvaniaAbilities.Contains(EntryName)) 
-		return metroidvaniaAbilities[EntryName];
+	if (GEngine)
+	{
+		if (UPlayerAdvancement* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancement>())
+		{
+			if (PlayerAdvancemntSubsystem->metroidvaniaAbilities.Contains(EntryName))
+				return PlayerAdvancemntSubsystem->metroidvaniaAbilities[EntryName];
+			return false;
+		}
+	}
 	return false;
+
 }
 
 bool UPlayerAdvancement::GetCollectableItems(FString EntryName)
 {
-	if (collectableItems.Contains(EntryName))
-		return collectableItems[EntryName];
+	if (GEngine)
+	{
+		if (UPlayerAdvancement* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancement>())
+		{
+			if (PlayerAdvancemntSubsystem->collectableItems.Contains(EntryName))
+				return PlayerAdvancemntSubsystem->collectableItems[EntryName];
+			return false;
+		}
+	}
 	return false;
+
+}
+
+
+void UPlayerAdvancement::SetScannableItemStatus(FString EntryName, bool isScanned)
+{
+	if (GEngine)
+	{
+		if (UPlayerAdvancement* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancement>())
+		{
+			if (PlayerAdvancemntSubsystem->scannableItems.Contains(EntryName)) PlayerAdvancemntSubsystem->scannableItems[EntryName] = isScanned;
+		}
+	}
+}
+
+void UPlayerAdvancement::SetUnlockableAbilities(FString EntryName, bool isUnlocked)
+{
+	if (GEngine)
+	{
+		if (UPlayerAdvancement* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancement>())
+		{
+			if (PlayerAdvancemntSubsystem->unlockableAbilities.Contains(EntryName)) PlayerAdvancemntSubsystem->unlockableAbilities[EntryName] = isUnlocked;
+		}
+	}
+}
+void UPlayerAdvancement::SetMetroidvaniaAbilities(FString EntryName, bool isUnlocked)
+{
+	if (GEngine)
+	{
+		if (UPlayerAdvancement* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancement>())
+		{
+			if (PlayerAdvancemntSubsystem->metroidvaniaAbilities.Contains(EntryName)) PlayerAdvancemntSubsystem->metroidvaniaAbilities[EntryName] = isUnlocked;
+		}
+	}
+}
+void UPlayerAdvancement::SetCollectableItems(FString EntryName, bool isCollected)
+{
+	if (GEngine)
+	{
+		if (UPlayerAdvancement* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancement>())
+		{
+			if (PlayerAdvancemntSubsystem->collectableItems.Contains(EntryName)) PlayerAdvancemntSubsystem->collectableItems[EntryName] = isCollected;
+		}
+	}
 }
