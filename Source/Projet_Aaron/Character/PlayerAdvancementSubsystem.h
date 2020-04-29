@@ -5,11 +5,11 @@
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
 #include "Subsystems/EngineSubsystem.h"
-#include "PlayerAdvancement.generated.h"
+#include "PlayerAdvancementSubsystem.generated.h"
 
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class PROJET_AARON_API UPlayerAdvancement : public UEngineSubsystem
+class PROJET_AARON_API UPlayerAdvancementSubsystem : public UEngineSubsystem
 {
 	GENERATED_BODY()
 

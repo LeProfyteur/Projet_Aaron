@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "PlayerAdvancement.h"
+#include "PlayerAdvancementSubsystem.h"
 #include "Engine/Engine.h"
 
-void UPlayerAdvancement::ResetAdvancement()
+void UPlayerAdvancementSubsystem::ResetAdvancement()
 {
 	scannableItems = { {"LightPlantScan",false}, {"PoisonPlantScan",false} ,{"BlockingPlantScan",false}  ,{"PuncturePlantScan",false} ,{"CarnivorousPlantScan",false} ,{"PakurvaScan",false},{"LumeilScan",false} ,{"KorvaifScan",false} ,{"GrosHerbivoreScan",false} };
 	collectableItems={ {"ParalysingDartBlackBox",false}, {"GrapnelItem",false} ,{"WeakeningDartDocument",false},{"EnvironmentalScanBeacon",false},{"MovementDetectorBeacon",false}, {"GliderBlackBox",false}, {"PoweredBootsBlackBox",false}, {"GillsDoc",false}, {"NightVisionBlackBox",false}, {"TrackerBlackBox",false} };
@@ -12,11 +12,11 @@ void UPlayerAdvancement::ResetAdvancement()
 	metroidvaniaAbilities={ {"NightVision",false}, {"Grapnel",false} ,{"Gills",false},{"ExtremeTemperaturesResistance",false},{"StickyFeet",false} };
 }
 
-void UPlayerAdvancement::UnlockAbilities(FString EntryName)
+void UPlayerAdvancementSubsystem::UnlockAbilities(FString EntryName)
 {
 	if (GEngine)
 	{
-		if (UPlayerAdvancement* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancement>())
+		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
 		{
 			if (PlayerAdvancemntSubsystem->unlockableAbilities.Contains(EntryName))
 				PlayerAdvancemntSubsystem->unlockableAbilities[EntryName] = true;
@@ -26,11 +26,11 @@ void UPlayerAdvancement::UnlockAbilities(FString EntryName)
 	}
 }
 
-bool UPlayerAdvancement::IsUnlock(FString EntryName)
+bool UPlayerAdvancementSubsystem::IsUnlock(FString EntryName)
 {
 	if (GEngine)
 	{
-		if (UPlayerAdvancement* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancement>())
+		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
 		{
 			if (PlayerAdvancemntSubsystem->scannableItems.Contains(EntryName))
 				return PlayerAdvancemntSubsystem->scannableItems[EntryName];
@@ -43,11 +43,11 @@ bool UPlayerAdvancement::IsUnlock(FString EntryName)
 
 }
 
-bool UPlayerAdvancement::IsUnlockAbilities(FString EntryName)
+bool UPlayerAdvancementSubsystem::IsUnlockAbilities(FString EntryName)
 {
 	if (GEngine)
 	{
-		if (UPlayerAdvancement* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancement>())
+		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
 		{
 			if (PlayerAdvancemntSubsystem->unlockableAbilities.Contains(EntryName))
 				return PlayerAdvancemntSubsystem->unlockableAbilities[EntryName];
@@ -60,11 +60,11 @@ bool UPlayerAdvancement::IsUnlockAbilities(FString EntryName)
 
 }
 
-void UPlayerAdvancement::UnlockItem(FString EntryName)
+void UPlayerAdvancementSubsystem::UnlockItem(FString EntryName)
 {
 	if (GEngine)
 	{
-		if (UPlayerAdvancement* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancement>())
+		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
 		{
 			if (PlayerAdvancemntSubsystem->scannableItems.Contains(EntryName))
 				PlayerAdvancemntSubsystem->scannableItems[EntryName] = true;
@@ -74,11 +74,11 @@ void UPlayerAdvancement::UnlockItem(FString EntryName)
 	}
 }
 
-bool UPlayerAdvancement::GetScannableItemStatus(FString EntryName)
+bool UPlayerAdvancementSubsystem::GetScannableItemStatus(FString EntryName)
 {
 	if (GEngine)
 	{
-		if (UPlayerAdvancement* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancement>())
+		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
 		{
 			if (PlayerAdvancemntSubsystem->scannableItems.Contains(EntryName))
 				return PlayerAdvancemntSubsystem->scannableItems[EntryName];
@@ -88,11 +88,11 @@ bool UPlayerAdvancement::GetScannableItemStatus(FString EntryName)
 	return false;
 }
 
-bool UPlayerAdvancement::GetUnlockableAbilities(FString EntryName)
+bool UPlayerAdvancementSubsystem::GetUnlockableAbilities(FString EntryName)
 {
 	if (GEngine)
 	{
-		if (UPlayerAdvancement* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancement>())
+		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
 		{
 			if (PlayerAdvancemntSubsystem->unlockableAbilities.Contains(EntryName))
 				return PlayerAdvancemntSubsystem->unlockableAbilities[EntryName];
@@ -103,11 +103,11 @@ bool UPlayerAdvancement::GetUnlockableAbilities(FString EntryName)
 
 }
 
-bool UPlayerAdvancement::GetMetroidvaniaAbilities(FString EntryName)
+bool UPlayerAdvancementSubsystem::GetMetroidvaniaAbilities(FString EntryName)
 {
 	if (GEngine)
 	{
-		if (UPlayerAdvancement* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancement>())
+		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
 		{
 			if (PlayerAdvancemntSubsystem->metroidvaniaAbilities.Contains(EntryName))
 				return PlayerAdvancemntSubsystem->metroidvaniaAbilities[EntryName];
@@ -118,11 +118,11 @@ bool UPlayerAdvancement::GetMetroidvaniaAbilities(FString EntryName)
 
 }
 
-bool UPlayerAdvancement::GetCollectableItems(FString EntryName)
+bool UPlayerAdvancementSubsystem::GetCollectableItems(FString EntryName)
 {
 	if (GEngine)
 	{
-		if (UPlayerAdvancement* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancement>())
+		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
 		{
 			if (PlayerAdvancemntSubsystem->collectableItems.Contains(EntryName))
 				return PlayerAdvancemntSubsystem->collectableItems[EntryName];
@@ -134,42 +134,42 @@ bool UPlayerAdvancement::GetCollectableItems(FString EntryName)
 }
 
 
-void UPlayerAdvancement::SetScannableItemStatus(FString EntryName, bool isScanned)
+void UPlayerAdvancementSubsystem::SetScannableItemStatus(FString EntryName, bool isScanned)
 {
 	if (GEngine)
 	{
-		if (UPlayerAdvancement* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancement>())
+		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
 		{
 			if (PlayerAdvancemntSubsystem->scannableItems.Contains(EntryName)) PlayerAdvancemntSubsystem->scannableItems[EntryName] = isScanned;
 		}
 	}
 }
 
-void UPlayerAdvancement::SetUnlockableAbilities(FString EntryName, bool isUnlocked)
+void UPlayerAdvancementSubsystem::SetUnlockableAbilities(FString EntryName, bool isUnlocked)
 {
 	if (GEngine)
 	{
-		if (UPlayerAdvancement* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancement>())
+		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
 		{
 			if (PlayerAdvancemntSubsystem->unlockableAbilities.Contains(EntryName)) PlayerAdvancemntSubsystem->unlockableAbilities[EntryName] = isUnlocked;
 		}
 	}
 }
-void UPlayerAdvancement::SetMetroidvaniaAbilities(FString EntryName, bool isUnlocked)
+void UPlayerAdvancementSubsystem::SetMetroidvaniaAbilities(FString EntryName, bool isUnlocked)
 {
 	if (GEngine)
 	{
-		if (UPlayerAdvancement* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancement>())
+		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
 		{
 			if (PlayerAdvancemntSubsystem->metroidvaniaAbilities.Contains(EntryName)) PlayerAdvancemntSubsystem->metroidvaniaAbilities[EntryName] = isUnlocked;
 		}
 	}
 }
-void UPlayerAdvancement::SetCollectableItems(FString EntryName, bool isCollected)
+void UPlayerAdvancementSubsystem::SetCollectableItems(FString EntryName, bool isCollected)
 {
 	if (GEngine)
 	{
-		if (UPlayerAdvancement* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancement>())
+		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
 		{
 			if (PlayerAdvancemntSubsystem->collectableItems.Contains(EntryName)) PlayerAdvancemntSubsystem->collectableItems[EntryName] = isCollected;
 		}
