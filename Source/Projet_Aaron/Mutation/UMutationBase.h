@@ -11,7 +11,7 @@
  * 
  */
 UCLASS()
-class PROJET_AARON_API UUMutationBase : public UObject
+class PROJET_AARON_API UUMutationBase : public UActorComponent
 {
 	GENERATED_BODY()
 

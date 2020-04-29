@@ -81,8 +81,11 @@ bool UDialogSubsystem::GetKnowledge(FString KnowledgeToGet)
 
 void PlayDialog(UObject* WorldContextObject, UDialog* DataAssetDialog)
 {
+	UE_LOG(LogTemp, Warning, TEXT("PlayDialog"));
+
 	if (DataAssetDialog && DataAssetDialog->IsValid())
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Valide"));
 		APawn* Pawn = WorldContextObject->GetWorld()->SpawnActor<APawn>(APawn::StaticClass());
 		Pawn->SpawnDefaultController();
 		if (AAIController* Controller = Cast<AAIController>(Pawn->GetController()))
@@ -94,18 +97,29 @@ void PlayDialog(UObject* WorldContextObject, UDialog* DataAssetDialog)
 			}
 		}
 	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Non Valide"));
+		if (UDialogSubsystem* DialogSubsystem = GEngine->GetEngineSubsystem<UDialogSubsystem>())
+		{
+			DialogSubsystem->UpdateQueue(WorldContextObject);
+		}
+	}
 }
 
 void UDialogSubsystem::QueueDialog(UObject* WorldContextObject, UDialog* DataAssetDialog)
 {
+	UE_LOG(LogTemp, Warning, TEXT("QueueDialog"));
 	if (UDialogSubsystem* DialogSubsystem = GEngine->GetEngineSubsystem<UDialogSubsystem>())
 	{
 		if(DialogSubsystem->DialogPlaying == false)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("PlayDialoginQueue"));
 			PlayDialog(WorldContextObject, DataAssetDialog);
 		}
 		else
 		{
+			UE_LOG(LogTemp, Warning, TEXT("Add to Queue"));
 			DialogSubsystem->DialogQueue.Enqueue(DataAssetDialog);
 		}
 	}
@@ -113,22 +127,26 @@ void UDialogSubsystem::QueueDialog(UObject* WorldContextObject, UDialog* DataAss
 
 void UDialogSubsystem::UpdateQueue(UObject* WorldContextObject)
 {
+	UE_LOG(LogTemp, Warning, TEXT("UpdateQueue"));
+
 	if (UDialogSubsystem* DialogSubsystem = GEngine->GetEngineSubsystem<UDialogSubsystem>())
 	{
 		DialogSubsystem->DialogPlaying = false;
-	}
-	
-	if (UDialogSubsystem* DialogSubsystem = GEngine->GetEngineSubsystem<UDialogSubsystem>())
-	{
+		
 		if (DialogSubsystem->DialogQueue.IsEmpty() == false)
 		{
-			//UE_LOG(LogTemp, Warning, TEXT("QueuePasVide"));
+			UE_LOG(LogTemp, Warning, TEXT("QueuePasVide"));
 
 			DialogSubsystem->DialogQueue.Peek(DialogSubsystem->DialogAsset);
+			DialogSubsystem->DialogQueue.Pop();
 
 			DialogSubsystem->World = WorldContextObject;
 
 			WorldContextObject->GetWorld()->GetTimerManager().SetTimer(TimeHandle, this, &UDialogSubsystem::ResetTimer, 2.0f, false);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Vide"));
 		}
 	}
 }

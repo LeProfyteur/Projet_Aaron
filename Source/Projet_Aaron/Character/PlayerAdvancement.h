@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/DataTable.h"
 #include "Components/ActorComponent.h"
 #include "PlayerAdvancement.generated.h"
 
@@ -12,35 +13,47 @@ class PROJET_AARON_API UPlayerAdvancement : public UActorComponent
 {
 	GENERATED_BODY()
 
-	TMap <FString, bool> scannableItems = { {"LightPlant",false}, {"PoisonPlant",false} ,{"BlockingPlant",false} ,{"Creature1",false} ,{"Creature2",false} ,{"Creature3",false} ,{"Creature4",false} };
-	TMap <FString, bool> unlockableAbilities = { {"EnvironmentalScan",true}, {"MovementDetector",false} ,{"ParalysingDartGun",true} ,{"WeakeningDartGun",false} ,{"SoundImitation",false} ,{"OpticCamouflage",false} ,{"FertilizerGun",false},{"Hound",false},{"GrowingRoots",false},{"BarkCovering",true},{"Tracker",false},{"TimeSlow",false},{"Glider",true},{"PoweredBoots",false},{"EmpoweredDash",false},{"PheromonesRelease",false},{"Allergy",true},{"Hallucination",false},{"FastSwimming",false},{"BiologicalRegeneration",false},{"ToughSkin",false},{"HeartContractrion",false} };
-	TMap <FString, bool> metroidvaniaAbilities{ {"NightVision",true}, {"Grapnel",true} ,{"Gills",true},{"ExtremeTemperaturesResistance",false},{"StickyFeet",false} };
+	TMap <FString, bool> scannableItems = { {"LightPlant",false}, {"PoisonPlant",false} ,{"BlockingPlant",false} ,{"LumeilScan",false} ,{"PuncturePlantScan",false} ,{"CarnivorousPlantScan",false} ,{"PakuraScan",false} };
+	TMap <FString, bool> collectableItems{ {"ParalysingDartBlackBox",false}, {"GrapnelItem",false} ,{"WeakeningDartDocument",false},{"EnvironmentalScanBeacon",false},{"MovementDetectorBeacon",false}, {"GliderBlackBox",false}, {"PoweredBootsBlackBox",false}, {"GillsDoc",false}, {"NightVisionBlackBox",false}, {"TrackerBlackBox",false} };
+	TMap <FString, bool> unlockableAbilities = { {"EnvironmentalScan",true}, {"MovementDetector",false} ,{"ParalysingDartGun",true} ,{"WeakeningDartGun",false} ,{"SoundImitation",false} ,{"OpticCamouflage",false} ,{"FertilizerGun",false},{"Hound",false},{"GrowingRoots",false},{"BarkCovering",false},{"Tracker",false},{"TimeSlow",false},{"Glider",false},{"PoweredBoots",false},{"EmpoweredDash",false},{"PheromonesRelease",false},{"Allergy",true},{"Hallucination",false},{"FastSwimming",false},{"BiologicalRegeneration",false},{"ToughSkin",false},{"HeartContractrion",false} };
+	TMap <FString, bool> metroidvaniaAbilities{ {"NightVision",false}, {"Grapnel",false} ,{"Gills",false},{"ExtremeTemperaturesResistance",false},{"StickyFeet",false} };
 
 public:
 	// Sets default values for this component's properties
 	UPlayerAdvancement();
 
-protected:
-
-public:
-
-public:
 	UFUNCTION(BlueprintCallable)
-		void SetScannableItemStatus(FString entryName, bool isScanned) { scannableItems[entryName] = isScanned; }
+		void UnlockAbilities(FString EntryName);
 
 	UFUNCTION(BlueprintCallable)
-		void SetUnlockableAbilities(FString entryName, bool isUnlocked) { unlockableAbilities[entryName] = isUnlocked; }
+		bool IsUnlock(FString EntryName);
 
 	UFUNCTION(BlueprintCallable)
-		void SetMetroidvaniaAbilities(FString entryName, bool isUnlocked) { metroidvaniaAbilities[entryName] = isUnlocked; }
+		void UnlockItem(FString EntryName);
 
 public:
 	UFUNCTION(BlueprintCallable)
-		bool GetScannableItemStatus(FString entryName) { return scannableItems[entryName]; }
+		void SetScannableItemStatus(FString EntryName, bool isScanned) { if (scannableItems.Contains(EntryName)) scannableItems[EntryName] = isScanned; }
 
 	UFUNCTION(BlueprintCallable)
-		bool GetUnlockableAbilities(FString entryName) { return unlockableAbilities[entryName]; }
+		void SetUnlockableAbilities(FString EntryName, bool isUnlocked) { if (unlockableAbilities.Contains(EntryName)) unlockableAbilities[EntryName] = isUnlocked; }
 
 	UFUNCTION(BlueprintCallable)
-		bool GetMetroidvaniaAbilities(FString entryName) { return metroidvaniaAbilities[entryName]; }
+		void SetMetroidvaniaAbilities(FString EntryName, bool isUnlocked) { if (metroidvaniaAbilities.Contains(EntryName)) metroidvaniaAbilities[EntryName] = isUnlocked; }
+
+	UFUNCTION(BlueprintCallable)
+		void SetCollectableItems(FString EntryName, bool isCollected) { if (collectableItems.Contains(EntryName)) collectableItems[EntryName] = isCollected; }
+
+public:
+	UFUNCTION(BlueprintCallable)
+		bool GetScannableItemStatus(FString EntryName);
+
+	UFUNCTION(BlueprintCallable)
+		bool GetUnlockableAbilities(FString EntryName);
+
+	UFUNCTION(BlueprintCallable)
+		bool GetMetroidvaniaAbilities(FString EntryName);
+
+	UFUNCTION(BlueprintCallable)
+		bool GetCollectableItems(FString EntryName);
 };
