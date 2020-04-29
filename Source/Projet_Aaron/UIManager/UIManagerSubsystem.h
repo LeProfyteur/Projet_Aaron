@@ -8,7 +8,7 @@
 #include "UIManagerSubsystem.generated.h"
 
 UCLASS()
-class PROJET_AARON_API UIManagerSubsystem : public UGameInstanceSubsystem
+class PROJET_AARON_API UUIManagerSubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 
@@ -16,6 +16,12 @@ private:
 	TArray<UUserWidget*> MenuStack;
 
 public:
+
+	UFUNCTION(BlueprintCallable)
+		void Initialize();
+
+	UFUNCTION(BlueprintCallable)
+		void PopAllMenus();
 
 	UFUNCTION(BlueprintCallable)
 		void Reset();

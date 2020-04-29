@@ -24,6 +24,24 @@ UAaronSaveGame::UAaronSaveGame()
 {
 }
 
+void UAaronSaveGame::Save(UObject* WorldContextObject)
+{
+	//TODO : manually save each subsystem
+
+	SaveInfo.LevelName = WorldContextObject->GetWorld()->GetName();
+	SaveInfo.Date = FDateTime::Now();
+}
+
+void UAaronSaveGame::Load(UObject* WorldContextObject)
+{
+	//TODO : manually load each subsystem
+	
+	for (auto& Record : Actors)
+	{
+		LoadActor(WorldContextObject->GetWorld(), Record);
+	}
+}
+
 void UAaronSaveGame::SaveActor(AActor* Actor)
 {
 	//Reject invalid call
@@ -33,6 +51,9 @@ void UAaronSaveGame::SaveActor(AActor* Actor)
 	UAaronPersistentComponent* Persistence = Actor->FindComponentByClass<UAaronPersistentComponent>();
 	if (!Persistence) return;
 	if (Persistence->Transient) return;
+
+	//Pre-Save Persistence event Broadcast
+	Persistence->OnSave.Broadcast();
 
 	//Reject If Already Saved
 	for (const FActorRecord& Record : Actors)
@@ -64,15 +85,11 @@ void UAaronSaveGame::SaveActor(AActor* Actor)
 	}
 }
 
-void UAaronSaveGame::LoadActor(UObject* WorldContextObject, UPARAM(ref) FActorRecord& ActorRecord)
+void UAaronSaveGame::LoadActor(UWorld* World, UPARAM(ref) FActorRecord& ActorRecord)
 {
 	//Reject already Deserialized Record
 	if (ActorRecord.Reference) return;
 	
-	//UE_LOG(LogSerialization, Display, TEXT("Loading Actor %s %s"), *ActorRecord.Class->GetName(), *ActorRecord.Name.ToString());
-	
-	UWorld* World = WorldContextObject->GetWorld();
-
 	//Instantiate Actor & load serialized data
 	FActorSpawnParameters SpawnParameters;
 	SpawnParameters.Name = ActorRecord.Name;
@@ -86,7 +103,13 @@ void UAaronSaveGame::LoadActor(UObject* WorldContextObject, UPARAM(ref) FActorRe
 	FindComponentsForActor(ActorRecord.UniqueID, ActorComponents);
 	for (auto ComponentRecord : ActorComponents)
 	{
-		LoadComponent(WorldContextObject, Actor, *ComponentRecord);
+		LoadComponent(World, Actor, *ComponentRecord);
+	}
+
+	//Post-load Persistence Event Broadcast
+	if (UAaronPersistentComponent* Persistence = Actor->FindComponentByClass<UAaronPersistentComponent>())
+	{
+		Persistence->OnLoad.Broadcast();
 	}
 }
 
@@ -108,43 +131,12 @@ void UAaronSaveGame::SaveComponent(UActorComponent* Component)
 	Serialize(Component, Record.ComponentData);
 }
 
-void UAaronSaveGame::LoadComponent(UObject* WorldContextObject, AActor* Actor, UPARAM(ref)FComponentRecord& ComponentRecord)
+void UAaronSaveGame::LoadComponent(UWorld* World, AActor* Actor, UPARAM(ref)FComponentRecord& ComponentRecord)
 {
 	//Reject already deserialized Records
 	if (ComponentRecord.Reference) return;
 
 	//UE_LOG(LogSerialization, Display, TEXT("Loading Component %s %s"), *ComponentRecord.Class->GetName(), *ComponentRecord.Name.ToString());
-
-	
-}
-
-void UAaronSaveGame::Save(UObject* WorldContextObject)
-{
-	//Persist all subsystems
-	UDialogSubsystem::SaveDialogSubsystem(this);
-	
-	//Persist all Actors
-	for (TObjectIterator<AActor> Itr; Itr; ++Itr)
-	{
-		SaveActor(*Itr);
-	}
-
-	//TODO : Persist Subsystem data?
-
-}
-
-void UAaronSaveGame::Load(UObject* WorldContextObject)
-{
-	//Load all subsystems
-	UDialogSubsystem::LoadDialogSubsystem(this);
-	
-	//Load Actors
-	for (auto& Record : Actors)
-	{
-		LoadActor(WorldContextObject, Record);
-	}
-
-	//TODO : Load Sybsystem data?
 }
 
 void UAaronSaveGame::FindComponentsForActor(uint32 ActorUniqueID, TArray<FComponentRecord*>& Records)
@@ -180,23 +172,5 @@ void UAaronSaveGame::Deserialize(UObject* Object, UPARAM(ref) TArray<uint8>& Buf
 		Archive.ArNoDelta = true;
 
 		Object->Serialize(Archive);
-	}
-}
-
-UAaronSaveGame* UAaronSaveGame::CreateAaronSaveGame(UObject* WorldContextObject)
-{
-	if (UAaronSaveGame* SaveGame = Cast<UAaronSaveGame>(UGameplayStatics::CreateSaveGameObject(UAaronSaveGame::StaticClass())))
-	{
-		SaveGame->Save(WorldContextObject);		
-		return SaveGame;
-	}
-	return nullptr;
-}
-
-void UAaronSaveGame::LoadAaronSaveGame(UObject* WorldContextObject, const FString& SlotName, int32 UserIndex)
-{
-	if (UAaronSaveGame* SaveGame = Cast<UAaronSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, UserIndex)))
-	{
-		SaveGame->Load(WorldContextObject);
 	}
 }

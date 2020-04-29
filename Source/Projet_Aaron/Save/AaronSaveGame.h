@@ -9,12 +9,36 @@
 
 #include "AaronSaveGame.generated.h"
 
+/**
+ * SaveInfo represents the details of the header of a SaveGame.
+ * It has a few fields that are managed by the index.
+ */
+USTRUCT(BlueprintType)
+struct FSaveInfo
+{
+	GENERATED_BODY()
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame)
+		FString LevelName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame)
+		FDateTime Date;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame)
+		FTimespan PlayTime;
+};
+
+/**
+ * DialogSubsystemRecord is the persistent version of the Dialog subsystem.
+ * Broken ATM.
+ */
 USTRUCT(BlueprintType)
 struct FDialogSubsystemRecord
 {
 	GENERATED_BODY()
 public:
-
+	
 	UPROPERTY(SaveGame)
 		TMap<FString, int32> Metrics;
 
@@ -23,6 +47,14 @@ public:
 
 	UPROPERTY(SaveGame)
 		TMap<FString, bool> Dialog;
+
+	FORCEINLINE FArchive& Serialize(FArchive& Ar)
+	{
+		Ar << Metrics;
+		Ar << Knowledge;
+		Ar << Dialog;
+		return Ar;
+	}
 };
 
 USTRUCT(BlueprintType)
@@ -106,6 +138,12 @@ class PROJET_AARON_API UAaronSaveGame : public USaveGame
 	GENERATED_BODY()
 public:
 	/**
+	 * 
+	 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ProjetAaron")
+		FSaveInfo SaveInfo;
+	
+	/**
 	 * Name of the level to open
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ProjetAaron")
@@ -134,21 +172,20 @@ public:
 	 */
 	UAaronSaveGame();	
 
-private:
 	//--------------------------------------------------------------------------//
 	// AaronSaveGame Functions
 	//--------------------------------------------------------------------------//
+	void Save(UObject* WorldObjectContext);
+	void Load(UObject* WorldObjectContext);
+
 	void SaveActor(AActor* Actor);
-	void LoadActor(UObject* WorldContextObject, UPARAM(ref) FActorRecord& ActorRecord);
+	void LoadActor(UWorld* World, UPARAM(ref) FActorRecord& ActorRecord);
 
 	void SaveComponent(UActorComponent* Component);
-	void LoadComponent(UObject* WorldContextObject, AActor* Actor, UPARAM(ref) FComponentRecord& ComponentRecord);
-	
-	void Save(UObject* WorldContextObject);
-	void Load(UObject* WorldContextObject);
+	void LoadComponent(UWorld* World, AActor* Actor, UPARAM(ref) FComponentRecord& ComponentRecord);
 	
 	void FindComponentsForActor(uint32 ActorUniqueID, TArray<FComponentRecord*>& Records); // MAYDO : optimize that to avoid copying data around
-public:
+
 	//--------------------------------------------------------------------------//
 	// Static Utility Functions
 	//--------------------------------------------------------------------------//
@@ -156,10 +193,4 @@ public:
 	static void Serialize(UObject* Object, UPARAM(ref) TArray<uint8>& Buffer);
 	
 	static void Deserialize(UObject* Object, UPARAM(ref) TArray<uint8>& Buffer);
-
-	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
-	static UAaronSaveGame* CreateAaronSaveGame(UObject* WorldContextObject);
-
-	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
-	static void LoadAaronSaveGame(UObject* WorldContextObject, const FString& SlotName, int32 UserIndex);
 };
