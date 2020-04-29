@@ -18,7 +18,6 @@ AAaronCharacter::AAaronCharacter()
 
 	StatManager = CreateDefaultSubobject<UCharacterStatManager>(TEXT("StatManager"));
 	PostProcessing = CreateDefaultSubobject<UPostProcessComponent>(TEXT("Post Processing"));
-	PlayerAdvancement = CreateDefaultSubobject<UPlayerAdvancement>(TEXT("Player Advancement"));
 
 	CharacterMovement = GetCharacterMovement();
 	CharacterMovement->JumpZVelocity = StatManager->GetJumpForce();
@@ -253,7 +252,7 @@ void AAaronCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 void AAaronCharacter::EnableDisableNightVision()
 {
-	if (PlayerAdvancement->GetMetroidvaniaAbilities(FString("NightVision")) && StatManager->GetNightVisionEffect() == 0.0f)
+	if (UPlayerAdvancementSubsystem::GetMetroidvaniaAbilities(FString("NightVision")) && StatManager->GetNightVisionEffect() == 0.0f)
 		StatManager->SetNightVisionEffect(1.0f);
 	else
 		StatManager->SetNightVisionEffect(0.0f);
@@ -674,7 +673,7 @@ void AAaronCharacter::Scan()
 			else
 			{
 				IAnalyseObjectInterface::Execute_ScanFinished(OutHit.GetActor());
-				//PlayerAdvancement->SetScannableItemStatus(OutHit.GetActor()->GetName(),true);
+				//UPlayerAdvancementSubsystem::SetScannableItemStatus(OutHit.GetActor()->GetName(),true);
 				LastScannedActor = OutHit.GetActor();
 				PlayerHUD->ResetCircleRadius();
 			}
