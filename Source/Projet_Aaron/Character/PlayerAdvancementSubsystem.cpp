@@ -7,9 +7,10 @@
 void UPlayerAdvancementSubsystem::ResetAdvancement()
 {
 	scannableItems = { {"LightPlantScan",false}, {"PoisonPlantScan",false} ,{"BlockingPlantScan",false}  ,{"PuncturePlantScan",false} ,{"CarnivorousPlantScan",false} ,{"PakurvaScan",false},{"LumeilScan",false} ,{"KorvaifScan",false} ,{"GrosHerbivoreScan",false} };
-	collectableItems={ {"ParalysingDartBlackBox",false}, {"GrapnelItem",false} ,{"WeakeningDartDocument",false},{"EnvironmentalScanBeacon",false},{"MovementDetectorBeacon",false}, {"GliderBlackBox",false}, {"PoweredBootsBlackBox",false}, {"GillsDoc",false}, {"NightVisionBlackBox",false}, {"TrackerBlackBox",false} };
+	collectableItems = { {"ParalysingDartBlackBox",false}, {"GrapnelItem",false} ,{"WeakeningDartDocument",false},{"EnvironmentalScanBeacon",false},{"MovementDetectorBeacon",false}, {"GliderBlackBox",false}, {"PoweredBootsBlackBox",false}, {"GillsDoc",false}, {"NightVisionBlackBox",false}, {"TrackerBlackBox",false} };
 	unlockableAbilities = { {"EnvironmentalScan",false}, {"MovementDetector",false} ,{"ParalysingDartGun",false} ,{"WeakeningDartGun",false} ,{"SoundImitation",false} ,{"OpticCamouflage",false} ,{"FertilizerGun",false},{"Hound",false},{"GrowingRoots",false},{"BarkCovering",false},{"Tracker",false},{"TimeSlow",false},{"Glider",false},{"PoweredBoots",false},{"EmpoweredDash",false},{"PheromonesRelease",false},{"Allergy",false},{"Hallucination",false},{"FastSwimming",false},{"BiologicalRegeneration",false},{"ToughSkin",false},{"HeartContractrion",false} };
-	metroidvaniaAbilities={ {"NightVision",false}, {"Grapnel",false} ,{"Gills",false},{"ExtremeTemperaturesResistance",false},{"StickyFeet",false} };
+	metroidvaniaAbilities = { {"NightVision",false}, {"Grapnel",false} ,{"Gills",false},{"ExtremeTemperaturesResistance",false},{"StickyFeet",false} };
+	collectableItemsCompleted = { {"ParalysingDartBlackBox",false}, {"GrapnelItem",false} ,{"WeakeningDartDocument",false},{"EnvironmentalScanBeacon",false},{"MovementDetectorBeacon",false}, {"GliderBlackBox",false}, {"PoweredBootsBlackBox",false}, {"GillsDoc",false}, {"NightVisionBlackBox",false}, {"TrackerBlackBox",false} };
 }
 
 void UPlayerAdvancementSubsystem::UnlockAbilities(FString EntryName)
@@ -36,11 +37,9 @@ bool UPlayerAdvancementSubsystem::IsUnlock(FString EntryName)
 				return PlayerAdvancemntSubsystem->scannableItems[EntryName];
 			else if (PlayerAdvancemntSubsystem->collectableItems.Contains(EntryName))
 				return PlayerAdvancemntSubsystem->collectableItems[EntryName];
-			return false;
 		}
 	}
 	return false;
-
 }
 
 bool UPlayerAdvancementSubsystem::IsUnlockAbilities(FString EntryName)
@@ -53,11 +52,9 @@ bool UPlayerAdvancementSubsystem::IsUnlockAbilities(FString EntryName)
 				return PlayerAdvancemntSubsystem->unlockableAbilities[EntryName];
 			else if (PlayerAdvancemntSubsystem->metroidvaniaAbilities.Contains(EntryName))
 				return PlayerAdvancemntSubsystem->metroidvaniaAbilities[EntryName];
-			return false;
 		}
 	}
 	return false;
-
 }
 
 void UPlayerAdvancementSubsystem::UnlockItem(FString EntryName)
@@ -82,7 +79,6 @@ bool UPlayerAdvancementSubsystem::GetScannableItemStatus(FString EntryName)
 		{
 			if (PlayerAdvancemntSubsystem->scannableItems.Contains(EntryName))
 				return PlayerAdvancemntSubsystem->scannableItems[EntryName];
-			return false;
 		}
 	}
 	return false;
@@ -96,11 +92,9 @@ bool UPlayerAdvancementSubsystem::GetUnlockableAbilities(FString EntryName)
 		{
 			if (PlayerAdvancemntSubsystem->unlockableAbilities.Contains(EntryName))
 				return PlayerAdvancemntSubsystem->unlockableAbilities[EntryName];
-			return false;
 		}
 	}
 	return false;
-
 }
 
 bool UPlayerAdvancementSubsystem::GetMetroidvaniaAbilities(FString EntryName)
@@ -111,11 +105,9 @@ bool UPlayerAdvancementSubsystem::GetMetroidvaniaAbilities(FString EntryName)
 		{
 			if (PlayerAdvancemntSubsystem->metroidvaniaAbilities.Contains(EntryName))
 				return PlayerAdvancemntSubsystem->metroidvaniaAbilities[EntryName];
-			return false;
 		}
 	}
 	return false;
-
 }
 
 bool UPlayerAdvancementSubsystem::GetCollectableItems(FString EntryName)
@@ -126,13 +118,23 @@ bool UPlayerAdvancementSubsystem::GetCollectableItems(FString EntryName)
 		{
 			if (PlayerAdvancemntSubsystem->collectableItems.Contains(EntryName))
 				return PlayerAdvancemntSubsystem->collectableItems[EntryName];
-			return false;
 		}
 	}
 	return false;
-
 }
 
+bool UPlayerAdvancementSubsystem::GetItemCompletion(FString EntryName)
+{
+	if (GEngine)
+	{
+		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
+		{
+			if (PlayerAdvancemntSubsystem->collectableItemsCompleted.Contains(EntryName))
+				return PlayerAdvancemntSubsystem->collectableItemsCompleted[EntryName] ;
+		}
+	}
+	return false;
+}
 
 void UPlayerAdvancementSubsystem::SetScannableItemStatus(FString EntryName, bool isScanned)
 {
@@ -172,6 +174,17 @@ void UPlayerAdvancementSubsystem::SetCollectableItems(FString EntryName, bool is
 		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
 		{
 			if (PlayerAdvancemntSubsystem->collectableItems.Contains(EntryName)) PlayerAdvancemntSubsystem->collectableItems[EntryName] = isCollected;
+		}
+	}
+}
+
+void UPlayerAdvancementSubsystem::SetItemCompletion(FString EntryName, bool isCompleted)
+{
+	if (GEngine)
+	{
+		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
+		{
+			if (PlayerAdvancemntSubsystem->collectableItemsCompleted.Contains(EntryName)) PlayerAdvancemntSubsystem->collectableItemsCompleted[EntryName] = isCompleted;
 		}
 	}
 }
