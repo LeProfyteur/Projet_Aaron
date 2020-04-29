@@ -481,6 +481,9 @@ void AAaronCharacter::ToggleSprint()
 		MovementState = EMovementState::Run;
 	else if (CharacterMovement->Velocity.Size() > 0.0f)
 	{
+		if (MovementState == EMovementState::Slide)
+			CharacterMovement->GroundFriction = 8.0f;
+		
 		UnCrouch();
 		MovementState = EMovementState::Sprint;
 	}
@@ -488,8 +491,12 @@ void AAaronCharacter::ToggleSprint()
 
 void AAaronCharacter::StartSprinting()
 {
+	if (MovementState == EMovementState::Slide)
+		CharacterMovement->GroundFriction = 8.0f;
+	
 	UnCrouch();
 	MovementState = EMovementState::Sprint;
+	
 }
 
 void AAaronCharacter::StopSprinting()
