@@ -74,7 +74,12 @@ void UStatManager::Heal(float BioHeal, float TechHeal)
 
 void UStatManager::Die()
 {
-	//GetOwner()->Destroy();
-	//Do somethings
+	if (Undying)
+	{
+		HealthBio = 1.0f;
+	}  else
+	{
+		GetOwner()->Destroy();
+	}
 }
 
