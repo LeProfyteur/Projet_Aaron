@@ -11,6 +11,7 @@ void UPlayerAdvancementSubsystem::ResetAdvancement()
 	unlockableAbilities = { {"EnvironmentalScan",false}, {"MovementDetector",false} ,{"ParalysingDartGun",false} ,{"WeakeningDartGun",false} ,{"SoundImitation",false} ,{"OpticCamouflage",false} ,{"FertilizerGun",false},{"Hound",false},{"GrowingRoots",false},{"BarkCovering",false},{"Tracker",false},{"TimeSlow",false},{"Glider",false},{"PoweredBoots",false},{"EmpoweredDash",false},{"PheromonesRelease",false},{"Allergy",false},{"Hallucination",false},{"FastSwimming",false},{"BiologicalRegeneration",false},{"ToughSkin",false},{"HeartContractrion",false} };
 	metroidvaniaAbilities = { {"NightVision",false}, {"Grapnel",false} ,{"Gills",false},{"ExtremeTemperaturesResistance",false},{"StickyFeet",false} };
 	collectableItemsCompleted = { {"ParalysingDartBlackBox",false}, {"GrapnelItem",false} ,{"WeakeningDartDocument",false},{"EnvironmentalScanBeacon",false},{"MovementDetectorBeacon",false}, {"GliderBlackBox",false}, {"PoweredBootsBlackBox",false}, {"GillsDoc",false}, {"NightVisionBlackBox",false}, {"TrackerBlackBox",false} };
+	savedEquipmentSets.Reset();
 }
 
 void UPlayerAdvancementSubsystem::UnlockAbilities(FString EntryName)
@@ -188,3 +189,29 @@ void UPlayerAdvancementSubsystem::SetItemCompletion(FString EntryName, bool isCo
 		}
 	}
 }
+
+TArray<int32> UPlayerAdvancementSubsystem::GetSavedEquipmentSet(FString EntryName)
+{
+	if (GEngine)
+	{
+		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
+		{
+			if (PlayerAdvancemntSubsystem->savedEquipmentSets.Contains(EntryName)) 
+				return PlayerAdvancemntSubsystem->savedEquipmentSets[EntryName];
+		}
+	}
+	return {-1,-1,-1,-1,-1,-1,-1-1,-1,-1};
+}
+
+void UPlayerAdvancementSubsystem::AddSavedEquipmentSet(FString EntryName, TArray<int32> equipmentIndexes)
+{
+	if (GEngine)
+	{
+		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
+		{
+			if (!PlayerAdvancemntSubsystem->savedEquipmentSets.Contains(EntryName))
+				PlayerAdvancemntSubsystem->savedEquipmentSets.Add(EntryName,equipmentIndexes);
+		}
+	}
+}
+
