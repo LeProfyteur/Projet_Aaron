@@ -18,6 +18,7 @@
 #include "Projet_Aaron/Save/AaronGameUserSettings.h"
 #include "IHeadMountedDisplay.h"
 #include "PlayerAdvancement.h"
+#include "Projet_Aaron/Mutation/UMutationBase.h"
 #include "Projet_Aaron/Equipment/EquipmentBase.h"
 
 #include "DrawDebugHelpers.h"
@@ -59,7 +60,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		UPostProcessComponent* PostProcessing;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UPlayerAdvancement* PlayerAdvancement;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -115,7 +116,7 @@ public:
 
 protected:
 
-	FHitResult* HitGrab = nullptr;
+	TArray<UUMutationBase*> Mutations;
 	FHitResult* HitActor = nullptr;
 
 	UCharacterMovementComponent* CharacterMovement;
@@ -161,6 +162,8 @@ protected:
 
 	float WaterHeight;
 
+	float VaultHeight;
+	VaultType VaultType;
 	FVaultParams VaultParams;
 	FVaultComponentAndTransform VaultLedgeLS;
 	FVaultComponentAndTransform VaultLedgeWS;
@@ -268,6 +271,12 @@ protected:
 	UFUNCTION(BlueprintCallable)
 		void RemoveEquipment(UChildActorComponent* PartChild, TSubclassOf<AEquipmentBase> ClassEquipment);
 
+	UFUNCTION(BlueprintCallable)
+		void AddMutation(TSubclassOf<UUMutationBase> Mutation);
+
+	UFUNCTION(BlueprintCallable)
+		void RemoveMutation(UClass *ClassMutation);
+
 	void Climb(float DeltaTime);
 	void UpdateClimbingPosition();
 	bool SearchClimbPoint(FVector& ClimbPoint);
@@ -284,14 +293,14 @@ protected:
 	void PressedUseQuickItem();
 
 	bool VaultCheck(VaultTraceSettings TraceSettings);
-	void VaultStart(float VaultHeight, VaultType VaultType);
+	void VaultStart();
 
 	bool FindWallToClimb(VaultTraceSettings TraceSettings, FVector& InitialTraceImpactPoint, FVector& InitialTraceNormal);
-	bool CanClimbOnWall(VaultTraceSettings TraceSettings, FVector& InitialTraceImpactPoint, FVector& InitialTraceNormal, float& VaultHeight, VaultType& Vault);
+	bool CanClimbOnWall(VaultTraceSettings TraceSettings, FVector& InitialTraceImpactPoint, FVector& InitialTraceNormal);
 	bool CapsuleHasRoomCheck(FVector TargetLocation, float HeightOffset, float RadiusOffset);
 	FVaultComponentAndTransform ConvertWorldToLocal(FVaultComponentAndTransform WorldSpaceVault);
 	FVaultComponentAndTransform ConvertLocalToWorld(FVaultComponentAndTransform LocalSpaceVault);
-	FVaultParams GetVaultParam(VaultType Vault, float VaultHeight);
+	FVaultParams GetVaultParam();
 	FTransform GetVaultStartOffset(FTransform& VaultTarget);
 	FTransform GetVaultAnimatedStartOffset(FVaultParams& VaultParam, FTransform& VaultTarget);
 	FVector GetCapsuleBaseLocation(float ZOffset) const;
