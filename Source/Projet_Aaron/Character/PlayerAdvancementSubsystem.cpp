@@ -215,3 +215,27 @@ void UPlayerAdvancementSubsystem::AddSavedEquipmentSet(FString EntryName, TArray
 	}
 }
 
+void UPlayerAdvancementSubsystem::RemoveSavedEquipmentSet(FString EntryName)
+{
+	if (GEngine)
+	{
+		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
+		{
+			if (PlayerAdvancemntSubsystem->savedEquipmentSets.Contains(EntryName))
+				PlayerAdvancemntSubsystem->savedEquipmentSets.Remove(EntryName);
+		}
+	}
+}
+
+TArray<FString> UPlayerAdvancementSubsystem::GetAllSavedEquipmentSet()
+{
+	TArray<FString> keysSavedEquipmentSets;
+	if (GEngine)
+	{
+		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
+		{
+			PlayerAdvancemntSubsystem->savedEquipmentSets.GetKeys(keysSavedEquipmentSets);
+		}
+	}
+	return keysSavedEquipmentSets;
+}
