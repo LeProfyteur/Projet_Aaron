@@ -25,7 +25,8 @@ void UCharacterStatManager::TakeDamage(float BioDamage, float TechDamage)
 	if (!Skills.HardBark)
 		Super::TakeDamage(BioDamage, TechDamage);
 
-	float RateHealth = HealthBio / HealthBioMax;
+	
+	float RateHealth = GetHealthBioRate();
 	if(RateHealth <= 0.5f)
 	{
 		ParameterCollectionInstance->SetScalarParameterValue(FName(TEXT("Damage")), 1.0f - RateHealth);
@@ -45,6 +46,32 @@ void UCharacterStatManager::RecoveryOxygene(float DeltaTime)
 	Oxygene += 10.0f * DeltaTime;
 	if (Oxygene > OxygeneMax)
 		Oxygene = OxygeneMax;
+}
+
+void UCharacterStatManager::Heal(float BioHeal, float TechHeal)
+{
+	Super::Heal(BioHeal, TechHeal);
+	//remove des post process
+	float RateHealth = (HealthBio + HealthTech) / (HealthBioMax + HealthTechMax);
+	if (RateHealth <= 0.5f)
+	{
+		ParameterCollectionInstance->SetScalarParameterValue(FName(TEXT("Damage")), 1.0f - RateHealth);
+	}else
+	{
+		ParameterCollectionInstance->SetScalarParameterValue(FName(TEXT("Damage")), 0.0f);
+	}
+}
+
+float UCharacterStatManager::GetNightVisionEffect()
+{
+	float Res;
+	ParameterCollectionInstance->GetScalarParameterValue(FName("NightVision"), Res);
+	return Res;
+}
+
+void UCharacterStatManager::SetNightVisionEffect(float Value)
+{
+	ParameterCollectionInstance->SetScalarParameterValue(FName(TEXT("NightVision")), Value);
 }
 
 void UCharacterStatManager::SetPoisonEffect(float Value)
