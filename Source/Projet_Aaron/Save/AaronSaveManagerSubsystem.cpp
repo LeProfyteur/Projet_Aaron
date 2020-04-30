@@ -21,6 +21,11 @@ FString UAaronSaveManagerSubsystem::GetSaveSlotName(int32 SaveSlot)
 	return FString::Printf(TEXT("Save_%2d"), SaveSlot);
 }
 
+bool UAaronSaveManagerSubsystem::IsSaveSlotValid(int32 SaveSlot)
+{
+	return 0 <= SaveSlot && SaveSlot < MaxSaveSlots;
+}
+
 void UAaronSaveManagerSubsystem::RefreshDateBeginPlay()
 {
 	DateBeginPlay = FDateTime::Now();
@@ -65,31 +70,47 @@ void UAaronSaveManagerSubsystem::DeleteGame(int32 SaveSlot)
 
 void UAaronSaveManagerSubsystem::Save()
 {
-	ensureMsgf(CurrentSaveSlot >= 0 && CurrentSaveSlot < MaxSaveSlots, TEXT("CurrentSaveSlot is not set."));
+	if (!IsSaveSlotValid(CurrentSaveSlot))
+	{
+		UE_LOG(LogSerialization, Error, TEXT("Current SaveSlot is not valid (%d). Aborting Save"), CurrentSaveSlot);
+		return;
+	}
+
 	UAaronSaveGame* SaveGame = Cast<UAaronSaveGame>(UGameplayStatics::CreateSaveGameObject(UAaronSaveGame::StaticClass()));
 
 	SaveGame->Save(this);
-
+	
 	UGameplayStatics::SaveGameToSlot(SaveGame, GetSaveSlotName(CurrentSaveSlot), 0);
 }
 
 void UAaronSaveManagerSubsystem::BeginLoading()
 {
-	ensureMsgf(CurrentSaveSlot >= 0 && CurrentSaveSlot < MaxSaveSlots, TEXT("CurrentSaveSlot is not set."));
+	if (!IsSaveSlotValid(CurrentSaveSlot))
+	{
+		UE_LOG(LogSerialization, Error, TEXT("Current SaveSlot is not valid (%d). Aborting Load"), CurrentSaveSlot);
+		return;
+	}
+
 	LoadingSaveGame = Cast<UAaronSaveGame>(UGameplayStatics::LoadGameFromSlot(GetSaveSlotName(CurrentSaveSlot), 0));
-	ensureMsgf(LoadingSaveGame, TEXT("Failed to load the SaveGame file."));
+
+	if (!LoadingSaveGame)
+	{
+		UE_LOG(LogSerialization, Error, TEXT("Failed to load the AaronSaveGame. Aborting Load."));
+		return;
+	}
+
 	UGameplayStatics::OpenLevel(this, *LoadingSaveGame->SaveInfo.LevelName);
 }
 
 void UAaronSaveManagerSubsystem::FinishLoading()
 {
+	//Check if there is a SaveGame currently loading.
 	if (LoadingSaveGame)
 	{
-		ensureMsgf(LoadingSaveGame->LevelName == UGameplayStatics::GetCurrentLevelName(this), TEXT("Tried to FinishLoading a SaveGame that doesn't target the current Level"));
-
+		//Load the SaveGame.
 		LoadingSaveGame->Load(this);
-		
-		//Clean-up the reference (we don't want to load again the next time we switch maps)
+
+		//Reset the Reference.
 		LoadingSaveGame = nullptr;
 	}
 }

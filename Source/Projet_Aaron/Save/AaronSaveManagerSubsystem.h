@@ -77,4 +77,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 		static FString GetSaveSlotName(int32 SaveSlot);
 
+	UFUNCTION(BlueprintCallable)
+		static bool IsSaveSlotValid(int32 SaveSlot);
 };

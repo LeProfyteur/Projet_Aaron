@@ -27,6 +27,15 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame)
 		FTimespan PlayTime;
+
+
+	FORCEINLINE FArchive& Serialize(FArchive& Ar)
+	{
+		Ar << LevelName;
+		Ar << Date;
+		Ar << PlayTime;
+		return Ar;
+	}
 };
 
 /**
@@ -184,8 +193,6 @@ public:
 	void SaveComponent(UActorComponent* Component);
 	void LoadComponent(UWorld* World, AActor* Actor, UPARAM(ref) FComponentRecord& ComponentRecord);
 	
-	void FindComponentsForActor(uint32 ActorUniqueID, TArray<FComponentRecord*>& Records); // MAYDO : optimize that to avoid copying data around
-
 	//--------------------------------------------------------------------------//
 	// Static Utility Functions
 	//--------------------------------------------------------------------------//
