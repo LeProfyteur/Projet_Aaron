@@ -24,5 +24,5 @@ class PROJET_AARON_API IHookInterface
 public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-		TArray<FVector> GiveMeHookSpot();
+		bool IsSwingSpot();
 };
