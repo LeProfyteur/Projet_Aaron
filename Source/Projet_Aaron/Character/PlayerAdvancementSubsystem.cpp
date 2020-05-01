@@ -2,6 +2,7 @@
 
 
 #include "PlayerAdvancementSubsystem.h"
+#include "Engine/DataTable.h"
 #include "Engine/Engine.h"
 
 void UPlayerAdvancementSubsystem::ResetAdvancement()
@@ -68,6 +69,42 @@ void UPlayerAdvancementSubsystem::UnlockItem(FString EntryName)
 				PlayerAdvancemntSubsystem->scannableItems[EntryName] = true;
 			else if (PlayerAdvancemntSubsystem->collectableItems.Contains(EntryName))
 				PlayerAdvancemntSubsystem->collectableItems[EntryName] = true;
+		}
+	}
+}
+
+void UPlayerAdvancementSubsystem::CheckUnlockAbilities(FString EntryName)
+{
+	if (GEngine)
+	{
+		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
+		{
+			UDataTable* DataTable = LoadObject<UDataTable>(NULL, TEXT("DataTable'/Game/Projet_Aaron/CC/Equipment/DataTableTEST.DataTableTEST'"), NULL, LOAD_None, NULL);
+			if (DataTable)
+			{
+				TArray<FName> RowNames = DataTable->GetRowNames();
+				for(FName Name : RowNames)
+				{
+					FAbilitiesRow* Row = DataTable->FindRow<FAbilitiesRow>(Name, FString(""));
+					if (Row && Row->UnlockRequirement.Contains(EntryName))
+					{
+						bool AllIsUnlock = true;
+						for(FString Requirement : Row->UnlockRequirement)
+						{
+							if (!IsUnlock(Requirement))
+							{
+								AllIsUnlock = false;
+								break;
+							}
+						}
+
+						if (AllIsUnlock)
+						{
+							UnlockAbilities(Name.ToString());
+						}
+					}
+				}
+			}
 		}
 	}
 }

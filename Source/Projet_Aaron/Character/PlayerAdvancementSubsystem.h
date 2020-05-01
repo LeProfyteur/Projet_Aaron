@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
+#include "Projet_Aaron/Character/CharacterUtils.h"
 #include "Subsystems/EngineSubsystem.h"
 #include "PlayerAdvancementSubsystem.generated.h"
 
@@ -39,7 +40,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 		static void UnlockItem(FString EntryName);
 
-
+	UFUNCTION(BlueprintCallable)
+		static void CheckUnlockAbilities(FString EntryName);
 
 public:
 	UFUNCTION(BlueprintCallable)
