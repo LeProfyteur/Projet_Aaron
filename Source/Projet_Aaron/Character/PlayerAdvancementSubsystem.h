@@ -21,6 +21,10 @@ class PROJET_AARON_API UPlayerAdvancementSubsystem : public UEngineSubsystem
 	TMap <FString, bool> collectableItemsCompleted = { {"ParalysingDartBlackBox",false}, {"GrapnelItem",false} ,{"WeakeningDartDocument",false},{"EnvironmentalScanBeacon",false},{"MovementDetectorBeacon",false}, {"GliderBlackBox",false}, {"PoweredBootsBlackBox",false}, {"GillsDoc",false}, {"NightVisionBlackBox",false}, {"TrackerBlackBox",false} };
 	TMap <FString, TArray<int32>> savedEquipmentSets;
 
+protected:
+	bool CanRecreateCharacter = false;
+	bool TutorialCompleted = false;
+
 
 public:
 	// Sets default values for this component's properties
@@ -61,8 +65,15 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		static void AddSavedEquipmentSet(FString EntryName, TArray<int32> equipmentIndexes);
+	
 	UFUNCTION(BlueprintCallable)
 		static void RemoveSavedEquipmentSet(FString EntryName);
+
+	UFUNCTION(BlueprintCallable)
+		static void SetCanRecreateCharacter(bool Value);
+
+	UFUNCTION(BlueprintCallable)
+		static void SetTutorialCompleted(bool Value);
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -85,4 +96,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		static TArray<FString> GetAllSavedEquipmentSet();
+
+	UFUNCTION(BlueprintCallable)
+		static bool GetCanRecreateCharacter();
+
+	UFUNCTION(BlueprintCallable)
+		static bool GetTutorialCompleted();
 };
