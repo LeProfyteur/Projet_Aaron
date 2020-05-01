@@ -18,12 +18,12 @@ void UPlayerAdvancementSubsystem::UnlockAbilities(FString EntryName)
 {
 	if (GEngine)
 	{
-		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
+		if (UPlayerAdvancementSubsystem* PlayerAdvancementSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
 		{
-			if (PlayerAdvancemntSubsystem->unlockableAbilities.Contains(EntryName))
-				PlayerAdvancemntSubsystem->unlockableAbilities[EntryName] = true;
-			else if (PlayerAdvancemntSubsystem->metroidvaniaAbilities.Contains(EntryName))
-				PlayerAdvancemntSubsystem->metroidvaniaAbilities[EntryName] = true;
+			if (PlayerAdvancementSubsystem->unlockableAbilities.Contains(EntryName))
+				PlayerAdvancementSubsystem->unlockableAbilities[EntryName] = true;
+			else if (PlayerAdvancementSubsystem->metroidvaniaAbilities.Contains(EntryName))
+				PlayerAdvancementSubsystem->metroidvaniaAbilities[EntryName] = true;
 		}
 	}
 }
@@ -32,12 +32,12 @@ bool UPlayerAdvancementSubsystem::IsUnlock(FString EntryName)
 {
 	if (GEngine)
 	{
-		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
+		if (UPlayerAdvancementSubsystem* PlayerAdvancementSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
 		{
-			if (PlayerAdvancemntSubsystem->scannableItems.Contains(EntryName))
-				return PlayerAdvancemntSubsystem->scannableItems[EntryName];
-			else if (PlayerAdvancemntSubsystem->collectableItems.Contains(EntryName))
-				return PlayerAdvancemntSubsystem->collectableItems[EntryName];
+			if (PlayerAdvancementSubsystem->scannableItems.Contains(EntryName))
+				return PlayerAdvancementSubsystem->scannableItems[EntryName];
+			else if (PlayerAdvancementSubsystem->collectableItems.Contains(EntryName))
+				return PlayerAdvancementSubsystem->collectableItems[EntryName];
 		}
 	}
 	return false;
@@ -47,12 +47,12 @@ bool UPlayerAdvancementSubsystem::IsUnlockAbilities(FString EntryName)
 {
 	if (GEngine)
 	{
-		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
+		if (UPlayerAdvancementSubsystem* PlayerAdvancementSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
 		{
-			if (PlayerAdvancemntSubsystem->unlockableAbilities.Contains(EntryName))
-				return PlayerAdvancemntSubsystem->unlockableAbilities[EntryName];
-			else if (PlayerAdvancemntSubsystem->metroidvaniaAbilities.Contains(EntryName))
-				return PlayerAdvancemntSubsystem->metroidvaniaAbilities[EntryName];
+			if (PlayerAdvancementSubsystem->unlockableAbilities.Contains(EntryName))
+				return PlayerAdvancementSubsystem->unlockableAbilities[EntryName];
+			else if (PlayerAdvancementSubsystem->metroidvaniaAbilities.Contains(EntryName))
+				return PlayerAdvancementSubsystem->metroidvaniaAbilities[EntryName];
 		}
 	}
 	return false;
@@ -62,12 +62,12 @@ void UPlayerAdvancementSubsystem::UnlockItem(FString EntryName)
 {
 	if (GEngine)
 	{
-		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
+		if (UPlayerAdvancementSubsystem* PlayerAdvancementSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
 		{
-			if (PlayerAdvancemntSubsystem->scannableItems.Contains(EntryName))
-				PlayerAdvancemntSubsystem->scannableItems[EntryName] = true;
-			else if (PlayerAdvancemntSubsystem->collectableItems.Contains(EntryName))
-				PlayerAdvancemntSubsystem->collectableItems[EntryName] = true;
+			if (PlayerAdvancementSubsystem->scannableItems.Contains(EntryName))
+				PlayerAdvancementSubsystem->scannableItems[EntryName] = true;
+			else if (PlayerAdvancementSubsystem->collectableItems.Contains(EntryName))
+				PlayerAdvancementSubsystem->collectableItems[EntryName] = true;
 		}
 	}
 }
@@ -76,10 +76,10 @@ bool UPlayerAdvancementSubsystem::GetScannableItemStatus(FString EntryName)
 {
 	if (GEngine)
 	{
-		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
+		if (UPlayerAdvancementSubsystem* PlayerAdvancementSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
 		{
-			if (PlayerAdvancemntSubsystem->scannableItems.Contains(EntryName))
-				return PlayerAdvancemntSubsystem->scannableItems[EntryName];
+			if (PlayerAdvancementSubsystem->scannableItems.Contains(EntryName))
+				return PlayerAdvancementSubsystem->scannableItems[EntryName];
 		}
 	}
 	return false;
@@ -89,10 +89,10 @@ bool UPlayerAdvancementSubsystem::GetUnlockableAbilities(FString EntryName)
 {
 	if (GEngine)
 	{
-		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
+		if (UPlayerAdvancementSubsystem* PlayerAdvancementSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
 		{
-			if (PlayerAdvancemntSubsystem->unlockableAbilities.Contains(EntryName))
-				return PlayerAdvancemntSubsystem->unlockableAbilities[EntryName];
+			if (PlayerAdvancementSubsystem->unlockableAbilities.Contains(EntryName))
+				return PlayerAdvancementSubsystem->unlockableAbilities[EntryName];
 		}
 	}
 	return false;
@@ -102,10 +102,10 @@ bool UPlayerAdvancementSubsystem::GetMetroidvaniaAbilities(FString EntryName)
 {
 	if (GEngine)
 	{
-		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
+		if (UPlayerAdvancementSubsystem* PlayerAdvancementSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
 		{
-			if (PlayerAdvancemntSubsystem->metroidvaniaAbilities.Contains(EntryName))
-				return PlayerAdvancemntSubsystem->metroidvaniaAbilities[EntryName];
+			if (PlayerAdvancementSubsystem->metroidvaniaAbilities.Contains(EntryName))
+				return PlayerAdvancementSubsystem->metroidvaniaAbilities[EntryName];
 		}
 	}
 	return false;
@@ -115,10 +115,10 @@ bool UPlayerAdvancementSubsystem::GetCollectableItems(FString EntryName)
 {
 	if (GEngine)
 	{
-		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
+		if (UPlayerAdvancementSubsystem* PlayerAdvancementSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
 		{
-			if (PlayerAdvancemntSubsystem->collectableItems.Contains(EntryName))
-				return PlayerAdvancemntSubsystem->collectableItems[EntryName];
+			if (PlayerAdvancementSubsystem->collectableItems.Contains(EntryName))
+				return PlayerAdvancementSubsystem->collectableItems[EntryName];
 		}
 	}
 	return false;
@@ -128,10 +128,10 @@ bool UPlayerAdvancementSubsystem::GetItemCompletion(FString EntryName)
 {
 	if (GEngine)
 	{
-		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
+		if (UPlayerAdvancementSubsystem* PlayerAdvancementSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
 		{
-			if (PlayerAdvancemntSubsystem->collectableItemsCompleted.Contains(EntryName))
-				return PlayerAdvancemntSubsystem->collectableItemsCompleted[EntryName] ;
+			if (PlayerAdvancementSubsystem->collectableItemsCompleted.Contains(EntryName))
+				return PlayerAdvancementSubsystem->collectableItemsCompleted[EntryName] ;
 		}
 	}
 	return false;
@@ -141,9 +141,9 @@ void UPlayerAdvancementSubsystem::SetScannableItemStatus(FString EntryName, bool
 {
 	if (GEngine)
 	{
-		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
+		if (UPlayerAdvancementSubsystem* PlayerAdvancementSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
 		{
-			if (PlayerAdvancemntSubsystem->scannableItems.Contains(EntryName)) PlayerAdvancemntSubsystem->scannableItems[EntryName] = isScanned;
+			if (PlayerAdvancementSubsystem->scannableItems.Contains(EntryName)) PlayerAdvancementSubsystem->scannableItems[EntryName] = isScanned;
 		}
 	}
 }
@@ -152,9 +152,9 @@ void UPlayerAdvancementSubsystem::SetUnlockableAbilities(FString EntryName, bool
 {
 	if (GEngine)
 	{
-		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
+		if (UPlayerAdvancementSubsystem* PlayerAdvancementSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
 		{
-			if (PlayerAdvancemntSubsystem->unlockableAbilities.Contains(EntryName)) PlayerAdvancemntSubsystem->unlockableAbilities[EntryName] = isUnlocked;
+			if (PlayerAdvancementSubsystem->unlockableAbilities.Contains(EntryName)) PlayerAdvancementSubsystem->unlockableAbilities[EntryName] = isUnlocked;
 		}
 	}
 }
@@ -162,9 +162,9 @@ void UPlayerAdvancementSubsystem::SetMetroidvaniaAbilities(FString EntryName, bo
 {
 	if (GEngine)
 	{
-		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
+		if (UPlayerAdvancementSubsystem* PlayerAdvancementSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
 		{
-			if (PlayerAdvancemntSubsystem->metroidvaniaAbilities.Contains(EntryName)) PlayerAdvancemntSubsystem->metroidvaniaAbilities[EntryName] = isUnlocked;
+			if (PlayerAdvancementSubsystem->metroidvaniaAbilities.Contains(EntryName)) PlayerAdvancementSubsystem->metroidvaniaAbilities[EntryName] = isUnlocked;
 		}
 	}
 }
@@ -172,9 +172,9 @@ void UPlayerAdvancementSubsystem::SetCollectableItems(FString EntryName, bool is
 {
 	if (GEngine)
 	{
-		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
+		if (UPlayerAdvancementSubsystem* PlayerAdvancementSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
 		{
-			if (PlayerAdvancemntSubsystem->collectableItems.Contains(EntryName)) PlayerAdvancemntSubsystem->collectableItems[EntryName] = isCollected;
+			if (PlayerAdvancementSubsystem->collectableItems.Contains(EntryName)) PlayerAdvancementSubsystem->collectableItems[EntryName] = isCollected;
 		}
 	}
 }
@@ -183,9 +183,9 @@ void UPlayerAdvancementSubsystem::SetItemCompletion(FString EntryName, bool isCo
 {
 	if (GEngine)
 	{
-		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
+		if (UPlayerAdvancementSubsystem* PlayerAdvancementSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
 		{
-			if (PlayerAdvancemntSubsystem->collectableItemsCompleted.Contains(EntryName)) PlayerAdvancemntSubsystem->collectableItemsCompleted[EntryName] = isCompleted;
+			if (PlayerAdvancementSubsystem->collectableItemsCompleted.Contains(EntryName)) PlayerAdvancementSubsystem->collectableItemsCompleted[EntryName] = isCompleted;
 		}
 	}
 }
@@ -194,10 +194,10 @@ TArray<int32> UPlayerAdvancementSubsystem::GetSavedEquipmentSet(FString EntryNam
 {
 	if (GEngine)
 	{
-		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
+		if (UPlayerAdvancementSubsystem* PlayerAdvancementSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
 		{
-			if (PlayerAdvancemntSubsystem->savedEquipmentSets.Contains(EntryName)) 
-				return PlayerAdvancemntSubsystem->savedEquipmentSets[EntryName];
+			if (PlayerAdvancementSubsystem->savedEquipmentSets.Contains(EntryName)) 
+				return PlayerAdvancementSubsystem->savedEquipmentSets[EntryName];
 		}
 	}
 	return {-1,-1,-1,-1,-1,-1,-1-1,-1,-1};
@@ -207,10 +207,10 @@ void UPlayerAdvancementSubsystem::AddSavedEquipmentSet(FString EntryName, TArray
 {
 	if (GEngine)
 	{
-		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
+		if (UPlayerAdvancementSubsystem* PlayerAdvancementSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
 		{
-			if (!PlayerAdvancemntSubsystem->savedEquipmentSets.Contains(EntryName))
-				PlayerAdvancemntSubsystem->savedEquipmentSets.Add(EntryName,equipmentIndexes);
+			if (!PlayerAdvancementSubsystem->savedEquipmentSets.Contains(EntryName))
+				PlayerAdvancementSubsystem->savedEquipmentSets.Add(EntryName,equipmentIndexes);
 		}
 	}
 }
@@ -219,10 +219,10 @@ void UPlayerAdvancementSubsystem::RemoveSavedEquipmentSet(FString EntryName)
 {
 	if (GEngine)
 	{
-		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
+		if (UPlayerAdvancementSubsystem* PlayerAdvancementSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
 		{
-			if (PlayerAdvancemntSubsystem->savedEquipmentSets.Contains(EntryName))
-				PlayerAdvancemntSubsystem->savedEquipmentSets.Remove(EntryName);
+			if (PlayerAdvancementSubsystem->savedEquipmentSets.Contains(EntryName))
+				PlayerAdvancementSubsystem->savedEquipmentSets.Remove(EntryName);
 		}
 	}
 }
@@ -232,10 +232,56 @@ TArray<FString> UPlayerAdvancementSubsystem::GetAllSavedEquipmentSet()
 	TArray<FString> keysSavedEquipmentSets;
 	if (GEngine)
 	{
-		if (UPlayerAdvancementSubsystem* PlayerAdvancemntSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
+		if (UPlayerAdvancementSubsystem* PlayerAdvancementSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
 		{
-			PlayerAdvancemntSubsystem->savedEquipmentSets.GetKeys(keysSavedEquipmentSets);
+			PlayerAdvancementSubsystem->savedEquipmentSets.GetKeys(keysSavedEquipmentSets);
 		}
 	}
 	return keysSavedEquipmentSets;
+}
+
+void UPlayerAdvancementSubsystem::SetCanRecreateCharacter(bool Value)
+{
+	if (GEngine)
+	{
+		if (UPlayerAdvancementSubsystem* PlayerAdvancementSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
+		{
+			PlayerAdvancementSubsystem->CanRecreateCharacter = Value;
+		}
+	}
+}
+
+void UPlayerAdvancementSubsystem::SetTutorialCompleted(bool Value)
+{
+	if (GEngine)
+	{
+		if (UPlayerAdvancementSubsystem* PlayerAdvancementSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
+		{
+			PlayerAdvancementSubsystem->TutorialCompleted = Value;
+		}
+	}
+}
+
+bool UPlayerAdvancementSubsystem::GetCanRecreateCharacter()
+{
+	if (GEngine)
+	{
+		if (UPlayerAdvancementSubsystem* PlayerAdvancementSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
+		{
+			return PlayerAdvancementSubsystem->CanRecreateCharacter;
+		}
+	}
+	return false;
+}
+
+bool UPlayerAdvancementSubsystem::GetTutorialCompleted()
+{
+	if (GEngine)
+	{
+		if (UPlayerAdvancementSubsystem* PlayerAdvancementSubsystem = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
+		{
+			return PlayerAdvancementSubsystem->TutorialCompleted;
+		}
+	}
+	return false;
 }
