@@ -7,8 +7,9 @@
 // Sets default values
 AGrapnelEquipmentSuperAaron::AGrapnelEquipmentSuperAaron()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 	SetActorEnableCollision(false);
+	SetActorTickEnabled(false);
 
 	RootComponent = StaticMeshComponent;
 
@@ -33,7 +34,22 @@ void AGrapnelEquipmentSuperAaron::BeginPlay()
 	timeline->SetTimelinePostUpdateFunc(updateFunction);
 	timeline->SetLooping(true);
 
-	cable->SetHiddenInGame(true, false);
+	cable->SetVisibility(false);
+}
+
+void AGrapnelEquipmentSuperAaron::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	AAaronCharacter* Character = Cast<AAaronCharacter>(GetParentActor());
+	if (Character->GetCharacterMovement()->IsFalling())
+	{
+		Swing(DeltaTime);
+	}
+	else
+	{
+		SetActorTickEnabled(false);
+		AfterHook();
+	}
 }
 
 void AGrapnelEquipmentSuperAaron::Activate_Implementation(bool isPressed)
@@ -52,15 +68,25 @@ void AGrapnelEquipmentSuperAaron::Activate_Implementation(bool isPressed)
 		ParticleSystem->DeactivaateNextTick();
 		if (foundHookSpot && canHook)
 		{
-			DisableInput(GetWorld()->GetFirstPlayerController());
 			canHook = false;
 			playTLForLaser = false;
-			cable->SetHiddenInGame(false, false);
-			hookMeshComponent->SetHiddenInGame(true);
+			hookMeshComponent->SetVisibility(false);
+
 			myBullet = GetWorld()->SpawnActor<AGrappleHead>(hookMeshComponent->GetComponentLocation(), GetActorRotation());
 			myBullet->locationToGo = locationToGrip;
+
+			cable->SetVisibility(true);
 			cable->SetAttachEndTo(myBullet, NAME_None, NAME_None);
-			Hook();
+			if (IsSwing)
+			{
+				ForceDirection = FVector(locationToGrip.X - GetParentActor()->GetActorLocation().X, locationToGrip.Y - GetParentActor()->GetActorLocation().Y, 0.0f);
+				SetActorTickEnabled(true);
+			}
+			else
+			{
+				DisableInput(GetWorld()->GetFirstPlayerController());
+				Hook();
+			}
 		}
 	}
 }
@@ -82,8 +108,10 @@ void AGrapnelEquipmentSuperAaron::TimelineCallback()
 		bool haveHit = GetWorld()->LineTraceSingleByChannel(outHit, vStart, vEnd, ECC_Visibility, collisionParams);
 		if (haveHit && outHit.Actor->GetClass()->ImplementsInterface(UHookInterface::StaticClass()))
 		{
+			IsSwing = IHookInterface::Execute_IsSwingSpot(outHit.GetActor());
 			ParticleSystem->SetColorParameter(FName("color"), FLinearColor::Green);
 			locationToGrip = outHit.Location;
+			cable->CableLength = FVector::Distance(GetActorLocation(), locationToGrip);
 			TimeInterpolation = (outHit.Distance * 0.25f) / 250.0f;
 			foundHookSpot = true;
 		}
@@ -109,10 +137,28 @@ void AGrapnelEquipmentSuperAaron::PlayTimeline()
 	}
 }
 
+void AGrapnelEquipmentSuperAaron::Swing(float DeltaTime)
+{
+	AAaronCharacter* Character = Cast<AAaronCharacter>(GetParentActor());
+	FVector VDirection = GetActorLocation() - locationToGrip;
+
+	float DistToGrab = VDirection.Size();
+	cable->CableLength = DistToGrab;
+
+	float DegreeSwing = UKismetMathLibrary::RadiansToDegrees(UKismetMathLibrary::Acos(FVector::DotProduct(VDirection.GetSafeNormal() * -1.0f, ForceDirection.GetSafeNormal())));
+
+	Character->GetCharacterMovement()->AddForce(FVector::DotProduct(VDirection, Character->GetVelocity()) * VDirection.GetSafeNormal() * RopeForce);
+	Character->GetCharacterMovement()->AddForce(Character->FpsCamera->GetForwardVector() * SwingSpeed);
+
+	if (DegreeSwing > Degree + 90.0f)
+	{
+		SetActorTickEnabled(false);
+		AfterHook();
+	}
+}
+
 void AGrapnelEquipmentSuperAaron::Hook()
 {
-	cable->SetAttachEndTo(myBullet, NAME_None, NAME_None);
-	cable->SetVisibility(true);
 	FLatentActionInfo LatentActionInfo = FLatentActionInfo(1, 1, TEXT("AfterHook"), this);
 	ACharacter* Character = GetWorld()->GetFirstPlayerController()->GetCharacter();
 	UKismetSystemLibrary::MoveComponentTo(Character->GetRootComponent(), locationToGrip, Character->GetActorRotation(), true, false, TimeInterpolation, false, EMoveComponentAction::Move, LatentActionInfo);
@@ -120,12 +166,12 @@ void AGrapnelEquipmentSuperAaron::Hook()
 
 void AGrapnelEquipmentSuperAaron::AfterHook()
 {
-	cable->SetHiddenInGame(true, true);
+	cable->SetVisibility(false);
 	if (IsValid(myBullet))
 	{
 		myBullet->Destroy();
 		myBullet = nullptr;
-		hookMeshComponent->SetHiddenInGame(false, true);
+		hookMeshComponent->SetVisibility(true);
 		foundHookSpot = false;
 		playTLForLaser = true;
 		canHook = true;
