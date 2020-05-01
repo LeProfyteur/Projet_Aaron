@@ -43,10 +43,12 @@ AAaronCharacter::AAaronCharacter()
 
 	VaultTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Vault Timeline"));
 	PoisonTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Poison Timeline"));
+	LsdTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("LSD Timeline"));
 
 	UpdateTimeline.BindUFunction(this, FName("UpdateTimelineFunction"));
 	FinishTimeLine.BindUFunction(this, FName("EndTimelineFunction"));
 	UpdateTimelinePoison.BindUFunction(this, FName("UpdateTimelinePoisonFunction"));
+	UpdateTimelineLSD.BindUFunction(this, FName("UpdateTimelineLSDFunction"));
 
 	Mutations = TArray<UUMutationBase*>();
 }
@@ -68,6 +70,7 @@ void AAaronCharacter::BeginPlay()
 	VaultTimeline->AddInterpFloat(CurveFloat, UpdateTimeline);
 	VaultTimeline->SetTimelineFinishedFunc(FinishTimeLine);
 	PoisonTimeline->AddInterpFloat(CurvePoison, UpdateTimelinePoison);
+	LsdTimeline->AddInterpFloat(CurveLSD, UpdateTimelineLSD);
 	CharacterMovement->AirControl = StatManager->GetAirControl();
 	CharacterMovement->GravityScale = StatManager->GetGravityScale();
 
@@ -798,9 +801,20 @@ void AAaronCharacter::OnPoisonAlteration()
 	PoisonTimeline->PlayFromStart();
 }
 
+void AAaronCharacter::OnLsdAlteration(float time)
+{
+	LsdTimeline->SetPlayRate(1.0f);
+	LsdTimeline->PlayFromStart();
+}
+
 void AAaronCharacter::UpdateTimelinePoisonFunction(float value)
 {
 	StatManager->GetParameterCollectionInstance()->SetScalarParameterValue(FName(TEXT("Poison")), value);
+}
+
+void AAaronCharacter::UpdateTimelineLSDFunction(float value)
+{
+	StatManager->GetParameterCollectionInstance()->SetScalarParameterValue(FName(TEXT("LSD")), value);
 }
 
 void AAaronCharacter::UpdateTimelineFunction(float value)
