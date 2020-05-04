@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "DA_SlotStructure.h"
+#include "Components/CanvasPanel.h"
+
 #include "HUDCPP.generated.h"
 
 /**
@@ -16,7 +18,12 @@ class PROJET_AARON_API UHUDCPP : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	void NativePreConstruct() override;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UDA_SlotStructure* ItemSelected;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UCanvasPanel* CanvasPanelCast;
 	
 };

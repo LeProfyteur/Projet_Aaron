@@ -31,6 +31,8 @@ protected:
 	float HealthTech;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
 	float HealthTechMax = 100.0f;
+
+	bool Undying = false;
 	
 public:	
 
@@ -66,6 +68,8 @@ public:
 		void SetHealthTech(float NewHealthTech) { HealthTech = NewHealthTech; }
 	UFUNCTION(BlueprintCallable)
 		void SetHealthTechMax(float NewHealthTechMax) { HealthBio = NewHealthTechMax; }
+	UFUNCTION(BlueprintCallable)
+		void SetUndying(bool NewUndying) { Undying = NewUndying; }
 	
 	//Called when you take damage
 	UFUNCTION(BlueprintCallable, Category = "Damage")

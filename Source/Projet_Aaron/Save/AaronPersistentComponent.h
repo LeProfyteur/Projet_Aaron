@@ -6,6 +6,9 @@
 #include "Components/ActorComponent.h"
 #include "AaronPersistentComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSave);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLoad);
+
 struct FActorRecord;
 
 /**
@@ -20,6 +23,12 @@ class PROJET_AARON_API UAaronPersistentComponent : public UActorComponent
 	GENERATED_BODY()
 public:	
 	UAaronPersistentComponent();
+
+	UPROPERTY(BlueprintAssignable)
+		FOnSave OnSave;
+
+	UPROPERTY(BlueprintAssignable)
+		FOnLoad OnLoad;
 
 	/**
 	 * Transient Actors are never persisted. Use this to ensure that an Actor is always wiped at each Load but not persisted.
