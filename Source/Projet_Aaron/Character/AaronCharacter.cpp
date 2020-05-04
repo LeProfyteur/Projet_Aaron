@@ -11,18 +11,13 @@ AAaronCharacter::AAaronCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	//VRComponent = CreateDefaultSubobject<USceneComponent>(TEXT("VR Component"));
-	//VRComponent->SetupAttachment(RootComponent);
-
 	FpsCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FPS_Camera"));
-	//FpsCamera->SetupAttachment(VRComponent);
 	FpsCamera->SetupAttachment(RootComponent);
 	FpsCamera->SetRelativeLocation(FVector(0.0f, 0.0f, 50.0f + BaseEyeHeight));
 	FpsCamera->bUsePawnControlRotation = true;
 
 	StatManager = CreateDefaultSubobject<UCharacterStatManager>(TEXT("StatManager"));
 	PostProcessing = CreateDefaultSubobject<UPostProcessComponent>(TEXT("Post Processing"));
-	PlayerAdvancement = CreateDefaultSubobject<UPlayerAdvancement>(TEXT("Player Advancement"));
 
 	CharacterMovement = GetCharacterMovement();
 	CharacterMovement->JumpZVelocity = StatManager->GetJumpForce();
@@ -40,13 +35,20 @@ AAaronCharacter::AAaronCharacter()
 	ChestEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Chest Equipment"));
 	ChestEquipment->SetupAttachment(FpsCamera);
 
+	LegsEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Legs Equipment"));
+	LegsEquipment->SetupAttachment(FpsCamera);
+
 	InventaireComponent = CreateDefaultSubobject<UInventaireComponent>(TEXT("InventaireComponent"));
 	InventaireComponent->PrepareInventory();
 
 	VaultTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Vault Timeline"));
+	PoisonTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Poison Timeline"));
 
 	UpdateTimeline.BindUFunction(this, FName("UpdateTimelineFunction"));
 	FinishTimeLine.BindUFunction(this, FName("EndTimelineFunction"));
+	UpdateTimelinePoison.BindUFunction(this, FName("UpdateTimelinePoisonFunction"));
+
+	Mutations = TArray<UUMutationBase*>();
 }
 
 void AAaronCharacter::AddControllerYawInput(float Val)
@@ -65,6 +67,7 @@ void AAaronCharacter::BeginPlay()
 	MovementState = EMovementState::Run;
 	VaultTimeline->AddInterpFloat(CurveFloat, UpdateTimeline);
 	VaultTimeline->SetTimelineFinishedFunc(FinishTimeLine);
+	PoisonTimeline->AddInterpFloat(CurvePoison, UpdateTimelinePoison);
 	CharacterMovement->AirControl = StatManager->GetAirControl();
 	CharacterMovement->GravityScale = StatManager->GetGravityScale();
 
@@ -84,7 +87,6 @@ void AAaronCharacter::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor
 	APhysicsVolume* WaterVolume = Cast<APhysicsVolume>(OtherActor);
 	if(WaterVolume && WaterVolume->bWaterVolume)
 	{
-		//UE_LOG(LogActor, Error, TEXT("In Water"));
 		IsInWater = true;
 		FBoxSphereBounds WaterBounds = WaterVolume->GetBounds();
 		WaterHeight = WaterBounds.Origin.Z + WaterBounds.BoxExtent.Z;
@@ -220,16 +222,6 @@ void AAaronCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AAaronCharacter::EndJumping);
 
 	PlayerInputComponent->BindAction("Walk", IE_Pressed, this, &AAaronCharacter::ToggleWalk);
-
-	/*if (UserSettings->GetIsToggleSprint())
-	{
-		PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AAaronCharacter::ToggleSprint);
-	} else
-	{
-		PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AAaronCharacter::StartSprinting);
-		PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AAaronCharacter::StopSprinting);
-	}*/
-
 	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &AAaronCharacter::ToggleCrouch);
 
 	PlayerInputComponent->BindAction("Dodge", IE_Pressed, this, &AAaronCharacter::Dodge);
@@ -256,17 +248,11 @@ void AAaronCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	
 	PlayerInputComponent->BindAction("ItemWheel", IE_Pressed, this, &AAaronCharacter::PressedItemWheel);
 	PlayerInputComponent->BindAction("ItemWheel", IE_Released, this, &AAaronCharacter::ReleaseItemWheel);
-
-	for (int i = 0; i < PlayerInputComponent->GetNumActionBindings(); i++)
-	{
-		if (PlayerInputComponent->GetActionBinding(i).GetActionName().Compare(FName("FireLeft")) == 0)
-			IndexFireLeftAction = i;
-	}
 }
 
 void AAaronCharacter::EnableDisableNightVision()
 {
-	if (StatManager->GetNightVisionEffect() == 0.0f)
+	if (UPlayerAdvancementSubsystem::GetMetroidvaniaAbilities(FString("NightVision")) && StatManager->GetNightVisionEffect() == 0.0f)
 		StatManager->SetNightVisionEffect(1.0f);
 	else
 		StatManager->SetNightVisionEffect(0.0f);
@@ -278,7 +264,8 @@ void AAaronCharacter::EnableDisableGrapnel()
 	{
 		IsGrapnelMod = true;
 		LeftArmEquipment->SetChildActorClass(GrapnelClass);
-	} else if (IsGrapnelMod)
+	} 
+	else if (IsGrapnelMod)
 	{
 		IsGrapnelMod = false;
 		LeftArmEquipment->SetChildActorClass(LeftArmEquipmentClass);
@@ -324,24 +311,16 @@ FVector AAaronCharacter::GetCharacterDirection() const
 
 void AAaronCharacter::MoveForward(float Value)
 {
-	FVector ForwardVector = FpsCamera->GetForwardVector();
-	if (UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled())
-		ForwardVector = GetActorForwardVector();
-
 	if (CharacterMovement->IsSwimming())
-		AddMovementInput(ForwardVector, Value);
+		AddMovementInput(FpsCamera->GetForwardVector(), Value);
 	else if (MovementState != EMovementState::Slide)
 		AddMovementInput(GetActorForwardVector(), Value);
 }
 
 void AAaronCharacter::MoveRight(float Value)
 {
-	FVector ForwardVector = FpsCamera->GetForwardVector();
-	if (UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled())
-		ForwardVector = GetActorForwardVector();
-
 	if (CharacterMovement->IsSwimming())
-		AddMovementInput(ForwardVector, Value);
+		AddMovementInput(FpsCamera->GetRightVector(), Value);
 	else if (MovementState != EMovementState::Slide)
 		AddMovementInput(GetActorRightVector(), Value);
 }
@@ -349,13 +328,45 @@ void AAaronCharacter::MoveRight(float Value)
 void AAaronCharacter::AddEquipment(UChildActorComponent* PartChild, TSubclassOf<AEquipmentBase> ClassEquipment)
 {
 	PartChild->SetChildActorClass(ClassEquipment);
-	IEquipmentInterface::Execute_OnEquip(PartChild, StatManager->Skills);
+	IEquipmentInterface::Execute_OnEquip(PartChild->GetChildActor(), StatManager->Skills);
 }
 
 void AAaronCharacter::RemoveEquipment(UChildActorComponent* PartChild, TSubclassOf<AEquipmentBase> ClassEquipment)
 {
 	PartChild->SetChildActorClass(ClassEquipment);
-	IEquipmentInterface::Execute_OnUnequip(PartChild, StatManager->Skills);
+	IEquipmentInterface::Execute_OnUnequip(PartChild->GetChildActor(), StatManager->Skills);
+}
+
+void AAaronCharacter::AddMutation(TSubclassOf<UUMutationBase> Mutation)
+{
+	bool FindRef = false;
+	for (int i = 0; i < Mutations.Num(); i++)
+	{
+		if (Mutations[i]->GetClass() == Mutation.Get()->StaticClass())
+		{
+			FindRef = true;
+			break;
+		}
+	}
+
+	if (FindRef)
+	{
+		int index = Mutations.Add(Mutation.GetDefaultObject());
+		Mutations[index]->OnEquip(StatManager->Skills);
+	}
+}
+
+void AAaronCharacter::RemoveMutation(UClass *ClassMutation)
+{
+	for (int i = 0; i < Mutations.Num(); i++)
+	{
+		if (Mutations[i]->StaticClass() == ClassMutation->StaticClass())
+		{
+			Mutations[i]->OnUnEquip(StatManager->Skills);
+			Mutations.RemoveAt(i);
+			break;
+		}
+	}
 }
 
 void AAaronCharacter::StartJumping()
@@ -363,7 +374,11 @@ void AAaronCharacter::StartJumping()
 	if (GetCharacterMovement()->IsFalling())
 	{
 		//CharacterMovement->SetMovementMode(EMovementMode::MOVE_Flying);
-		if(!VaultCheck(FallingTraceSettings) && StatManager->Skills.Glider)
+		if (VaultCheck(FallingTraceSettings))
+		{
+			VaultStart();
+		}
+		else if(StatManager->Skills.Glider)
 		{
 			IsGliding = true;
 			CharacterMovement->GravityScale = StatManager->GetGlidingGravityScale();
@@ -374,7 +389,11 @@ void AAaronCharacter::StartJumping()
 	}
 	else
 	{
-		if (GetCharacterDirection().Size() == 0.0f || !VaultCheck(GroundedTraceSettings))
+		if (GetCharacterDirection().Size() != 0.0f && VaultCheck(GroundedTraceSettings))
+		{
+			VaultStart();
+		}
+		else
 		{
 			if (MovementState != EMovementState::Climb && !CharacterMovement->IsSwimming())
 			{
@@ -462,16 +481,22 @@ void AAaronCharacter::ToggleSprint()
 		MovementState = EMovementState::Run;
 	else if (CharacterMovement->Velocity.Size() > 0.0f)
 	{
+		if (MovementState == EMovementState::Slide)
+			CharacterMovement->GroundFriction = 8.0f;
+		
 		UnCrouch();
 		MovementState = EMovementState::Sprint;
 	}
-		
 }
 
 void AAaronCharacter::StartSprinting()
 {
+	if (MovementState == EMovementState::Slide)
+		CharacterMovement->GroundFriction = 8.0f;
+	
 	UnCrouch();
 	MovementState = EMovementState::Sprint;
+	
 }
 
 void AAaronCharacter::StopSprinting()
@@ -644,7 +669,7 @@ void AAaronCharacter::Scan()
 
 	if (GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECC_Visibility, collisionParams))
 	{
-		if (OutHit.GetActor()->Implements<UAnalyseObjectInterface>())
+		if (OutHit.GetActor()->Implements<UAnalyseObjectInterface>() && (LastScannedActor==nullptr || LastScannedActor!=OutHit.GetActor()))
 		{
 			float ScanPercent = 0.0f;
 			AMyHUD* PlayerHUD = Cast<AMyHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
@@ -655,7 +680,8 @@ void AAaronCharacter::Scan()
 			else
 			{
 				IAnalyseObjectInterface::Execute_ScanFinished(OutHit.GetActor());
-				//PlayerAdvancement->SetScannableItemStatus(OutHit.GetActor()->GetName(),true);
+				//UPlayerAdvancementSubsystem::SetScannableItemStatus(OutHit.GetActor()->GetName(),true);
+				LastScannedActor = OutHit.GetActor();
 				PlayerHUD->ResetCircleRadius();
 			}
 		}
@@ -765,9 +791,21 @@ FVector AAaronCharacter::GetCapsuleBaseLocationFromBase(FVector BaseLocation, fl
 	return FVector(BaseLocation.X, BaseLocation.Y, BaseLocation.Z + GetCapsuleComponent()->GetScaledCapsuleHalfHeight() + ZOffset);
 }
 
+void AAaronCharacter::OnPoisonAlteration()
+{
+	PoisonTimeline->SetTimelineLength(4.0f);
+	PoisonTimeline->SetPlayRate(1.0f);
+	PoisonTimeline->PlayFromStart();
+}
+
+void AAaronCharacter::UpdateTimelinePoisonFunction(float value)
+{
+	StatManager->GetParameterCollectionInstance()->SetScalarParameterValue(FName(TEXT("Poison")), value);
+}
+
 void AAaronCharacter::UpdateTimelineFunction(float value)
 {
-	FTransform VaultTarget = VaultLedgeWS.Transform;//ConvertLocalToWorld(VaultLedgeLS).Transform;
+	FTransform VaultTarget = VaultLedgeWS.Transform;
 	FVector VectorOfCurve = VaultParams.PositionCurve->GetVectorValue(VaultTimeline->GetPlaybackPosition() + VaultParams.StartingPosition);
 	FTransform BlendTrans = FTransform(VaultAnimatedStartOffset.GetRotation(), FVector(VaultAnimatedStartOffset.GetLocation().X, VaultAnimatedStartOffset.GetLocation().Y, VaultStartOffset.GetLocation().Z));
 	FTransform XYCorrectionTrans = UKismetMathLibrary::TLerp(VaultStartOffset, BlendTrans, VectorOfCurve.Y);
@@ -800,40 +838,28 @@ void AAaronCharacter::UpdateBindAction()
 			PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AAaronCharacter::StartSprinting);
 			PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AAaronCharacter::StopSprinting);
 		}
-	}/*else
-	{
-		UE_LOG(LogActor, Error, TEXT("PlayerInput null"));
-	}*/
-	
+	}
 }
 
 bool AAaronCharacter::VaultCheck(VaultTraceSettings TraceSettings)
 {
-	VaultType VaultType;
 	FVector InitialTraceImpactPoint;
 	FVector InitialTraceNormal;
-	float VaultHeight;
 
-	if (FindWallToClimb(TraceSettings, InitialTraceImpactPoint, InitialTraceNormal))
-	{
-		if (CanClimbOnWall(TraceSettings, InitialTraceImpactPoint, InitialTraceNormal, VaultHeight, VaultType))
-		{
-			VaultStart(VaultHeight, VaultType);
-			return true;
-		}
-	}
+	if (FindWallToClimb(TraceSettings, InitialTraceImpactPoint, InitialTraceNormal) && CanClimbOnWall(TraceSettings, InitialTraceImpactPoint, InitialTraceNormal))
+		return true;
 
 	return false;
 }
 
-void AAaronCharacter::VaultStart(float VaultHeight, VaultType VaultType)
+void AAaronCharacter::VaultStart()
 {
-	VaultParams = GetVaultParam(VaultType, VaultHeight);
+	VaultParams = GetVaultParam();
 	VaultLedgeLS = ConvertWorldToLocal(VaultLedgeWS);
 	VaultStartOffset = GetVaultStartOffset(VaultLedgeWS.Transform);
 	VaultAnimatedStartOffset = GetVaultAnimatedStartOffset(VaultParams, VaultLedgeWS.Transform);
 
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	CharacterMovement->SetMovementMode(EMovementMode::MOVE_None);
 	float MaxTime, MinTime;
 	VaultParams.PositionCurve->GetTimeRange(MinTime, MaxTime);
 	VaultTimeline->SetTimelineLength(MaxTime - VaultParams.StartingPosition);
@@ -870,7 +896,7 @@ bool AAaronCharacter::FindWallToClimb(VaultTraceSettings TraceSettings, FVector&
 	return false;
 }
 
-bool AAaronCharacter::CanClimbOnWall(VaultTraceSettings TraceSettings, FVector& InitialTraceImpactPoint, FVector& InitialTraceNormal, float& VaultHeight, VaultType& Vault)
+bool AAaronCharacter::CanClimbOnWall(VaultTraceSettings TraceSettings, FVector& InitialTraceImpactPoint, FVector& InitialTraceNormal)
 {
 	FVector DownTraceLocation;
 
@@ -901,12 +927,12 @@ bool AAaronCharacter::CanClimbOnWall(VaultTraceSettings TraceSettings, FVector& 
 				if (!GetCharacterMovement()->IsFalling())
 				{
 					if (VaultHeight > 125.0f)
-						Vault = VaultType::HighVault;
+						VaultType = VaultType::HighVault;
 					else
-						Vault = VaultType::LowVault;
+						VaultType = VaultType::LowVault;
 				}
 				else
-					Vault = VaultType::FallingCatch;
+					VaultType = VaultType::FallingCatch;
 
 				return true;
 			}
@@ -942,10 +968,10 @@ FVaultComponentAndTransform AAaronCharacter::ConvertLocalToWorld(FVaultComponent
 	return FVaultComponentAndTransform(LocalSpaceVault.Component, TransformWorld);
 }
 
-FVaultParams AAaronCharacter::GetVaultParam(VaultType Vault, float VaultHeight)
+FVaultParams AAaronCharacter::GetVaultParam()
 {
 	FVaultAsset VaultAsset;
-	switch (Vault)
+	switch (VaultType)
 	{
 	case VaultType::LowVault:
 		VaultAsset = LowVaultAsset;
@@ -961,7 +987,6 @@ FVaultParams AAaronCharacter::GetVaultParam(VaultType Vault, float VaultHeight)
 	float StartingPos = UKismetMathLibrary::MapRangeClamped(VaultHeight, VaultAsset.LowHeight, VaultAsset.HightHeight, VaultAsset.LowStartPosition, VaultAsset.HightStartPosition);
 
 	return FVaultParams(VaultAsset, PlayRate, StartingPos);
-
 }
 
 FTransform AAaronCharacter::GetVaultStartOffset(FTransform& VaultTarget)

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "Engine/World.h"
 #include "AaronPlayerController.generated.h"
 
 /**

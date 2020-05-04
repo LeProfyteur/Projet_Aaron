@@ -16,6 +16,11 @@ class PROJET_AARON_API UAaronGameUserSettings : public UGameUserSettings
 
 public:
 
+    UFUNCTION(BlueprintCallable)
+        float GetMasterSoundVolume();
+    UFUNCTION(BlueprintCallable)
+        void SetMasterSoundVolume(float Volume);
+
 	UFUNCTION(BlueprintCallable)
     float GetSFXSoundVolume();
 	UFUNCTION(BlueprintCallable)
@@ -53,10 +58,12 @@ public:
 	void UpdateVersion() override;
 
 protected:
-
+    //Scale on [0,1]
+    UPROPERTY(config)
+        float MasterSoundVolume = 1.0f;
 	//Scale on [0,1]
     UPROPERTY(config)
-        float SFXSoundVolume = 1.0f;;
+        float SFXSoundVolume = 1.0f;
     //Scale on [0,1]
     UPROPERTY(config)
         float MusicSoundVolume = 1.0f;

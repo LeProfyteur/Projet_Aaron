@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Curves/CurveVector.h"
+#include "Engine/DataTable.h"
+#include "Engine/Texture2D.h"
 #include "Animation/AnimMontage.h"
 #include "CharacterUtils.generated.h"
 
@@ -31,6 +33,17 @@ enum class EMovementState : uint8
 	Sprint,
 	Climb,
 	Slide
+};
+
+UENUM(BlueprintType)
+enum class EEquipment : uint8
+{
+	Metroidvania,
+	Arm,
+	Head,
+	Torso,
+	Legs,
+	Abilities
 };
 
 USTRUCT(BlueprintType)
@@ -68,6 +81,29 @@ public:
 		HardBark = false;
 		Stilt = false;
 	}
+};
+
+USTRUCT(BlueprintType)
+struct FAbilitiesRow : public FTableRowBase
+{
+	GENERATED_BODY()
+
+public:
+
+	FAbilitiesRow() {}
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FName Name;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		EEquipment CategoryEquipment;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FText Description;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UTexture2D* Thumbnail;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)	
+		UClass *Class;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TArray<FString> UnlockRequirement;
 };
 
 struct FVaultComponentAndTransform

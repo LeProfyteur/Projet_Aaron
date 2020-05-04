@@ -13,15 +13,15 @@ AGrappleHead::AGrappleHead()
 	RootComponent = boxCollision;
 
 	staticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	staticMesh->AttachTo(RootComponent);
+	staticMesh->SetupAttachment(RootComponent);
 
-	ConstructorHelpers::FObjectFinder<UStaticMesh> hookMesh(TEXT("/Game/Projet_Aaron/CC/FirstPersonBP/Blueprints/Grappnel/Hook.Hook"));
+	ConstructorHelpers::FObjectFinder<UStaticMesh> hookMesh(TEXT("/Game/Projet_Aaron/CC/Equipment/Grapnel/Hook.Hook"));
 	if(hookMesh.Succeeded())
 		staticMesh->SetStaticMesh(hookMesh.Object);
 
-	projectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement"));
+	/*projectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement"));
 	projectileMovement->InitialSpeed = 10000.0f;
-	projectileMovement->MaxSpeed = 10000.0f;
+	projectileMovement->MaxSpeed = 10000.0f;*/
 	
 }
 
@@ -35,11 +35,16 @@ void AGrappleHead::BeginPlay()
 void AGrappleHead::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	FVector NewPosition = UKismetMathLibrary::VInterpTo(GetActorLocation(), locationToGo, DeltaTime, Speed);
+	SetActorLocation(NewPosition);
+}
 
-	if(FVector::PointsAreNear(GetActorLocation(), locationToGo, 150.0f))
+void AGrappleHead::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	AHookSpot* HookSpot = Cast<AHookSpot>(OtherActor);
+	if (HookSpot)
 	{
-		projectileMovement->SetVelocityInLocalSpace(FVector::ZeroVector);
-		SetActorEnableCollision(false);
+		SetActorTickEnabled(false);
 	}
 }
 

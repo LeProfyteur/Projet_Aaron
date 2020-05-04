@@ -4,6 +4,7 @@
 
 #include "Projet_Aaron/Character/GrappleHead.h"
 #include "GameFramework/PlayerController.h"
+#include "DrawDebugHelpers.h"
 #include "Projet_Aaron/Equipment/GrapplePointer.h"
 #include "Components/TimelineComponent.h"
 #include "Materials/MaterialInstance.h"
@@ -24,35 +25,49 @@ public:
 	AGrapnelEquipmentSuperAaron();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		class AGrappleHead* myBullet;
+		AGrappleHead* myBullet;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		class UCableComponent* laser;
+		UStaticMeshComponent* hookMeshComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		class UStaticMeshComponent* hookMeshComponent;
+		UCableComponent* cable;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		class UChildActorComponent* pointer;
+		UTimelineComponent* timeline;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		class UCableComponent* cable;
+		UParticleSystemComponent* ParticleSystem;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		class UTimelineComponent* timeline;
+		FVector ForceDirection;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		float Distance = 5000.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		float SwingSpeed = 100000.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		float RopeForce = -2.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		float Degree = 60.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		float EndSwingLaunchZReductionFactor = 1.2f;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime);
 
 	bool isActivated = false;
 	bool canHook = true;
+	bool Hooked = false;
 	bool foundHookSpot = false;
 	bool playTLForLaser = true;
+	bool IsSwing = false;
 
 	float TimeInterpolation;
 
@@ -66,13 +81,13 @@ public:
 		void TimelineCallback();
 
 	UFUNCTION()
-		void updatePointerLocation();
-
-	UFUNCTION()
 		void AfterHook();
 
 	UFUNCTION()
 		void Hook();
+
+	UFUNCTION()
+		void Swing(float DeltaTime);
 
 	void PlayTimeline();
 
