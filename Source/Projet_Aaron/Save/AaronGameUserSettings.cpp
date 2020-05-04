@@ -3,6 +3,16 @@
 #define MY_GAMEUSERSETTINGS_VERSION 8	// UE settings + 3
 #include "AaronGameUserSettings.h"
 
+float UAaronGameUserSettings::GetMasterSoundVolume()
+{
+	return MasterSoundVolume;
+}
+
+void UAaronGameUserSettings::SetMasterSoundVolume(float Volume)
+{
+	MasterSoundVolume = Volume;
+}
+
 float UAaronGameUserSettings::GetSFXSoundVolume()
 {
 	return SFXSoundVolume;

@@ -31,15 +31,14 @@ void UPoisonAlteration::BeginPlay()
 		CharacterStatManager->SetPoisonAlteration(true);
 		CharacterStatManager->SetPoisonEffect(1.0f);
 		DamageOverTime();
+		AAaronCharacter* Character = Cast<AAaronCharacter>(GetOwner());
+		Character->OnPoisonAlteration();
 	}
 	else if (_CreatureStatManager)
 	{
 		_CreatureStatManager->SetPoisonAlteration(true);
 		DamageOverTime();
 	}
-
-	AAaronCharacter* Character = Cast<AAaronCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-	Character->OnPoisonAlteration();
 	
 }
 

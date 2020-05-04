@@ -5,7 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/BoxComponent.h"
+#include "Projet_Aaron/Equipment/HookSpot.h"
 #include "Components/StaticMeshComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "UObject/ConstructorHelpers.h"
 #include "GrappleHead.generated.h"
@@ -25,18 +27,21 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		UBoxComponent *boxCollision;
 
-	UPROPERTY(VisibleAnywhere)
-		FVector locationToGo;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		float Speed = 100.0f;
 
 	UPROPERTY(VisibleAnywhere)
-		UProjectileMovementComponent* projectileMovement;
+		FVector locationToGo;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
+
+	UFUNCTION()
+		void OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
 	virtual void Tick(float DeltaTime) override;
 
 };
