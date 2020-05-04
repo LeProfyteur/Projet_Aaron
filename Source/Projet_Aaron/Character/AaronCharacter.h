@@ -96,7 +96,13 @@ public:
 		UTimelineComponent* PoisonTimeline;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UTimelineComponent* LsdTimeline;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UCurveFloat* CurvePoison;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UCurveFloat* CurveLSD;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UClass* GrapnelClass;
@@ -205,6 +211,9 @@ public:
 		void UpdateTimelinePoisonFunction(float value);
 
 	UFUNCTION()
+		void UpdateTimelineLSDFunction(float value);
+
+	UFUNCTION()
 		void EndTimelineFunction();
 
 	/**
@@ -214,6 +223,7 @@ public:
 		void UpdateBindAction();
 
 	void OnPoisonAlteration();
+	void OnLsdAlteration(float Time);
 
 protected:
 	void BeginPlay() override;
@@ -319,6 +329,7 @@ protected:
 	FOnTimelineFloat UpdateTimeline{};
 	FOnTimelineEvent FinishTimeLine{};
 	FOnTimelineFloat UpdateTimelinePoison{};
+	FOnTimelineFloat UpdateTimelineLSD{};
 
 	AActor* LastScannedActor = nullptr;
 };
