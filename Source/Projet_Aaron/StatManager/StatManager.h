@@ -31,6 +31,8 @@ protected:
 	float HealthTech;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
 	float HealthTechMax = 100.0f;
+
+	bool Undying = false;
 	
 public:	
 
@@ -49,6 +51,9 @@ public:
 		FString GetHealthBioRateText() const;
 	UFUNCTION(BlueprintCallable)
 		float GetHealthTechRate() const { return HealthTech / HealthTechMax; }
+
+	UFUNCTION(BlueprintCallable)
+		float GetHealthRate() const { return (HealthBio + HealthTech) / (HealthBioMax + HealthTechMax); }
 	UFUNCTION(BlueprintCallable)
 		FString GetHealthTechRateText() const;
 	
@@ -63,17 +68,16 @@ public:
 		void SetHealthTech(float NewHealthTech) { HealthTech = NewHealthTech; }
 	UFUNCTION(BlueprintCallable)
 		void SetHealthTechMax(float NewHealthTechMax) { HealthBio = NewHealthTechMax; }
+	UFUNCTION(BlueprintCallable)
+		void SetUndying(bool NewUndying) { Undying = NewUndying; }
 	
 	//Called when you take damage
 	UFUNCTION(BlueprintCallable, Category = "Damage")
 	virtual void TakeDamage(float BioDamage, float TechDamage);
 
 	UFUNCTION(BlueprintCallable, Category = "Damage")
-	void Heal(float BioHeal, float TechHeal);
+	virtual void Heal(float BioHeal, float TechHeal);
 
 	UFUNCTION(BlueprintCallable, Category = "Damage")
 	void Die();
-	
-
-		
 };

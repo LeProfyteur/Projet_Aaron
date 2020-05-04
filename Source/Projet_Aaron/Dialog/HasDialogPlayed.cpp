@@ -7,5 +7,8 @@
 
 bool UHasDialogPlayed::Verify()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Verify %s"),*DialogName);
+	UE_LOG(LogTemp, Warning, TEXT("Value %d"), UDialogSubsystem::GetKnowledge(DialogName) );
+
 	return UDialogSubsystem::GetKnowledge(DialogName) ;
 }
