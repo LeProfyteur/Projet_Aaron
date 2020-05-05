@@ -20,6 +20,7 @@ ULSDAlteration::ULSDAlteration()
 void ULSDAlteration::BeginPlay()
 {
 	Super::BeginPlay();
+	UE_LOG(LogActor, Warning, TEXT("Damage : %f"), Damage);
 	_CreatureStatManager = GetOwner()->FindComponentByClass<UCreatureStatManager>();
 	UCharacterStatManager* CharacterStatManager = Cast<UCharacterStatManager>(_CreatureStatManager);
 
