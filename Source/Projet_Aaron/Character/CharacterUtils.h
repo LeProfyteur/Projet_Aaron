@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-//#include "Projet_Aaron/Equipment/EquipmentBase.h"
 #include "Curves/CurveVector.h"
+#include "Engine/DataTable.h"
 #include "Engine/Texture2D.h"
 #include "Animation/AnimMontage.h"
 #include "CharacterUtils.generated.h"
@@ -84,7 +84,7 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct FAbilitiesRow
+struct FAbilitiesRow : public FTableRowBase
 {
 	GENERATED_BODY()
 

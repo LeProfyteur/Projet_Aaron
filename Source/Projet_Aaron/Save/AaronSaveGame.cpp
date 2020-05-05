@@ -1,13 +1,14 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "AaronSaveGame.h"
+
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Actor.h"
 #include "Misc/Paths.h"
 #include "Serialization/ObjectAndNameAsStringProxyArchive.h"
 #include "Engine/World.h"
+#include "EngineUtils.h"
 #include "UObject/UObjectIterator.h"
 #include "AaronPersistentComponent.h"
+#include "Projet_Aaron/Dialog/DialogSubsystem.h"
 
 static inline UActorComponent* GetComponentByFName(AActor* Owner, const FName& Name)
 {
@@ -23,6 +24,34 @@ UAaronSaveGame::UAaronSaveGame()
 {
 }
 
+void UAaronSaveGame::Save(UObject* WorldContextObject)
+{
+	//TODO : manually save each subsystem
+
+	SaveInfo.LevelName = WorldContextObject->GetWorld()->GetName();
+	SaveInfo.Date = FDateTime::Now();
+
+	for (TActorIterator<AActor> Itr(WorldContextObject->GetWorld()); Itr; ++Itr)
+	{
+		SaveActor(*Itr);
+	}
+}
+
+void UAaronSaveGame::Load(UObject* WorldContextObject)
+{
+	//TODO : manually load each subsystem
+	if (!WorldContextObject->GetWorld())
+	{
+		UE_LOG(LogSerialization, Error, TEXT("Invalid WCO ?!"));
+		return;
+	}
+	
+	for (auto& Record : Actors)
+	{
+		LoadActor(WorldContextObject->GetWorld(), Record);
+	}
+}
+
 void UAaronSaveGame::SaveActor(AActor* Actor)
 {
 	//Reject invalid call
@@ -32,6 +61,9 @@ void UAaronSaveGame::SaveActor(AActor* Actor)
 	UAaronPersistentComponent* Persistence = Actor->FindComponentByClass<UAaronPersistentComponent>();
 	if (!Persistence) return;
 	if (Persistence->Transient) return;
+
+	//Pre-Save Persistence event Broadcast
+	Persistence->OnSave.Broadcast();
 
 	//Reject If Already Saved
 	for (const FActorRecord& Record : Actors)
@@ -63,29 +95,46 @@ void UAaronSaveGame::SaveActor(AActor* Actor)
 	}
 }
 
-void UAaronSaveGame::LoadActor(UObject* WorldContextObject, UPARAM(ref) FActorRecord& ActorRecord)
+void UAaronSaveGame::LoadActor(UWorld* World, UPARAM(ref) FActorRecord& ActorRecord)
 {
 	//Reject already Deserialized Record
 	if (ActorRecord.Reference) return;
 	
-	//UE_LOG(LogSerialization, Display, TEXT("Loading Actor %s %s"), *ActorRecord.Class->GetName(), *ActorRecord.Name.ToString());
-	
-	UWorld* World = WorldContextObject->GetWorld();
+	if (!ActorRecord.Class)
+	{
+		UE_LOG(LogSerialization, Error, TEXT("Failed to deserialize Actor Class ! Skipping Actor Load"));
+		return;
+	}
 
-	//Instantiate Actor & load serialized data
 	FActorSpawnParameters SpawnParameters;
 	SpawnParameters.Name = ActorRecord.Name;
-	UClass* ActorClass = ActorRecord.Class.Get();
-	AActor* Actor = World->SpawnActorDeferred<AActor>(ActorClass, ActorRecord.Transform);
-	Deserialize(Actor, ActorRecord.ActorData);
-	UGameplayStatics::FinishSpawningActor(Actor, ActorRecord.Transform);
+	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	ActorRecord.Reference = World->SpawnActor(ActorRecord.Class, &ActorRecord.Transform, SpawnParameters);
+
+	if (!ActorRecord.Reference) 
+	{
+		UE_LOG(LogSerialization, Error, TEXT("Failed to spawn Actor ! Skipping Actor Load"));
+		return;
+	}
+	
+	Deserialize(ActorRecord.Reference, ActorRecord.ActorData);
 
 	//Instantiate Components
-	TArray<FComponentRecord*> ActorComponents;
-	FindComponentsForActor(ActorRecord.UniqueID, ActorComponents);
-	for (auto ComponentRecord : ActorComponents)
+	/*//
+	for (auto& ComponentRecord : Components)
 	{
-		LoadComponent(WorldContextObject, Actor, *ComponentRecord);
+		//Skip components that do not belong to this Actor
+		if (!ComponentRecord.OwnerID == ActorRecord.UniqueID)
+			continue;
+
+		LoadComponent(World, Actor, ComponentRecord);
+	}
+	//*/
+	
+	//Post-load Persistence Event Broadcast
+	if (UAaronPersistentComponent* Persistence = ActorRecord.Reference->FindComponentByClass<UAaronPersistentComponent>())
+	{
+		Persistence->OnLoad.Broadcast();
 	}
 }
 
@@ -107,89 +156,51 @@ void UAaronSaveGame::SaveComponent(UActorComponent* Component)
 	Serialize(Component, Record.ComponentData);
 }
 
-void UAaronSaveGame::LoadComponent(UObject* WorldContextObject, AActor* Actor, UPARAM(ref)FComponentRecord& ComponentRecord)
+void UAaronSaveGame::LoadComponent(UWorld* World, AActor* Actor, UPARAM(ref)FComponentRecord& ComponentRecord)
 {
 	//Reject already deserialized Records
 	if (ComponentRecord.Reference) return;
 
-	//UE_LOG(LogSerialization, Display, TEXT("Loading Component %s %s"), *ComponentRecord.Class->GetName(), *ComponentRecord.Name.ToString());
-
+	/*//
 	
-}
-
-void UAaronSaveGame::Save(UObject* WorldContextObject)
-{
-	//Persist all Actors
-	for (TObjectIterator<AActor> Itr; Itr; ++Itr)
+	if (ComponentRecord.Class->IsChildOf(UPrimitiveComponent::StaticClass()))
 	{
-		SaveActor(*Itr);
+		UPrimitiveComponent* Component = NewObject<UPrimitiveComponent>(Actor, ComponentRecord.Class, ComponentRecord.Name);
 	}
+	ComponentRecord.Reference = NewObject<UActorComponent>(Actor, ComponentRecord.Class, ComponentRecord.Name);
 
-	//TODO : Persist Subsystem data?
+	//**/
 
-}
-
-void UAaronSaveGame::Load(UObject* WorldContextObject)
-{
-	//Load Actors
-	for (auto& Record : Actors)
-	{
-		LoadActor(WorldContextObject, Record);
-	}
-
-	//TODO : Load Sybsystem data?
-}
-
-void UAaronSaveGame::FindComponentsForActor(uint32 ActorUniqueID, TArray<FComponentRecord*>& Records)
-{
-	Records.Reset();
-	for (auto& Record : Components)
-	{
-		if (Record.OwnerID == ActorUniqueID)
-			Records.Add(&Record);
-	}
+	UE_LOG(LogSerialization, Display, TEXT("Loading Component %s %s"), *ComponentRecord.Class->GetName(), *ComponentRecord.Name.ToString());
 }
 
 void UAaronSaveGame::Serialize(UObject* Object, UPARAM(ref) TArray<uint8>& Buffer)
 {
-	if (Object)
+	if (!Object)
 	{
-		FMemoryWriter MemoryWriter = FMemoryWriter(Buffer, true);
-		FObjectAndNameAsStringProxyArchive Archive = FObjectAndNameAsStringProxyArchive(MemoryWriter, true);
-		Archive.ArIsSaveGame = true;
-		Archive.ArNoDelta = true;
-
-		Object->Serialize(Archive);
+		UE_LOG(LogSerialization, Error, TEXT("Trying to Serialize NULL UObject !"));
+		return;
 	}
+
+	FMemoryWriter MemoryWriter = FMemoryWriter(Buffer, true);
+	FObjectAndNameAsStringProxyArchive Archive = FObjectAndNameAsStringProxyArchive(MemoryWriter, true);
+	Archive.ArIsSaveGame = true;
+	Archive.ArNoDelta = true;
+
+	Object->Serialize(Archive);
 }
 
 void UAaronSaveGame::Deserialize(UObject* Object, UPARAM(ref) TArray<uint8>& Buffer)
 {
-	if (Object)
+	if (!Object)
 	{
-		FMemoryReader MemoryReader(Buffer, true);
-		FObjectAndNameAsStringProxyArchive Archive = FObjectAndNameAsStringProxyArchive(MemoryReader, true);
-		Archive.ArIsSaveGame = true;
-		Archive.ArNoDelta = true;
-
-		Object->Serialize(Archive);
+		UE_LOG(LogSerialization, Error, TEXT("Trying to Deserialize NULL Object !"));
 	}
-}
 
-UAaronSaveGame* UAaronSaveGame::CreateAaronSaveGame(UObject* WorldContextObject)
-{
-	if (UAaronSaveGame* SaveGame = Cast<UAaronSaveGame>(UGameplayStatics::CreateSaveGameObject(UAaronSaveGame::StaticClass())))
-	{
-		SaveGame->Save(WorldContextObject);		
-		return SaveGame;
-	}
-	return nullptr;
-}
+	FMemoryReader MemoryReader(Buffer, true);
+	FObjectAndNameAsStringProxyArchive Archive = FObjectAndNameAsStringProxyArchive(MemoryReader, true);
+	Archive.ArIsSaveGame = true;
+	Archive.ArNoDelta = true;
 
-void UAaronSaveGame::LoadAaronSaveGame(UObject* WorldContextObject, const FString& SlotName, int32 UserIndex)
-{
-	if (UAaronSaveGame* SaveGame = Cast<UAaronSaveGame>(UGameplayStatics::LoadGameFromSlot(SlotName, UserIndex)))
-	{
-		SaveGame->Load(WorldContextObject);
-	}
+	Object->Serialize(Archive);
 }

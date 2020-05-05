@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
+#include "Projet_Aaron/Character/CharacterUtils.h"
 #include "Subsystems/EngineSubsystem.h"
 #include "PlayerAdvancementSubsystem.generated.h"
 
@@ -13,11 +14,16 @@ class PROJET_AARON_API UPlayerAdvancementSubsystem : public UEngineSubsystem
 {
 	GENERATED_BODY()
 
-	TMap <FString, bool> scannableItems = { {"LightPlantScan",true}, {"PoisonPlantScan",false} ,{"BlockingPlantScan",false}  ,{"PuncturePlantScan",false} ,{"CarnivorousPlantScan",false} ,{"PakurvaScan",false},{"LumeilScan",false} ,{"KorvaifScan",false} ,{"GrosHerbivoreScan",false} };
+	TMap <FString, bool> scannableItems = { {"LightPlantScan",false}, {"PoisonPlantScan",false} ,{"BlockingPlantScan",false}  ,{"PuncturePlantScan",false} ,{"CarnivorousPlantScan",false} ,{"PakurvaScan",false},{"LumeilScan",false} ,{"KorvaifScan",false} ,{"GrosHerbivoreScan",false} };
 	TMap <FString, bool> collectableItems = { {"ParalysingDartBlackBox",false}, {"GrapnelItem",false} ,{"WeakeningDartDocument",false},{"EnvironmentalScanBeacon",false},{"MovementDetectorBeacon",false}, {"GliderBlackBox",false}, {"PoweredBootsBlackBox",false}, {"GillsDoc",false}, {"NightVisionBlackBox",false}, {"TrackerBlackBox",false} };
-	TMap <FString, bool> unlockableAbilities = { {"EnvironmentalScan",true}, {"MovementDetector",false} ,{"ParalysingDartGun",true} ,{"WeakeningDartGun",false} ,{"SoundImitation",false} ,{"OpticCamouflage",false} ,{"FertilizerGun",false},{"Hound",false},{"GrowingRoots",false},{"BarkCovering",false},{"Tracker",false},{"TimeSlow",false},{"Glider",false},{"PoweredBoots",false},{"EmpoweredDash",false},{"PheromonesRelease",false},{"Allergy",true},{"Hallucination",false},{"FastSwimming",false},{"BiologicalRegeneration",false},{"ToughSkin",false},{"HeartContractrion",false} };
+	TMap <FString, bool> unlockableAbilities = { {"EnvironmentalScan",false}, {"MovementDetector",false} ,{"ParalysingDartGun",false} ,{"WeakeningDartGun",false} ,{"SoundImitation",false} ,{"OpticCamouflage",false} ,{"FertilizerGun",false},{"Hound",false},{"GrowingRoots",false},{"BarkCovering",false},{"Tracker",false},{"TimeSlow",false},{"Glider",false},{"PoweredBoots",false},{"EmpoweredDash",false},{"PheromonesRelease",false},{"Allergy",false},{"Hallucination",false},{"FastSwimming",false},{"BiologicalRegeneration",false},{"ToughSkin",false},{"HeartContractrion",false} };
 	TMap <FString, bool> metroidvaniaAbilities = { {"NightVision",false}, {"Grapnel",false} ,{"Gills",false},{"ExtremeTemperaturesResistance",false},{"StickyFeet",false} };
+	TMap <FString, bool> collectableItemsCompleted = { {"ParalysingDartBlackBox",false}, {"GrapnelItem",false} ,{"WeakeningDartDocument",false},{"EnvironmentalScanBeacon",false},{"MovementDetectorBeacon",false}, {"GliderBlackBox",false}, {"PoweredBootsBlackBox",false}, {"GillsDoc",false}, {"NightVisionBlackBox",false}, {"TrackerBlackBox",false} };
+	TMap <FString, TArray<int32>> savedEquipmentSets;
 
+protected:
+	bool CanRecreateCharacter = false;
+	bool TutorialCompleted = false;
 
 
 public:
@@ -38,6 +44,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 		static void UnlockItem(FString EntryName);
 
+	UFUNCTION(BlueprintCallable)
+		static void CheckUnlockAbilities(FString EntryName);
+
 public:
 	UFUNCTION(BlueprintCallable)
 		static void SetScannableItemStatus(FString EntryName, bool isScanned);
@@ -50,6 +59,21 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		static void SetCollectableItems(FString EntryName, bool isCollected);
+
+	UFUNCTION(BlueprintCallable)
+		static void SetItemCompletion(FString EntryName, bool isCompleted);
+
+	UFUNCTION(BlueprintCallable)
+		static void AddSavedEquipmentSet(FString EntryName, TArray<int32> equipmentIndexes);
+	
+	UFUNCTION(BlueprintCallable)
+		static void RemoveSavedEquipmentSet(FString EntryName);
+
+	UFUNCTION(BlueprintCallable)
+		static void SetCanRecreateCharacter(bool Value);
+
+	UFUNCTION(BlueprintCallable)
+		static void SetTutorialCompleted(bool Value);
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -64,5 +88,18 @@ public:
 	UFUNCTION(BlueprintCallable)
 		static bool GetCollectableItems(FString EntryName);
 
+	UFUNCTION(BlueprintCallable)
+		static bool GetItemCompletion(FString EntryName);
 
+	UFUNCTION(BlueprintCallable)
+		static TArray<int32> GetSavedEquipmentSet(FString EntryName);
+
+	UFUNCTION(BlueprintCallable)
+		static TArray<FString> GetAllSavedEquipmentSet();
+
+	UFUNCTION(BlueprintCallable)
+		static bool GetCanRecreateCharacter();
+
+	UFUNCTION(BlueprintCallable)
+		static bool GetTutorialCompleted();
 };
