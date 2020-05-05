@@ -417,6 +417,7 @@ void AAaronCharacter::StartJumping()
 				else if (!StatManager->Skills.Stilt && StatManager->ConsumeStamina(StatManager->GetJumpStaminaCost()))
 				{
 					Jump();
+					isJumping = true;
 				}
 			}
 		}
@@ -431,6 +432,7 @@ void AAaronCharacter::EndJumping()
 		{
 			GetCharacterMovement()->JumpZVelocity = StatManager->GetJumpForce() * (1.0f + 2.0f * JumpMultPercent);
 			Jump();
+			isJumping = true;
 			bPressedJump = false;
 			JumpMultPercent = 0.0f;
 		}
