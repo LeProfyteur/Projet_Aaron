@@ -20,14 +20,18 @@ ULSDAlteration::ULSDAlteration()
 void ULSDAlteration::BeginPlay()
 {
 	Super::BeginPlay();
-	UE_LOG(LogActor, Warning, TEXT("Damage : %f"), Damage);
-	_CreatureStatManager = GetOwner()->FindComponentByClass<UCreatureStatManager>();
-	UCharacterStatManager* CharacterStatManager = Cast<UCharacterStatManager>(_CreatureStatManager);
 
-	if (CharacterStatManager)
+	_CreatureStatManager = GetOwner()->FindComponentByClass<UCreatureStatManager>();
+	if(_CreatureStatManager)
 	{
-		AAaronCharacter* Character = Cast<AAaronCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-		Character->OnLsdAlteration(TimeMutation);
+		UCharacterStatManager* CharacterStatManager = Cast<UCharacterStatManager>(_CreatureStatManager);
+
+		if (CharacterStatManager)
+		{
+			AAaronCharacter* Character = Cast<AAaronCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+			Character->OnLsdAlteration(TimeMutation);
+		}
+		_CreatureStatManager->TakeDamage(Damage, 0.0f);
 	}
-	_CreatureStatManager->TakeDamage(Damage,0.0f);
+	
 }
