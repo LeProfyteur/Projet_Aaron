@@ -119,6 +119,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float MaxTimeGliding = 5.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool isJumping = false;
+
 	bool IsGliding = false;
 
 	//Game settings : mouse sensivity
