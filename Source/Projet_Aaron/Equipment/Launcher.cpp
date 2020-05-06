@@ -20,7 +20,7 @@ void ALauncher::Activate_Implementation(bool isPressed)
 	if (ProjectileClass->IsValidLowLevel() && !isPressed && ReadyToFire)
 	{
 		FVector loc = SphereComponent->GetComponentLocation();
-		FRotator rota;
+		FRotator rota = SphereComponent->GetComponentRotation();
 		
 		if (UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayConnected())
 		{
@@ -46,7 +46,7 @@ void ALauncher::Activate_Implementation(bool isPressed)
 			FVector Forward = TargetPosition - SphereComponent->GetComponentLocation();
 			rota = UKismetMathLibrary::MakeRotFromXZ(Forward, FVector::UpVector);
 		}
-		
+
 		GetWorld()->SpawnActor(ProjectileClass, &loc, &rota);
 		Aiming = false;
 		ReadyToFire = false;
