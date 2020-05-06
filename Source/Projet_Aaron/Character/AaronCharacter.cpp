@@ -24,11 +24,11 @@ AAaronCharacter::AAaronCharacter()
 	CharacterMovement->GetNavAgentPropertiesRef().bCanCrouch = true;
 	
 	RightArmEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Right Arm Equipment"));
-	RightArmEquipment->SetupAttachment(FpsCamera);
+	RightArmEquipment->SetupAttachment(GetMesh(), FName("RightArm"));
 
 	LeftArmEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Left Arm Equipment"));
-	LeftArmEquipment->SetupAttachment(FpsCamera);
-
+	LeftArmEquipment->SetupAttachment(GetMesh(), FName("LeftArm"));
+	
 	HeadEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Head Equipment"));
 	HeadEquipment->SetupAttachment(FpsCamera);
 
@@ -417,6 +417,7 @@ void AAaronCharacter::StartJumping()
 				else if (!StatManager->Skills.Stilt && StatManager->ConsumeStamina(StatManager->GetJumpStaminaCost()))
 				{
 					Jump();
+					isJumping = true;
 				}
 			}
 		}
@@ -431,6 +432,7 @@ void AAaronCharacter::EndJumping()
 		{
 			GetCharacterMovement()->JumpZVelocity = StatManager->GetJumpForce() * (1.0f + 2.0f * JumpMultPercent);
 			Jump();
+			isJumping = true;
 			bPressedJump = false;
 			JumpMultPercent = 0.0f;
 		}
@@ -556,7 +558,10 @@ void AAaronCharacter::ActivatePressedLeft()
 	{
 		AActor* ChildActor = LeftArmEquipment->GetChildActor();
 		if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
+		{
+			isAimingLeft = true;
 			IEquipmentInterface::Execute_Activate(ChildActor, true);
+		}
 	}
 }
 
@@ -573,7 +578,10 @@ void AAaronCharacter::ActivateReleasedLeft()
 	{
 		AActor* ChildActor = LeftArmEquipment->GetChildActor();
 		if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
+		{
+			isAimingLeft = false;
 			IEquipmentInterface::Execute_Activate(ChildActor, false);
+		}	
 	}
 }
 
@@ -591,7 +599,10 @@ void AAaronCharacter::ActivatePressedRight()
 	{
 		AActor* ChildActor = RightArmEquipment->GetChildActor();
 		if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
+		{
+			isAimingRight = true;
 			IEquipmentInterface::Execute_Activate(ChildActor, true);
+		}
 	}
 }
 
@@ -608,7 +619,10 @@ void AAaronCharacter::ActivateReleasedRight()
 	{
 		AActor* ChildActor = RightArmEquipment->GetChildActor();
 		if (IsValid(ChildActor) && ChildActor->Implements<UEquipmentInterface>())
+		{
+			isAimingRight = false;
 			IEquipmentInterface::Execute_Activate(ChildActor, false);
+		}
 	}
 }
 
