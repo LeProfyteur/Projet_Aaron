@@ -130,6 +130,8 @@ public:
 		void SetPoisonEffect(float Value);
 	UFUNCTION(BlueprintCallable)
 		void SetNightVisionEffect(float Value);
+	UFUNCTION(BlueprintCallable)
+		void ResetDamagePP();
 
 	/*Others*/
 	void TakeDamage(float BioDamage, float TechDamage);
