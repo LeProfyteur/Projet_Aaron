@@ -746,7 +746,7 @@ void AAaronCharacter::Scan()
 			PlayerHUD->GetRadiusCircle(ScanPercent);
 
 			if (ScanPercent < 1.0f)
-				PlayerHUD->UpdateCircleRadius(ScanPercent + 0.01f);
+				PlayerHUD->UpdateCircleRadius(ScanPercent + GetWorld()->DeltaTimeSeconds);
 			else
 			{
 				IAnalyseObjectInterface::Execute_ScanFinished(OutHit.GetActor());
