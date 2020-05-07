@@ -44,11 +44,14 @@ AAaronCharacter::AAaronCharacter()
 	VaultTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Vault Timeline"));
 	PoisonTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Poison Timeline"));
 	LsdTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("LSD Timeline"));
+	DodgeTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Dodge Timeline"));
 
 	UpdateTimeline.BindUFunction(this, FName("UpdateTimelineFunction"));
 	FinishTimeLine.BindUFunction(this, FName("EndTimelineFunction"));
 	UpdateTimelinePoison.BindUFunction(this, FName("UpdateTimelinePoisonFunction"));
 	UpdateTimelineLSD.BindUFunction(this, FName("UpdateTimelineLSDFunction"));
+	UpdateDodgeTimeline.BindUFunction(this, FName("SetDodgeLocation"));
+	FinishDodgeTimeLine.BindUFunction(this, FName("ResetDodge"));
 
 	Mutations = TArray<UUMutationBase*>();
 }
@@ -71,6 +74,9 @@ void AAaronCharacter::BeginPlay()
 	VaultTimeline->SetTimelineFinishedFunc(FinishTimeLine);
 	PoisonTimeline->AddInterpFloat(CurvePoison, UpdateTimelinePoison);
 	LsdTimeline->AddInterpFloat(CurveLSD, UpdateTimelineLSD);
+	DodgeTimeline->AddInterpFloat(CurveDodge, UpdateDodgeTimeline);
+	DodgeTimeline->SetTimelineFinishedFunc(FinishDodgeTimeLine);
+
 	CharacterMovement->AirControl = StatManager->GetAirControl();
 	CharacterMovement->GravityScale = StatManager->GetGravityScale();
 
@@ -514,10 +520,57 @@ void AAaronCharacter::StopSprinting()
 void AAaronCharacter::Dodge()
 {
 	FVector Direction = GetCharacterDirection();
-	if (!CharacterMovement->IsFalling() && Direction.SizeSquared() != 0.0f && StatManager->ConsumeStamina(StatManager->GetDodgeStaminaCost()))
+	/*if (!CharacterMovement->IsFalling() && Direction.SizeSquared() != 0.0f && StatManager->ConsumeStamina(StatManager->GetDodgeStaminaCost()))
 	{
 		LaunchCharacter(Direction * StatManager->GetDodgeForce(), true, false);
+	}*/
+
+	CanDodge = false;
+	if (!CharacterMovement->IsSwimming() && !CharacterMovement->IsFalling() && Direction.Size() != 0.0f && StatManager->ConsumeStamina(StatManager->GetDodgeStaminaCost()))
+	{
+		DisableInput(GetWorld()->GetFirstPlayerController());
+		LocationBeforeDodge = GetActorLocation();
+
+		FHitResult HitResult;
+		if (GetWorld()->LineTraceSingleByChannel(HitResult, LocationBeforeDodge, GetActorLocationAfterDodge(DodgeDistance), ECC_Visibility))
+		{
+			float NewDistance = HitResult.Distance - GetCapsuleComponent()->GetScaledCapsuleRadius();
+			LocationAfterDodge = GetActorLocationAfterDodge(NewDistance);
+		}
+		else
+		{
+			LocationAfterDodge = HitResult.TraceEnd;
+		}
+
+		DodgeTimeline->PlayFromStart();
 	}
+	else
+	{
+		CanDodge = true;
+	}
+}
+
+void AAaronCharacter::SetDodgeLocation(float Value)
+{
+	FVector NewLocation = UKismetMathLibrary::VLerp(LocationBeforeDodge, LocationAfterDodge, Value);
+	SetActorLocation(NewLocation);
+}
+
+void AAaronCharacter::ResetDodge()
+{
+	EnableInput(GetWorld()->GetFirstPlayerController());
+	CanDodge = true;
+	//UKismetSystemLibrary::Delay(, , );
+}
+
+FVector AAaronCharacter::GetActorLocationAfterDodge(float Distance)
+{
+	FVector ForwardVector = FpsCamera->GetForwardVector() * Distance * GetInputAxisValue(FName("MoveForward"));
+	FVector RightVector = FpsCamera->GetRightVector() * Distance * GetInputAxisValue(FName("MoveRight"));
+	FVector Res = ForwardVector + RightVector + LocationBeforeDodge;
+	Res.Z = GetActorLocation().Z;
+	
+	return Res;
 }
 
 void AAaronCharacter::Interact()

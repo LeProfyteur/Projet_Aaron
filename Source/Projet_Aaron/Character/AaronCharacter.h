@@ -99,10 +99,16 @@ public:
 		UTimelineComponent* LsdTimeline;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UTimelineComponent* DodgeTimeline;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UCurveFloat* CurvePoison;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UCurveFloat* CurveLSD;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UCurveFloat* CurveDodge;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UClass* GrapnelClass;
@@ -179,6 +185,12 @@ protected:
 	bool bPressedJump = false;
 	bool IsGrapnelMod = false;
 	int IndexFireLeftAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float DodgeDistance = 1000.0f;
+	bool CanDodge = true;
+	FVector LocationBeforeDodge;
+	FVector LocationAfterDodge;
 
 	float WaterHeight;
 
@@ -265,7 +277,13 @@ protected:
 	void StartSprinting();
 	void StopSprinting();
 
+	UFUNCTION(BlueprintCallable)
 	void Dodge();
+	UFUNCTION(BlueprintCallable)
+	void SetDodgeLocation(float Value);
+	UFUNCTION(BlueprintCallable)
+	void ResetDodge();
+	FVector GetActorLocationAfterDodge(float Distance);
 
 	void Interact();
 	void StopInteract();
@@ -339,6 +357,8 @@ protected:
 	FOnTimelineEvent FinishTimeLine{};
 	FOnTimelineFloat UpdateTimelinePoison{};
 	FOnTimelineFloat UpdateTimelineLSD{};
+	FOnTimelineFloat UpdateDodgeTimeline{};
+	FOnTimelineEvent FinishDodgeTimeLine{};
 
 	AActor* LastScannedActor = nullptr;
 };
