@@ -27,10 +27,9 @@ void UCharacterStatManager::TakeDamage(float BioDamage, float TechDamage)
 
 	
 	float RateHealth = GetHealthBioRate();
-	if(RateHealth <= 0.5f)
-	{
-		ParameterCollectionInstance->SetScalarParameterValue(FName(TEXT("Damage")), 1.0f - RateHealth);
-	}
+	ParameterCollectionInstance->SetScalarParameterValue(FName(TEXT("Damage")), 1.0f - RateHealth);
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UCharacterStatManager::ResetDamagePP, 0.45f, false);
 }
 
 void UCharacterStatManager::ConsumeOxygene(float OxygeneToConsume)
@@ -72,6 +71,11 @@ float UCharacterStatManager::GetNightVisionEffect()
 void UCharacterStatManager::SetNightVisionEffect(float Value)
 {
 	ParameterCollectionInstance->SetScalarParameterValue(FName(TEXT("NightVision")), Value);
+}
+
+void UCharacterStatManager::ResetDamagePP()
+{
+	ParameterCollectionInstance->SetScalarParameterValue(FName(TEXT("Damage")), 0.0f);
 }
 
 void UCharacterStatManager::SetPoisonEffect(float Value)
