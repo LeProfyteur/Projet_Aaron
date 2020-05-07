@@ -18,7 +18,7 @@ void AMyHUD::BeginPlay()
 	
 	BarMatInstance = UMaterialInstanceDynamic::Create(AnalyseMat, this);
 	BarMatInstance->SetScalarParameterValue(FName(TEXT("Decimal")), 0.0f);
-	BarMatInstance->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor(0.7f, 200.0f, 0.34f));
+	BarMatInstance->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor(0.9f, 0.9f, 0.9f));
 
 	SetActorTickEnabled(false);
 }
@@ -35,7 +35,10 @@ void AMyHUD::DrawHUD()
 	FVector2D viewportSize(0, 0);
 	GEngine->GameViewport->GetViewportSize(viewportSize);
 	
-	DrawMaterialSimple(BarMatInstance, (viewportSize.X / 2.0f)-25.0f, (viewportSize.Y / 2.0f)-25.0f, 50.0f, 50.0f);
+	DrawMaterialSimple(BarMatInstance, (viewportSize.X / 2.0f)-40.0f, (viewportSize.Y / 2.0f)-40.0f, 80.0f, 80.0f);
+
+	//FString text = "Pourcent";
+	//DrawText(text, FLinearColor(1, 1, 1, 1), (viewportSize.X / 2.0f) - 40.0f, (viewportSize.Y / 2.0f) - 20.0f,0,1.0f);
 }
 
 void AMyHUD::UpdateCircleRadius(float RadiusBar)
