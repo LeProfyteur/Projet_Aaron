@@ -987,7 +987,7 @@ bool AAaronCharacter::CanClimbOnWall(VaultTraceSettings TraceSettings, FVector& 
 
 	FCollisionQueryParams CollisionParams;
 	CollisionParams.AddIgnoredActor(this);
-	CollisionParams.bDebugQuery = true;
+	//CollisionParams.bDebugQuery = true;
 
 	FCollisionShape CapsuleShape = FCollisionShape();
 	//CapsuleShape.MakeSphere(TraceSettings.DownwardTraceRadius);
