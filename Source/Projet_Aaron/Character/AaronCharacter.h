@@ -134,6 +134,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool isAimingRight = false;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool isPunctionning = false;
+
 	bool IsGliding = false;
 
 	//Game settings : mouse sensivity
