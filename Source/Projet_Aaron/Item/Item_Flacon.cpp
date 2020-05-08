@@ -19,6 +19,7 @@ bool AItem_FlaconCPP::UseItem_Implementation()
 		{
 			ESyringeType Syringe = IInterfaceFillSyringe::Execute_GetSeringueType(OutHit.GetActor());
 			UpdateBPFromSyringeTypeCPP(Syringe);
+			Character->isPunctionning = true;
 			return true;
 		}
 	}
