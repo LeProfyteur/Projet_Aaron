@@ -18,7 +18,7 @@ private:
 public:
 
 	UFUNCTION(BlueprintCallable)
-		void Initialize();
+		void InitializeSubsystem();
 
 	UFUNCTION(BlueprintCallable)
 		void PopAllMenus();

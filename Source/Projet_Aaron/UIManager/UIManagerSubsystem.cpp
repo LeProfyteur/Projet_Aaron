@@ -1,6 +1,6 @@
 #include "UIManagerSubsystem.h"
 
-void UUIManagerSubsystem::Initialize()
+void UUIManagerSubsystem::InitializeSubsystem()
 {
 	MenuStack.Empty();
 }
