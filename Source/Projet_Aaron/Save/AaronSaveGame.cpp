@@ -1,4 +1,4 @@
-#include "AaronSaveGame.h"
+*#include "AaronSaveGame.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Actor.h"
@@ -161,7 +161,7 @@ void UAaronSaveGame::LoadComponent(UWorld* World, AActor* Actor, UPARAM(ref)FCom
 	//Reject already deserialized Records
 	if (ComponentRecord.Reference) return;
 
-	/*//
+	/*
 	
 	if (ComponentRecord.Class->IsChildOf(UPrimitiveComponent::StaticClass()))
 	{
@@ -169,7 +169,7 @@ void UAaronSaveGame::LoadComponent(UWorld* World, AActor* Actor, UPARAM(ref)FCom
 	}
 	ComponentRecord.Reference = NewObject<UActorComponent>(Actor, ComponentRecord.Class, ComponentRecord.Name);
 
-	//**/
+	*/
 
 	UE_LOG(LogSerialization, Display, TEXT("Loading Component %s %s"), *ComponentRecord.Class->GetName(), *ComponentRecord.Name.ToString());
 }
