@@ -96,7 +96,19 @@ public:
 		UTimelineComponent* PoisonTimeline;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UTimelineComponent* LsdTimeline;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UTimelineComponent* DodgeTimeline;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UCurveFloat* CurvePoison;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UCurveFloat* CurveLSD;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UCurveFloat* CurveDodge;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UClass* GrapnelClass;
@@ -112,6 +124,18 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float MaxTimeGliding = 5.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool isJumping = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool isAimingLeft = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool isAimingRight = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool isPunctionning = false;
 
 	bool IsGliding = false;
 
@@ -165,6 +189,12 @@ protected:
 	bool IsGrapnelMod = false;
 	int IndexFireLeftAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float DodgeDistance = 1000.0f;
+	bool CanDodge = true;
+	FVector LocationBeforeDodge;
+	FVector LocationAfterDodge;
+
 	float WaterHeight;
 
 	float VaultHeight;
@@ -205,6 +235,9 @@ public:
 		void UpdateTimelinePoisonFunction(float value);
 
 	UFUNCTION()
+		void UpdateTimelineLSDFunction(float value);
+
+	UFUNCTION()
 		void EndTimelineFunction();
 
 	/**
@@ -214,6 +247,7 @@ public:
 		void UpdateBindAction();
 
 	void OnPoisonAlteration();
+	void OnLsdAlteration(float Time);
 
 protected:
 	void BeginPlay() override;
@@ -246,7 +280,13 @@ protected:
 	void StartSprinting();
 	void StopSprinting();
 
+	UFUNCTION(BlueprintCallable)
 	void Dodge();
+	UFUNCTION(BlueprintCallable)
+	void SetDodgeLocation(float Value);
+	UFUNCTION(BlueprintCallable)
+	void ResetDodge();
+	FVector GetActorLocationAfterDodge(float Distance);
 
 	void Interact();
 	void StopInteract();
@@ -319,6 +359,9 @@ protected:
 	FOnTimelineFloat UpdateTimeline{};
 	FOnTimelineEvent FinishTimeLine{};
 	FOnTimelineFloat UpdateTimelinePoison{};
+	FOnTimelineFloat UpdateTimelineLSD{};
+	FOnTimelineFloat UpdateDodgeTimeline{};
+	FOnTimelineEvent FinishDodgeTimeLine{};
 
 	AActor* LastScannedActor = nullptr;
 };

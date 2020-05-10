@@ -1,6 +1,6 @@
 #include "UIManagerSubsystem.h"
 
-void UUIManagerSubsystem::Initialize()
+void UUIManagerSubsystem::InitializeSubsystem()
 {
 	MenuStack.Empty();
 }
@@ -33,7 +33,7 @@ void UUIManagerSubsystem::PushMenu(UUserWidget* Menu)
 	}
 
 	//Push Menu to the Stack & Viewport
-	UE_LOG(LogLevel, Display, TEXT("Pushing Menu %s, %d Menus in Stack"), *Menu->GetDisplayLabel(), MenuStack.Num());
+	//UE_LOG(LogLevel, Display, TEXT("Pushing Menu %s, %d Menus in Stack"), *Menu->GetDisplayLabel(), MenuStack.Num());
 	Menu->AddToViewport();
 	Menu->SetFocus();
 	MenuStack.Push(Menu);
@@ -44,7 +44,7 @@ void UUIManagerSubsystem::PopMenu()
 	//Collapse & remove Current Menu from the Viewport (if exists)
 	if (UUserWidget* CurrentMenu = GetCurrentMenu())
 	{
-		UE_LOG(LogLevel, Display, TEXT("Poping Menu %s, %d Menus in Stack"), *CurrentMenu->GetDisplayLabel(), MenuStack.Num());
+		//UE_LOG(LogLevel, Display, TEXT("Poping Menu %s, %d Menus in Stack"), *CurrentMenu->GetDisplayLabel(), MenuStack.Num());
 		CurrentMenu->SetVisibility(ESlateVisibility::Collapsed);
 		CurrentMenu->RemoveFromViewport();
 

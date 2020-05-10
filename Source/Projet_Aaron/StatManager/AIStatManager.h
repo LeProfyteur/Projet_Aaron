@@ -19,6 +19,8 @@ class PROJET_AARON_API UAIStatManager : public UCreatureStatManager
 
 public:
 	// Sets default values for this component's properties
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Perception)
+		bool bisDamaged = false;
 	UAIStatManager();
 
 protected:
