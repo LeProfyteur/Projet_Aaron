@@ -17,32 +17,6 @@ void UDialogSubsystem::Clear()
 	DialogQueue.Empty();
 }
 
-void UDialogSubsystem::SaveDialogSubsystem(UAaronSaveGame* SaveGame)
-{
-	if (GEngine)
-	{
-		if (UDialogSubsystem* DialogSubsystem = GEngine->GetEngineSubsystem<UDialogSubsystem>())
-		{
-			SaveGame->DialogSubsystemRecord.Metrics = DialogSubsystem->Metrics;
-			SaveGame->DialogSubsystemRecord.Knowledge = DialogSubsystem->Knowledge;
-			SaveGame->DialogSubsystemRecord.Dialog = DialogSubsystem->Dialog;
-		}
-	}
-}
-
-void UDialogSubsystem::LoadDialogSubsystem(UAaronSaveGame* SaveGame)
-{
-	if (GEngine)
-	{
-		if (UDialogSubsystem* DialogSubsystem = GEngine->GetEngineSubsystem<UDialogSubsystem>())
-		{
-			DialogSubsystem->Metrics = SaveGame->DialogSubsystemRecord.Metrics;
-			DialogSubsystem->Knowledge = SaveGame->DialogSubsystemRecord.Knowledge;
-			DialogSubsystem->Dialog = SaveGame->DialogSubsystemRecord.Dialog;
-		}
-	}
-}
-
 void UDialogSubsystem::SetMetric(FString MetricToUpdate, int32 NewValue)
 {
 	if(GEngine)

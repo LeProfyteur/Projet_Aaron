@@ -38,12 +38,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void Clear();
-
-	UFUNCTION(BlueprintCallable)
-	static void SaveDialogSubsystem(UAaronSaveGame* SaveGame);
-
-	UFUNCTION(BlueprintCallable)
-	static void LoadDialogSubsystem(UAaronSaveGame* SaveGame);
 	
 	UFUNCTION(BlueprintCallable)
 	static void SetMetric(FString MetricToUpdate, int32 NewValue);

@@ -9,10 +9,6 @@
 
 #include "AaronSaveGame.generated.h"
 
-/**
- * SaveInfo represents the details of the header of a SaveGame.
- * It has a few fields that are managed by the index.
- */
 USTRUCT(BlueprintType)
 struct FSaveInfo
 {
@@ -27,43 +23,41 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame)
 		FTimespan PlayTime;
-
-
-	FORCEINLINE FArchive& Serialize(FArchive& Ar)
-	{
-		Ar << LevelName;
-		Ar << Date;
-		Ar << PlayTime;
-		return Ar;
-	}
 };
 
-/**
- * DialogSubsystemRecord is the persistent version of the Dialog subsystem.
- * Broken ATM.
- */
 USTRUCT(BlueprintType)
-struct FDialogSubsystemRecord
+struct FSubsystemData
 {
 	GENERATED_BODY()
 public:
-	
+
+	/* Dialog Subsystem Data */
 	UPROPERTY(SaveGame)
 		TMap<FString, int32> Metrics;
-
 	UPROPERTY(SaveGame)
 		TMap<FString, bool> Knowledge;
-
 	UPROPERTY(SaveGame)
 		TMap<FString, bool> Dialog;
 
-	FORCEINLINE FArchive& Serialize(FArchive& Ar)
-	{
-		Ar << Metrics;
-		Ar << Knowledge;
-		Ar << Dialog;
-		return Ar;
-	}
+	/* Spawn Subsystem Data */
+	UPROPERTY(SaveGame)
+		FString RespawnLevelName;
+	UPROPERTY(SaveGame)
+		FString RespawnPlayerStartTag;
+	UPROPERTY(SaveGame)
+		FString PreferredPlayerStartTag;
+
+	/* Player Advancement Data */
+	UPROPERTY(SaveGame)
+		TMap<FString, bool> ScannableItems;
+	UPROPERTY(SaveGame)
+		TMap<FString, bool> CollectableItems;
+	UPROPERTY(SaveGame)
+		TMap<FString, bool> UnlockableAbilities;
+	UPROPERTY(SaveGame)
+		TMap<FString, bool> MetroidvaniaAbilities;
+	UPROPERTY(SaveGame)
+		TMap<FString, bool> CollectableItemsCompleted;
 };
 
 USTRUCT(BlueprintType)
@@ -151,28 +145,13 @@ public:
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ProjetAaron")
 		FSaveInfo SaveInfo;
-	
-	/**
-	 * Name of the level to open
-	 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ProjetAaron")
-		FString LevelName;
 
-	/**
-	 * Configuration of the Subsystems
-	 */
 	UPROPERTY(VisibleAnywhere, Category = "ProjetAaron")
-		FDialogSubsystemRecord DialogSubsystemRecord;
+		FSubsystemData SubsystemData;
 
-	/**
-	 * Array of all the persisted Actors (without hierarchy)
-	 */
 	UPROPERTY(VisibleAnywhere, Category = "ProjetAaron")
 		TArray<FActorRecord> Actors;
 
-	/**
-	 * Array of all the persisted ActorComponents (without hierarchy)
-	 */
 	UPROPERTY(VisibleAnywhere, Category = "ProjetAaron")
 		TArray<FComponentRecord> Components;
 	
@@ -187,6 +166,9 @@ public:
 	void Save(UObject* WorldObjectContext);
 	void Load(UObject* WorldObjectContext);
 
+	void SaveSubsystemData(UObject* WorldObjectContext);
+	void LoadSubsystemData(UObject* WorldObjectContext);
+
 	void SaveActor(AActor* Actor);
 	void LoadActor(UWorld* World, UPARAM(ref) FActorRecord& ActorRecord);
 
@@ -197,7 +179,7 @@ public:
 	// Static Utility Functions
 	//--------------------------------------------------------------------------//
 	
-	static void Serialize(UObject* Object, UPARAM(ref) TArray<uint8>& Buffer);
+	static void SerializeObject(UObject* Object, UPARAM(ref) TArray<uint8>& Buffer);
 	
-	static void Deserialize(UObject* Object, UPARAM(ref) TArray<uint8>& Buffer);
+	static void DeserializeObject(UObject* Object, UPARAM(ref) TArray<uint8>& Buffer);
 };

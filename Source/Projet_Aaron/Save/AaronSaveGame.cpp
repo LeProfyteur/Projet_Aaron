@@ -6,8 +6,10 @@
 #include "Serialization/ObjectAndNameAsStringProxyArchive.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
-#include "UObject/UObjectIterator.h"
 #include "AaronPersistentComponent.h"
+#include "SpawnSubsystem.h"
+#include "Engine/Engine.h"
+#include "Projet_Aaron/Character/PlayerAdvancementSubsystem.h"
 #include "Projet_Aaron/Dialog/DialogSubsystem.h"
 
 static inline UActorComponent* GetComponentByFName(AActor* Owner, const FName& Name)
@@ -26,10 +28,10 @@ UAaronSaveGame::UAaronSaveGame()
 
 void UAaronSaveGame::Save(UObject* WorldContextObject)
 {
-	//TODO : manually save each subsystem
-
 	SaveInfo.LevelName = WorldContextObject->GetWorld()->GetName();
 	SaveInfo.Date = FDateTime::Now();
+
+	SaveSubsystemData(WorldContextObject);
 
 	for (TActorIterator<AActor> Itr(WorldContextObject->GetWorld()); Itr; ++Itr)
 	{
@@ -39,16 +41,63 @@ void UAaronSaveGame::Save(UObject* WorldContextObject)
 
 void UAaronSaveGame::Load(UObject* WorldContextObject)
 {
-	//TODO : manually load each subsystem
-	if (!WorldContextObject->GetWorld())
-	{
-		UE_LOG(LogSerialization, Error, TEXT("Invalid WCO ?!"));
-		return;
-	}
-	
+	LoadSubsystemData(WorldContextObject);
+
 	for (auto& Record : Actors)
 	{
 		LoadActor(WorldContextObject->GetWorld(), Record);
+	}
+}
+
+void UAaronSaveGame::SaveSubsystemData(UObject* WorldObjectContext)
+{
+	if (UPlayerAdvancementSubsystem* PlayerAdvancement = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
+	{
+		SubsystemData.ScannableItems = PlayerAdvancement->scannableItems;
+		SubsystemData.CollectableItems = PlayerAdvancement->collectableItems;
+		SubsystemData.UnlockableAbilities = PlayerAdvancement->unlockableAbilities;
+		SubsystemData.MetroidvaniaAbilities = PlayerAdvancement->metroidvaniaAbilities;
+		SubsystemData.CollectableItemsCompleted = PlayerAdvancement->collectableItemsCompleted;
+	}
+
+	if (UDialogSubsystem* Dialog = GEngine->GetEngineSubsystem<UDialogSubsystem>())
+	{
+		SubsystemData.Dialog = Dialog->Dialog;
+		SubsystemData.Knowledge = Dialog->Knowledge;
+		SubsystemData.Metrics = Dialog->Metrics;
+	}
+
+	if (USpawnSubsystem* Spawn = WorldObjectContext->GetWorld()->GetGameInstance()->GetSubsystem<USpawnSubsystem>())
+	{
+		SubsystemData.PreferredPlayerStartTag = Spawn->PreferredPlayerStartTag;
+		SubsystemData.RespawnLevelName = Spawn->RespawnLevelName;
+		SubsystemData.RespawnPlayerStartTag = Spawn->RespawnPlayerStartTag;
+	}
+}
+
+void UAaronSaveGame::LoadSubsystemData(UObject* WorldObjectContext)
+{
+	if (UPlayerAdvancementSubsystem* PlayerAdvancement = GEngine->GetEngineSubsystem<UPlayerAdvancementSubsystem>())
+	{
+		PlayerAdvancement->scannableItems = SubsystemData.ScannableItems;
+		PlayerAdvancement->collectableItems = SubsystemData.CollectableItems;
+		PlayerAdvancement->unlockableAbilities = SubsystemData.UnlockableAbilities;
+		PlayerAdvancement->metroidvaniaAbilities = SubsystemData.MetroidvaniaAbilities;
+		PlayerAdvancement->collectableItemsCompleted = SubsystemData.CollectableItemsCompleted;
+	}
+
+	if (UDialogSubsystem* Dialog = GEngine->GetEngineSubsystem<UDialogSubsystem>())
+	{
+		Dialog->Dialog = SubsystemData.Dialog;
+		Dialog->Knowledge = SubsystemData.Knowledge;
+		Dialog->Metrics = SubsystemData.Metrics;
+	}
+
+	if (USpawnSubsystem* Spawn = WorldObjectContext->GetWorld()->GetGameInstance()->GetSubsystem<USpawnSubsystem>())
+	{
+		Spawn->PreferredPlayerStartTag = SubsystemData.PreferredPlayerStartTag;
+		Spawn->RespawnLevelName = SubsystemData.RespawnLevelName;
+		Spawn->RespawnPlayerStartTag = SubsystemData.RespawnPlayerStartTag;
 	}
 }
 
@@ -83,7 +132,7 @@ void UAaronSaveGame::SaveActor(AActor* Actor)
 	Record.Class = Actor->GetClass();
 	Record.Name = Actor->GetFName();
 	Record.Transform = Actor->GetTransform();
-	Serialize(Actor, Record.ActorData);
+	SerializeObject(Actor, Record.ActorData);
 
 	//Serialize the Actor Components
 	for (auto ActorComponent : Actor->GetComponents())
@@ -117,7 +166,7 @@ void UAaronSaveGame::LoadActor(UWorld* World, UPARAM(ref) FActorRecord& ActorRec
 		return;
 	}
 	
-	Deserialize(ActorRecord.Reference, ActorRecord.ActorData);
+	DeserializeObject(ActorRecord.Reference, ActorRecord.ActorData);
 
 	//Instantiate Components
 	/*//
@@ -153,7 +202,7 @@ void UAaronSaveGame::SaveComponent(UActorComponent* Component)
 	Record.OwnerID = Component->GetOwner()->GetUniqueID();
 	Record.UniqueID = Component->GetUniqueID();
 	Record.Name = Component->GetFName();
-	Serialize(Component, Record.ComponentData);
+	SerializeObject(Component, Record.ComponentData);
 }
 
 void UAaronSaveGame::LoadComponent(UWorld* World, AActor* Actor, UPARAM(ref)FComponentRecord& ComponentRecord)
@@ -174,7 +223,7 @@ void UAaronSaveGame::LoadComponent(UWorld* World, AActor* Actor, UPARAM(ref)FCom
 	UE_LOG(LogSerialization, Display, TEXT("Loading Component %s %s"), *ComponentRecord.Class->GetName(), *ComponentRecord.Name.ToString());
 }
 
-void UAaronSaveGame::Serialize(UObject* Object, UPARAM(ref) TArray<uint8>& Buffer)
+void UAaronSaveGame::SerializeObject(UObject* Object, UPARAM(ref) TArray<uint8>& Buffer)
 {
 	if (!Object)
 	{
@@ -190,7 +239,7 @@ void UAaronSaveGame::Serialize(UObject* Object, UPARAM(ref) TArray<uint8>& Buffe
 	Object->Serialize(Archive);
 }
 
-void UAaronSaveGame::Deserialize(UObject* Object, UPARAM(ref) TArray<uint8>& Buffer)
+void UAaronSaveGame::DeserializeObject(UObject* Object, UPARAM(ref) TArray<uint8>& Buffer)
 {
 	if (!Object)
 	{
