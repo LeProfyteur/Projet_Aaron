@@ -10,7 +10,6 @@
 #include "Engine/Engine.h"
 #include "Projet_Aaron/StatManager/CharacterStatManager.h"
 #include "Projet_Aaron/Mechanisms/ClimbableInterface.h"
-#include "Projet_Aaron/Item/AnalyseObjectInterface.h"
 #include "Projet_Aaron/Equipment/NightVisionEquipment.h"
 #include "Projet_Aaron/Equipment/GrapnelEquipmentSuperAaron.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
@@ -24,17 +23,11 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/PlayerController.h"
 #include "Materials/MaterialInstanceDynamic.h"
-#include "MyHUD.h"
 #include "Kismet/KismetMathLibrary.h"
-//UMG
-#include "Runtime/UMG/Public/UMG.h"
-#include "Runtime/UMG/Public/Blueprint/UserWidget.h"
 
 #include "GameFramework/Character.h"
 #include "CoreMinimal.h"
-#include "Projet_Aaron/Item/UInventoryCastObject.h"
 #include "Projet_Aaron/Item/MainHudFixedSizeCPP.h"
-#include "Projet_Aaron/Item/HUDCPP.h"
 #include "Projet_Aaron/Item/InventaireComponent.h"
 #include "AaronCharacter.generated.h"
 
@@ -166,9 +159,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		class UMainHudFixedSizeCPP* MainHudFixedSizeCPP;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		class UHUDCPP* HudCPP;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TSubclassOf<class UUInventoryCastObject> InventoryCastObjectClass;
@@ -330,9 +320,6 @@ protected:
 	void Climb(float DeltaTime);
 	void UpdateClimbingPosition();
 	bool SearchClimbPoint(FVector& ClimbPoint);
-
-	void Scan();
-	void ScanRelease();
 
 	void PressedItemWheel();
 	void ReleaseItemWheel();

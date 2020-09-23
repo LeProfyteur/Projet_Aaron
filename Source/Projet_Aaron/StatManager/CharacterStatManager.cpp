@@ -2,6 +2,7 @@
 
 
 #include "CharacterStatManager.h"
+#include "Projet_Aaron/GameplayEvents/GameplayEventsSubsystem.h"
 
 UCharacterStatManager::UCharacterStatManager() : Super()
 {
@@ -30,14 +31,28 @@ void UCharacterStatManager::TakeDamage(float BioDamage, float TechDamage)
 	ParameterCollectionInstance->SetScalarParameterValue(FName(TEXT("Damage")), 1.0f - RateHealth);
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UCharacterStatManager::ResetDamagePP, 0.45f, false);
+	
+	if (UGameplayEventsSubsystem* GameplayEvents = GetOwner()->GetGameInstance()->GetSubsystem<UGameplayEventsSubsystem>())
+	{
+		GameplayEvents->BroadcastPlayerHealthChangedEvent(HealthBio, HealthBioMax);
+	}
 }
 
 void UCharacterStatManager::ConsumeOxygene(float OxygeneToConsume)
 {
-	if (Oxygene - OxygeneToConsume < 0.0f)
-		TakeDamage(OxygeneToConsume, 0.0f);
+	if (Oxygene > 0.0f)
+	{
+		Oxygene = FMath::Max(0.0f, Oxygene - OxygeneToConsume);
+	}
 	else
-		Oxygene -= OxygeneToConsume;
+	{
+		TakeDamage(OxygeneToConsume, 0.0f);
+	}
+
+	if (UGameplayEventsSubsystem* GameplayEvents = GetOwner()->GetGameInstance()->GetSubsystem<UGameplayEventsSubsystem>())
+	{
+		GameplayEvents->BroadcastPlayerOxygenChangedEvent(Oxygene, OxygeneMax);
+	}
 }
 
 void UCharacterStatManager::RecoveryOxygene(float DeltaTime)
@@ -45,6 +60,11 @@ void UCharacterStatManager::RecoveryOxygene(float DeltaTime)
 	Oxygene += 10.0f * DeltaTime;
 	if (Oxygene > OxygeneMax)
 		Oxygene = OxygeneMax;
+
+	if (UGameplayEventsSubsystem* GameplayEvents = GetOwner()->GetGameInstance()->GetSubsystem<UGameplayEventsSubsystem>())
+	{
+		GameplayEvents->BroadcastPlayerOxygenChangedEvent(Oxygene, OxygeneMax);
+	}
 }
 
 void UCharacterStatManager::Heal(float BioHeal, float TechHeal)
@@ -58,6 +78,11 @@ void UCharacterStatManager::Heal(float BioHeal, float TechHeal)
 	}else
 	{
 		ParameterCollectionInstance->SetScalarParameterValue(FName(TEXT("Damage")), 0.0f);
+	}
+
+	if (UGameplayEventsSubsystem* GameplayEvents = GetOwner()->GetGameInstance()->GetSubsystem<UGameplayEventsSubsystem>())
+	{
+		GameplayEvents->BroadcastPlayerHealthChangedEvent(HealthBio, HealthBioMax);
 	}
 }
 

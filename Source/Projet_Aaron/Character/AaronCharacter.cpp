@@ -188,6 +188,7 @@ void AAaronCharacter::Tick(float DeltaTime)
 	FVector End = Start + FpsCamera->GetForwardVector() * RaycastDistanceInventory;
 	FCollisionQueryParams collisionParams;
 
+	//TODO @glathuiliere : Fix Inventory
 	if (GetWorld()->SweepSingleByChannel(OutHit, Start, End, FpsCamera->GetComponentRotation().Quaternion(), ECC_Visibility, FCollisionShape::MakeCapsule(50, 50), collisionParams))
 	{
 		UStaticMeshComponent* actorMeshComponent = OutHit.Actor->FindComponentByClass<UStaticMeshComponent>();
@@ -196,16 +197,16 @@ void AAaronCharacter::Tick(float DeltaTime)
 			if (!HitActor || OutHit.Actor != HitActor->Actor)
 				HitActor = new FHitResult(OutHit);
 
-			InventoryCastObject->nameTextItem = IObjectInteractionInterface::Execute_GetLabel(OutHit.GetActor());
+			//InventoryCastObject->nameTextItem = IObjectInteractionInterface::Execute_GetLabel(OutHit.GetActor());
 		}
 		else
 		{
-			InventoryCastObject->nameTextItem = "";
+			//InventoryCastObject->nameTextItem = "";
 		}
 	}
 	else if (HitActor)
 	{
-		InventoryCastObject->nameTextItem = "";
+		//InventoryCastObject->nameTextItem = "";
 		HitActor = nullptr;
 	}
 
@@ -250,10 +251,6 @@ void AAaronCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AAaronCharacter::Interact);
 	PlayerInputComponent->BindAction("Interact", IE_Released, this, &AAaronCharacter::StopInteract);
-
-	PlayerInputComponent->BindAction("Scan", IE_Repeat, this, &AAaronCharacter::Scan);
-	PlayerInputComponent->BindAction("Scan", IE_Pressed, this, &AAaronCharacter::Scan);
-	PlayerInputComponent->BindAction("Scan", IE_Released, this, &AAaronCharacter::ScanRelease);
 	
 	PlayerInputComponent->BindAction("ItemWheel", IE_Pressed, this, &AAaronCharacter::PressedItemWheel);
 	PlayerInputComponent->BindAction("ItemWheel", IE_Released, this, &AAaronCharacter::ReleaseItemWheel);
@@ -730,40 +727,6 @@ void AAaronCharacter::UpdateClimbingPosition()
 	}
 }
 
-void AAaronCharacter::Scan()
-{
-	FHitResult OutHit;
-	FVector Start = FpsCamera->GetComponentLocation();
-	FVector End = Start + FpsCamera->GetForwardVector() * RaycastDistanceInventory;
-	FCollisionQueryParams collisionParams;
-
-	if (GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECC_Visibility, collisionParams))
-	{
-		if (OutHit.GetActor()->Implements<UAnalyseObjectInterface>() && (LastScannedActor==nullptr || LastScannedActor!=OutHit.GetActor()))
-		{
-			float ScanPercent = 0.0f;
-			AMyHUD* PlayerHUD = Cast<AMyHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
-			PlayerHUD->GetRadiusCircle(ScanPercent);
-
-			if (ScanPercent < 1.0f)
-				PlayerHUD->UpdateCircleRadius(ScanPercent + GetWorld()->DeltaTimeSeconds);
-			else
-			{
-				IAnalyseObjectInterface::Execute_ScanFinished(OutHit.GetActor());
-				//UPlayerAdvancementSubsystem::SetScannableItemStatus(OutHit.GetActor()->GetName(),true);
-				LastScannedActor = OutHit.GetActor();
-				PlayerHUD->ResetCircleRadius();
-			}
-		}
-	}
-}
-
-void AAaronCharacter::ScanRelease()
-{
-	AMyHUD* PlayerHUD = Cast<AMyHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
-	PlayerHUD->UpdateCircleRadius(0.0f);
-}
-
 void AAaronCharacter::PressedItemWheel()
 {
 	CurrentTimePressedItemWheel += GetWorld()->GetDeltaSeconds();
@@ -783,7 +746,7 @@ void AAaronCharacter::ReleaseItemWheel()
 		PlayerController->bShowMouseCursor = false;
 
 		//ChosenSlot
-		HudCPP->ItemSelected = MainHudFixedSizeCPP->ChosenSlot;
+		//HudCPP->ItemSelected = MainHudFixedSizeCPP->ChosenSlot;
 	}
 	else
 	{
