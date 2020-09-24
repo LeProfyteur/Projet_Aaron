@@ -258,10 +258,12 @@ void AAaronCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 void AAaronCharacter::EnableDisableNightVision()
 {
+/*
 	if (UPlayerAdvancementSubsystem::GetMetroidvaniaAbilities(FString("NightVision")) && StatManager->GetNightVisionEffect() == 0.0f)
 		StatManager->SetNightVisionEffect(1.0f);
 	else
 		StatManager->SetNightVisionEffect(0.0f);
+*/
 }
 
 void AAaronCharacter::EnableDisableGrapnel()
