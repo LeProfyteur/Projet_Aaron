@@ -4,20 +4,25 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "InteractorComponent.h"
 #include "GameplayEventsSubsystem.generated.h"
 
 //Player Status Events
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FPlayerStatChangedEvent, float, Current, float, Max);
 
-//Interaction Selection Events
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerSelectInteractionEvent, AActor*, Target);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerDeselectInteractionEvent, AActor*, Target);
+//Player Scan Events
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerSelectScannableInteractorEvent, UInteractorComponent*, Interactor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerBeginScanEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerScanProgressEvent, float, Progress);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerCancelScanEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerCompleteScanEvent);
 
-//Interaction Events
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerBeginInteractionEvent);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerInteractionProgressEvent, float, Progress);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerCancelInteractionEvent);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerCompleteInteractionEvent);
+//Action Events
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerSelectActionInteractorEvent, UInteractorComponent*, Interactor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerBeginActionEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerActionProgressEvent, float, Progress);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerCancelActionEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerCompleteActionEvent);
 
 /**
  * 
@@ -28,13 +33,41 @@ class PROJET_AARON_API UGameplayEventsSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
+	//Player Status Signals
 	UFUNCTION(BlueprintCallable)
-		void BroadcastPlayerHealthChangedEvent(float Current, float Max);
+		void SignalPlayerHealthChanged(float Current, float Max);
 	UFUNCTION(BlueprintCallable)
-		void BroadcastPlayerStaminaChangedEvent(float Current, float Max);
+		void SignalPlayerStaminaChanged(float Current, float Max);
 	UFUNCTION(BlueprintCallable)
-		void BroadcastPlayerOxygenChangedEvent(float Current, float Max);
+		void SignalPlayerOxygenChanged(float Current, float Max);
+
+	//Player Scan Signals
+	UFUNCTION(BlueprintCallable)
+		void SignalPlayerSelectScannableInteractor(UInteractorComponent* Interactor);
+	UFUNCTION(BlueprintCallable)
+		void SignalPlayerBeginScan();
+	UFUNCTION(BlueprintCallable)
+		void SignalPlayerScanProgress(float Progress);
+	UFUNCTION(BlueprintCallable)
+		void SignalPlayerCancelScan();
+	UFUNCTION(BlueprintCallable)
+		void SignalPlayerCompleteScan();
+
+
+	//Action Signals
+	UFUNCTION(BlueprintCallable)
+		void SignalPlayerSelectActionInteractor(UInteractorComponent* Interactor);
+	UFUNCTION(BlueprintCallable)
+		void SignalPlayerBeginAction();
+	UFUNCTION(BlueprintCallable)
+		void SignalPlayerActionProgress(float Progress);
+	UFUNCTION(BlueprintCallable)
+		void SignalPlayerCancelAction();
+	UFUNCTION(BlueprintCallable)
+		void SignalPlayerCompleteAction();
+	
 protected:
+	//Player Status Events
 	UPROPERTY(BlueprintAssignable)
 		FPlayerStatChangedEvent OnPlayerHealthChanged;
 	UPROPERTY(BlueprintAssignable)
@@ -42,35 +75,27 @@ protected:
 	UPROPERTY(BlueprintAssignable)
 		FPlayerStatChangedEvent OnPlayerOxygenChanged;
 
+	//Player Scan Events
+	UPROPERTY(BlueprintAssignable)
+		FPlayerSelectScannableInteractorEvent OnPlayerSelectScannableInteractor;
+	UPROPERTY(BlueprintAssignable)
+		FPlayerBeginScanEvent OnPlayerBeginScan;
+	UPROPERTY(BlueprintAssignable)
+		FPlayerScanProgressEvent OnPlayerScanProgress;
+	UPROPERTY(BlueprintAssignable)
+		FPlayerCancelScanEvent OnPlayerCancelScan;
+	UPROPERTY(BlueprintAssignable)
+		FPlayerCompleteScanEvent OnPlayerCompleteScan;
 
-public:
-	UFUNCTION(BlueprintCallable)
-		void BroadcastPlayerSelectInteractionEvent(AActor* Target);
-	UFUNCTION(BlueprintCallable)
-		void BroadcastPlayerDeselectInteractionEvent(AActor* Target);
-protected:
+	//Action Events
 	UPROPERTY(BlueprintAssignable)
-		FPlayerSelectInteractionEvent OnPlayerSelectInteraction;
+		FPlayerSelectActionInteractorEvent OnPlayerSelectActionInteractor;
 	UPROPERTY(BlueprintAssignable)
-		FPlayerDeselectInteractionEvent OnPlayerDeselectInteraction;
-
-
-public:
-	UFUNCTION(BlueprintCallable)
-		void BroadcastPlayerBeginInteractionEvent();
-	UFUNCTION(BlueprintCallable)
-		void BroadcastPlayerInteractionProgressEvent(float Progress);
-	UFUNCTION(BlueprintCallable)
-		void BroadcastPlayerCancelInteractionEvent();
-	UFUNCTION(BlueprintCallable)
-		void BroadcastPlayerCompleteInteractionEvent();
-protected:
+		FPlayerBeginActionEvent OnPlayerBeginAction;
 	UPROPERTY(BlueprintAssignable)
-		FPlayerBeginInteractionEvent OnPlayerBeginInteraction;
+		FPlayerActionProgressEvent OnPlayerActionProgress;
 	UPROPERTY(BlueprintAssignable)
-		FPlayerInteractionProgressEvent OnPlayerInteractionProgress;
+		FPlayerCancelActionEvent OnPlayerCancelAction;
 	UPROPERTY(BlueprintAssignable)
-		FPlayerCancelInteractionEvent OnPlayerCancelInteraction;
-	UPROPERTY(BlueprintAssignable)
-		FPlayerCompleteInteractionEvent OnPlayerCompleteInteraction;
+		FPlayerCompleteActionEvent OnPlayerCompleteAction;
 };

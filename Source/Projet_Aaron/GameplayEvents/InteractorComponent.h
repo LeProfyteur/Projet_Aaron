@@ -11,7 +11,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInteractionProgressEvent, float, Pr
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInteractionCancelEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInteractionCompleteEvent);
 
-UCLASS( meta=(BlueprintSpawnableComponent) )
+UCLASS(Blueprintable, meta=(BlueprintSpawnableComponent) )
 class PROJET_AARON_API UInteractorComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -27,6 +27,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		bool IsInteracting();
+
+	UFUNCTION(BlueprintGetter)
+		virtual bool CanInteract();
+
+	UFUNCTION(BlueprintSetter)
+		virtual void SetInteractive(bool Interactive);
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
@@ -45,7 +51,13 @@ protected:
 		FInteractionCompleteEvent OnInteractionComplete;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float InteractionDuration = 0;
+		float InteractionDuration = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		FText InteractionHint;
+
+	UPROPERTY(EditAnywhere, BlueprintGetter = CanInteract, BlueprintSetter = SetInteractive)
+		bool bInteractive = true;
 
 private:
 	bool Interacting = false;

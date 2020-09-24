@@ -10,7 +10,7 @@ UInteractorComponent::UInteractorComponent()
 
 void UInteractorComponent::StartInteraction()
 {
-	if (Interacting)
+	if (!CanInteract() || Interacting)
 	{
 		return;
 	}
@@ -24,14 +24,14 @@ void UInteractorComponent::StartInteraction()
 
 void UInteractorComponent::StopInteraction()
 {
-	if (!Interacting)
+	if (!CanInteract() || !Interacting)
 	{
 		return;
 	}
 
 	//Stop Interaction
-	bool Cancelled = RemainingDuration > 0;
 	Interacting = false;
+	bool Cancelled = !CanInteract() || RemainingDuration > 0;
 	RemainingDuration = 0;
 
 	if (Cancelled)
@@ -52,12 +52,30 @@ bool UInteractorComponent::IsInteracting()
 	return Interacting;
 }
 
+bool UInteractorComponent::CanInteract()
+{
+	return bInteractive;
+}
+
+void UInteractorComponent::SetInteractive(bool Interactive)
+{
+	bInteractive = Interactive;
+}
+
 void UInteractorComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+
 	if (Interacting)
 	{
+		if (!CanInteract())
+		{
+			StopInteraction();
+			return;
+		}
+
+
 		// Update Interaction Progress
 		RemainingDuration -= DeltaTime;
 		RemainingDuration = FMath::Max(0.0f, RemainingDuration);

@@ -2,49 +2,70 @@
 
 
 #include "GameplayEventsSubsystem.h"
-
-
-void UGameplayEventsSubsystem::BroadcastPlayerHealthChangedEvent(float Current, float Max)
+//Player Status Signals
+void UGameplayEventsSubsystem::SignalPlayerHealthChanged(float Current, float Max)
 {
 	OnPlayerHealthChanged.Broadcast(Current, Max);
 }
 
-void UGameplayEventsSubsystem::BroadcastPlayerStaminaChangedEvent(float Current, float Max)
+void UGameplayEventsSubsystem::SignalPlayerStaminaChanged(float Current, float Max)
 {
 	OnPlayerStaminaChanged.Broadcast(Current, Max);
 }
 
-void UGameplayEventsSubsystem::BroadcastPlayerOxygenChangedEvent(float Current, float Max)
+void UGameplayEventsSubsystem::SignalPlayerOxygenChanged(float Current, float Max)
 {
 	OnPlayerOxygenChanged.Broadcast(Current, Max);
 }
 
-void UGameplayEventsSubsystem::BroadcastPlayerSelectInteractionEvent(AActor* Target)
+//Player Scan Signals
+void UGameplayEventsSubsystem::SignalPlayerSelectScannableInteractor(UInteractorComponent* Interactor)
 {
-	OnPlayerSelectInteraction.Broadcast(Target);
+	OnPlayerSelectScannableInteractor.Broadcast(Interactor);
 }
 
-void UGameplayEventsSubsystem::BroadcastPlayerDeselectInteractionEvent(AActor* Target)
+void UGameplayEventsSubsystem::SignalPlayerBeginScan()
 {
-	OnPlayerDeselectInteraction.Broadcast(Target);
+	OnPlayerBeginScan.Broadcast();
 }
 
-void UGameplayEventsSubsystem::BroadcastPlayerBeginInteractionEvent()
+void UGameplayEventsSubsystem::SignalPlayerScanProgress(float Progress)
 {
-	OnPlayerBeginInteraction.Broadcast();
+	OnPlayerScanProgress.Broadcast(Progress);
 }
 
-void UGameplayEventsSubsystem::BroadcastPlayerInteractionProgressEvent(float Progress)
+void UGameplayEventsSubsystem::SignalPlayerCancelScan()
 {
-	OnPlayerInteractionProgress.Broadcast(Progress);
+	OnPlayerCancelScan.Broadcast();
+}
+void UGameplayEventsSubsystem::SignalPlayerCompleteScan()
+{
+	OnPlayerCancelScan.Broadcast();
 }
 
-void UGameplayEventsSubsystem::BroadcastPlayerCancelInteractionEvent()
+
+//Action Signals
+void UGameplayEventsSubsystem::SignalPlayerSelectActionInteractor(UInteractorComponent* Interactor)
 {
-	OnPlayerCancelInteraction.Broadcast();
+	OnPlayerSelectActionInteractor.Broadcast(Interactor);
 }
 
-void UGameplayEventsSubsystem::BroadcastPlayerCompleteInteractionEvent()
+void UGameplayEventsSubsystem::SignalPlayerBeginAction()
 {
-	OnPlayerCompleteInteraction.Broadcast();
+	OnPlayerBeginAction.Broadcast();
+}
+
+void UGameplayEventsSubsystem::SignalPlayerActionProgress(float Progress)
+{
+	OnPlayerActionProgress.Broadcast(Progress);
+}
+
+void UGameplayEventsSubsystem::SignalPlayerCancelAction()
+{
+	OnPlayerCancelAction.Broadcast();
+}
+
+void UGameplayEventsSubsystem::SignalPlayerCompleteAction()
+{
+	OnPlayerCompleteAction.Broadcast();
 }

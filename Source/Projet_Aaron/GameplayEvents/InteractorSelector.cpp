@@ -2,6 +2,8 @@
 
 
 #include "InteractorSelector.h"
+#include "InteractorComponent.h"
+#include "Engine/World.h"
 
 
 UInteractorSelector::UInteractorSelector()
@@ -18,88 +20,67 @@ void UInteractorSelector::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	FVector End = Start + GetForwardVector() * Range;
 	FHitResult Hit;
 
-	AActor* TargetActor = nullptr;
+	UInteractorComponent* Selection = nullptr;
 	if (GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECollisionChannel::ECC_Visibility))
 	{
-		if (Hit.GetActor() != nullptr && Hit.GetActor()->FindComponentByClass<UInteractorComponent>() != nullptr)
+		if (Hit.GetActor() != nullptr)
 		{
-			TargetActor = Hit.GetActor();
+			Selection = static_cast<UInteractorComponent*>( Hit.GetActor()->GetComponentByClass(InteractorTypeFilter) );
 		}
 	}
-
-	UpdateSelectedActor(TargetActor);
-}
-
-void UInteractorSelector::TryInteracting()
-{
-	if (InteractingWithSelection)
-	{
-		return;
-	}
-
-	if (UInteractorComponent* Interactor = GetInteractor())
-	{
-		Interactor->StartInteraction();
-		InteractingWithSelection = Interactor->IsInteracting();
-	}
-}
-
-void UInteractorSelector::StopInteracting()
-{
-	if (!InteractingWithSelection)
-	{
-		return;
-	}
-
-	InteractingWithSelection = false;
-	if (UInteractorComponent* Interactor = GetInteractor())
-	{
-		Interactor->StopInteraction();
-	}
+	UpdateSelection(Selection);
 }
 
 
-
-AActor* UInteractorSelector::GetSelectedActor()
+void UInteractorSelector::StartInteraction()
 {
-	return SelectedActor;
-}
-
-UInteractorComponent* UInteractorSelector::GetInteractor()
-{
-	if (SelectedActor != nullptr)
+	if (SelectedInteractor)
 	{
-		return SelectedActor->FindComponentByClass<UInteractorComponent>();
+		SelectedInteractor->StartInteraction();
 	}
-
-	return nullptr;
 }
 
-void UInteractorSelector::UpdateSelectedActor(class AActor* Actor)
+void UInteractorSelector::StopInteraction()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Actor : %p"), Actor);
+	if (SelectedInteractor)
+	{
+		SelectedInteractor->StopInteraction();
+	}
+}
+
+bool UInteractorSelector::IsInteracting()
+{
+	return SelectedInteractor && SelectedInteractor->IsInteracting();
+}
+
+UInteractorComponent* UInteractorSelector::GetSelectedInteractor()
+{
+	return SelectedInteractor;
+}
+
+
+void UInteractorSelector::UpdateSelection(UInteractorComponent* NewSelection)
+{
 	//Skip if nothing happened
-	if (SelectedActor == Actor)
+	if (SelectedInteractor != NewSelection)
 	{
-		return;
-	}
-
-	//Deselection
-	if (HasSelection())
-	{
-		if (InteractingWithSelection)
+		//Deselection
+		if (SelectedInteractor)
 		{
-			StopInteracting();
+			if (IsInteracting())
+			{
+				StopInteraction();
+			}
+			
+			OnInteractorDeselected.Broadcast(SelectedInteractor);
 		}
 
-		OnActorDeselected.Broadcast(SelectedActor);
-	}
+		SelectedInteractor = NewSelection;
 
-	SelectedActor = Actor;
-
-	//Selection
-	if (HasSelection())
-	{
-		OnActorSelected.Broadcast(SelectedActor);
+		//Selection
+		if (SelectedInteractor)
+		{
+			OnInteractorSelected.Broadcast(SelectedInteractor);
+		}
 	}
 }

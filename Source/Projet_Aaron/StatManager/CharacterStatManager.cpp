@@ -34,7 +34,7 @@ void UCharacterStatManager::TakeDamage(float BioDamage, float TechDamage)
 	
 	if (UGameplayEventsSubsystem* GameplayEvents = GetOwner()->GetGameInstance()->GetSubsystem<UGameplayEventsSubsystem>())
 	{
-		GameplayEvents->BroadcastPlayerHealthChangedEvent(HealthBio, HealthBioMax);
+		GameplayEvents->SignalPlayerHealthChanged(HealthBio, HealthBioMax);
 	}
 }
 
@@ -51,7 +51,7 @@ void UCharacterStatManager::ConsumeOxygene(float OxygeneToConsume)
 
 	if (UGameplayEventsSubsystem* GameplayEvents = GetOwner()->GetGameInstance()->GetSubsystem<UGameplayEventsSubsystem>())
 	{
-		GameplayEvents->BroadcastPlayerOxygenChangedEvent(Oxygene, OxygeneMax);
+		GameplayEvents->SignalPlayerOxygenChanged(Oxygene, OxygeneMax);
 	}
 }
 
@@ -63,7 +63,7 @@ void UCharacterStatManager::RecoveryOxygene(float DeltaTime)
 
 	if (UGameplayEventsSubsystem* GameplayEvents = GetOwner()->GetGameInstance()->GetSubsystem<UGameplayEventsSubsystem>())
 	{
-		GameplayEvents->BroadcastPlayerOxygenChangedEvent(Oxygene, OxygeneMax);
+		GameplayEvents->SignalPlayerOxygenChanged(Oxygene, OxygeneMax);
 	}
 }
 
@@ -82,7 +82,7 @@ void UCharacterStatManager::Heal(float BioHeal, float TechHeal)
 
 	if (UGameplayEventsSubsystem* GameplayEvents = GetOwner()->GetGameInstance()->GetSubsystem<UGameplayEventsSubsystem>())
 	{
-		GameplayEvents->BroadcastPlayerHealthChangedEvent(HealthBio, HealthBioMax);
+		GameplayEvents->SignalPlayerHealthChanged(HealthBio, HealthBioMax);
 	}
 }
 

@@ -4,52 +4,51 @@
 
 #include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
+#include "InteractorComponent.h"
 #include "InteractorSelector.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnActorSelectedEvent, AActor*, Actor);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnActorDeselectedEvent, AActor*, Actor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInteractorSelectedEvent, UInteractorComponent*, Interactor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInteractorDeselectedEvent, UInteractorComponent*, Interactor);
 
-UCLASS( meta=(BlueprintSpawnableComponent) )
+UCLASS(meta=(BlueprintSpawnableComponent) )
 class PROJET_AARON_API UInteractorSelector : public USceneComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	UInteractorSelector();
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable)
-		void TryInteracting();
+		void StartInteraction();
 
 	UFUNCTION(BlueprintCallable)
-		void StopInteracting();
+		void StopInteraction();
 
 	UFUNCTION(BlueprintCallable)
-		class AActor* GetSelectedActor();
+		bool IsInteracting();
 
 	UFUNCTION(BlueprintCallable)
-		class UInteractorComponent* GetInteractor();
-
-	UFUNCTION(BlueprintCallable)
-		bool HasSelection() { return SelectedActor != nullptr; }
+		UInteractorComponent* GetSelectedInteractor();
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		float Range = 100.0f;
+		float Range = 300.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		class UArrowComponent* DebugArrow;
 
 	UPROPERTY(BlueprintAssignable)
-		FOnActorSelectedEvent OnActorSelected;
+		FOnInteractorSelectedEvent OnInteractorSelected;
 
 	UPROPERTY(BlueprintAssignable)
-		FOnActorDeselectedEvent OnActorDeselected;
+		FOnInteractorDeselectedEvent OnInteractorDeselected;
+
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<UInteractorComponent> InteractorTypeFilter = UInteractorComponent::StaticClass();
 
 private:
-	void UpdateSelectedActor(class AActor* Actor);
-
-	bool InteractingWithSelection = false;
-	class AActor* SelectedActor;
+	void UpdateSelection(UInteractorComponent* NewSelection);
+	UInteractorComponent* SelectedInteractor;
 };
