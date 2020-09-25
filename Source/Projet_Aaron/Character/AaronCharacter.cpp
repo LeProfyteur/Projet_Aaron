@@ -38,9 +38,6 @@ AAaronCharacter::AAaronCharacter()
 	LegsEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Legs Equipment"));
 	LegsEquipment->SetupAttachment(FpsCamera);
 
-	InventaireComponent = CreateDefaultSubobject<UInventaireComponent>(TEXT("InventaireComponent"));
-	InventaireComponent->PrepareInventory();
-
 	VaultTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Vault Timeline"));
 	PoisonTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Poison Timeline"));
 	LsdTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("LSD Timeline"));
@@ -171,44 +168,11 @@ void AAaronCharacter::Tick(float DeltaTime)
 	else
 		UpdateSpeed();
 
-	//ItemWheel
-	if (CurrentTimePressedItemWheel > 0.f)
-	{
-		CurrentTimePressedItemWheel += DeltaTime;
-		if (!WheelDisplayed && CurrentTimePressedItemWheel >= UserSettings->GetHoldingTimeWheelSec())
-		{
-			DisplayWheel();
-			WheelDisplayed = true;
-		}
-	}
-
 	//Detecting pickable objects
 	FHitResult OutHit;
 	FVector Start = FpsCamera->GetComponentLocation();
 	FVector End = Start + FpsCamera->GetForwardVector() * RaycastDistanceInventory;
 	FCollisionQueryParams collisionParams;
-
-	//TODO @glathuiliere : Fix Inventory
-	if (GetWorld()->SweepSingleByChannel(OutHit, Start, End, FpsCamera->GetComponentRotation().Quaternion(), ECC_Visibility, FCollisionShape::MakeCapsule(50, 50), collisionParams))
-	{
-		UStaticMeshComponent* actorMeshComponent = OutHit.Actor->FindComponentByClass<UStaticMeshComponent>();
-		if (OutHit.GetActor()->Implements<UObjectInteractionInterface>())
-		{
-			if (!HitActor || OutHit.Actor != HitActor->Actor)
-				HitActor = new FHitResult(OutHit);
-
-			//InventoryCastObject->nameTextItem = IObjectInteractionInterface::Execute_GetLabel(OutHit.GetActor());
-		}
-		else
-		{
-			//InventoryCastObject->nameTextItem = "";
-		}
-	}
-	else if (HitActor)
-	{
-		//InventoryCastObject->nameTextItem = "";
-		HitActor = nullptr;
-	}
 
 	if (CrouchJumped)
 	{
@@ -248,12 +212,6 @@ void AAaronCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 	PlayerInputComponent->BindAction("HeadAction", IE_Pressed, this, &AAaronCharacter::ActivateHeadEquipment);
 	PlayerInputComponent->BindAction("NightVision", IE_Pressed, this, &AAaronCharacter::EnableDisableNightVision);
-
-	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AAaronCharacter::Interact);
-	PlayerInputComponent->BindAction("Interact", IE_Released, this, &AAaronCharacter::StopInteract);
-	
-	PlayerInputComponent->BindAction("ItemWheel", IE_Pressed, this, &AAaronCharacter::PressedItemWheel);
-	PlayerInputComponent->BindAction("ItemWheel", IE_Released, this, &AAaronCharacter::ReleaseItemWheel);
 }
 
 void AAaronCharacter::EnableDisableNightVision()
@@ -572,23 +530,6 @@ FVector AAaronCharacter::GetActorLocationAfterDodge(float Distance)
 	return Res;
 }
 
-void AAaronCharacter::Interact()
-{
-	if (HitActor && HitActor->GetActor()->Implements<UObjectInteractionInterface>())
-	{
-		IObjectInteractionInterface::Execute_Interact(HitActor->GetActor(), true, this);
-		HitActor = nullptr;
-	}
-}
-
-void AAaronCharacter::StopInteract()
-{
-	if (HitActor && HitActor->GetActor()->Implements<UObjectInteractionInterface>())
-	{
-		IObjectInteractionInterface::Execute_Interact(HitActor->GetActor(), false, this);
-	}
-}
-
 void AAaronCharacter::ActivateHeadEquipment()
 {
 	AActor* ChildActor = HeadEquipment->GetChildActor();
@@ -726,93 +667,6 @@ void AAaronCharacter::UpdateClimbingPosition()
 		CharacterMovement->SetActive(false);
 		CharacterMovement->StopMovementImmediately();
 		ClimbPosition = TargetPosition;
-	}
-}
-
-void AAaronCharacter::PressedItemWheel()
-{
-	CurrentTimePressedItemWheel += GetWorld()->GetDeltaSeconds();
-}
-
-void AAaronCharacter::ReleaseItemWheel()
-{
-	if (WheelDisplayed)
-	{
-		//reset wheel
-		MainHudFixedSizeCPP->RemoveFromParent();
-
-		//CloseRadialBar
-		auto PlayerController = GetWorld()->GetFirstPlayerController();
-		PlayerController->SetIgnoreLookInput(false);
-		PlayerController->SetInputMode(FInputModeGameOnly());
-		PlayerController->bShowMouseCursor = false;
-
-		//ChosenSlot
-		//HudCPP->ItemSelected = MainHudFixedSizeCPP->ChosenSlot;
-	}
-	else
-	{
-		PressedUseQuickItem();
-	}
-
-	//reset var
-	CurrentTimePressedItemWheel = 0.f;
-	WheelDisplayed = false;
-
-}
-
-void AAaronCharacter::DisplayWheel()
-{
-	MainHudFixedSizeCPP->AddToViewport();
-	MainHudFixedSizeCPP->CreateStandartWidgetCPP();
-
-	//Open Radial Bar
-	auto PlayerController = GetWorld()->GetFirstPlayerController();
-
-	FInputModeGameAndUI InputModeData;
-	InputModeData.SetWidgetToFocus(MainHudFixedSizeCPP->TakeWidget());
-	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-	PlayerController->SetInputMode(InputModeData);
-	PlayerController->SetIgnoreLookInput(true);
-	PlayerController->bShowMouseCursor = true;
-	const FVector2D ViewportSize = FVector2D(GEngine->GameViewport->Viewport->GetSizeXY());
-	PlayerController->SetMouseLocation(ViewportSize.X / 2.f, ViewportSize.Y / 2.f);
-}
-
-void AAaronCharacter::UseMyItem(UDA_SlotStructure* ChosenSlot)
-{
-	if (IsValid(ChosenSlot) && IsValid(ChosenSlot->ItemStructure))
-	{
-		if (ChosenSlot->ItemStructure->IsConsomable)
-		{
-			FTransform* transform = new FTransform();
-			transform->SetScale3D(FVector(0.1, 0.1, 0.1));
-			AItem* item = (AItem*)GetWorld()->SpawnActor(ChosenSlot->ItemStructure->Class.Get(), transform, FActorSpawnParameters());
-			bool bItemUsed = item->UseItem();
-			item->Destroy();
-			if (bItemUsed)
-			{
-				//Log de slotitem . display name
-				if (ChosenSlot->Quantity == 1)
-				{
-					//remove slot
-					ChosenSlot->Quantity = 0;
-					InventaireComponent->RemoveFromInventory(ChosenSlot);
-				}
-				else
-				{
-					ChosenSlot->Quantity--;
-				}
-			}
-		}
-	}
-}
-
-void AAaronCharacter::PressedUseQuickItem()
-{
-	if (IsValid(MainHudFixedSizeCPP->ChosenSlot) && MainHudFixedSizeCPP->ChosenSlot->Quantity > 0)
-	{
-		UseMyItem(MainHudFixedSizeCPP->ChosenSlot);
 	}
 }
 

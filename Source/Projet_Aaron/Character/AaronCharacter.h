@@ -5,7 +5,6 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/SceneComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Projet_Aaron/Item/ObjectInteractionInterface.h"
 #include "Projet_Aaron/Equipment/EquipmentInterface.h"
 #include "Engine/Engine.h"
 #include "Projet_Aaron/StatManager/CharacterStatManager.h"
@@ -13,7 +12,6 @@
 #include "Projet_Aaron/Equipment/NightVisionEquipment.h"
 #include "Projet_Aaron/Equipment/GrapnelEquipmentSuperAaron.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
-#include "Projet_Aaron/Item/Item.h"
 #include "Projet_Aaron/Save/AaronGameUserSettings.h"
 #include "IHeadMountedDisplay.h"
 #include "Projet_Aaron/Mutation/UMutationBase.h"
@@ -27,8 +25,6 @@
 
 #include "GameFramework/Character.h"
 #include "CoreMinimal.h"
-#include "Projet_Aaron/Item/MainHudFixedSizeCPP.h"
-#include "Projet_Aaron/Item/InventaireComponent.h"
 #include "AaronCharacter.generated.h"
 
 UCLASS()
@@ -66,9 +62,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UChildActorComponent* LegsEquipment;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UInventaireComponent* InventaireComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UTimelineComponent* VaultTimeline;
@@ -153,18 +146,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float HoldingTimeItemWheel = 0.2f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		class UUInventoryCastObject* InventoryCastObject;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		class UMainHudFixedSizeCPP* MainHudFixedSizeCPP;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TSubclassOf<class UUInventoryCastObject> InventoryCastObjectClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TSubclassOf<class UMainHudFixedSizeCPP> MainHudFixedSizeCPPClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float DisplayTimeTips = 10.0f;
@@ -278,9 +259,6 @@ protected:
 	void ResetDodge();
 	FVector GetActorLocationAfterDodge(float Distance);
 
-	void Interact();
-	void StopInteract();
-
 	UFUNCTION(BlueprintCallable)
 	void ActivateHeadEquipment();
 
@@ -320,14 +298,6 @@ protected:
 	void Climb(float DeltaTime);
 	void UpdateClimbingPosition();
 	bool SearchClimbPoint(FVector& ClimbPoint);
-
-	void PressedItemWheel();
-	void ReleaseItemWheel();
-	void DisplayWheel();
-
-	UFUNCTION(BlueprintCallable)
-	void UseMyItem(UDA_SlotStructure* ChosenSlot);
-	void PressedUseQuickItem();
 
 	bool VaultCheck(VaultTraceSettings TraceSettings);
 	void VaultStart();
