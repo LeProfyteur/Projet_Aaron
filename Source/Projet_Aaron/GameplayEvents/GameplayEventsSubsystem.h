@@ -7,6 +7,9 @@
 #include "InteractorComponent.h"
 #include "GameplayEventsSubsystem.generated.h"
 
+//Player Advancement Update Events
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerAdvancementUpdateEvent, FName, AdvancementID);
+
 //Player Tutorial Events
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerTutorialEvent);
 
@@ -42,6 +45,18 @@ class PROJET_AARON_API UGameplayEventsSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
+	//Player Advancement Update Signals
+	UFUNCTION(BlueprintCallable)
+		void SignalPlayerObjectiveUpdate(FName ObjectiveID);
+	UFUNCTION(BlueprintCallable)
+		void SignalPlayerScanUpdate(FName ScanID);
+	UFUNCTION(BlueprintCallable)
+		void SignalPlayerSkillUpdate(FName SkillID);
+	UFUNCTION(BlueprintCallable)
+		void SignalPlayerCollectibleUpdate(FName CollectibleID);
+	UFUNCTION(BlueprintCallable)
+		void SignalPlayerLogEntryUpdate(FName LogEntryID);
+	
     //Player Tutorial Signals
     UFUNCTION(BlueprintCallable)
         void SignalPlayerBeginTutorial();
@@ -90,6 +105,18 @@ public:
 		void SignalPlayerCompleteAction();
 	
 protected:
+	//Player Advancement Update Events
+	UPROPERTY(BlueprintAssignable)
+		FPlayerAdvancementUpdateEvent OnPlayerObjectiveUpdate;
+	UPROPERTY(BlueprintAssignable)
+		FPlayerAdvancementUpdateEvent OnPlayerScanUpdate;
+	UPROPERTY(BlueprintAssignable)
+		FPlayerAdvancementUpdateEvent OnPlayerSkillUpdate;
+	UPROPERTY(BlueprintAssignable)
+		FPlayerAdvancementUpdateEvent OnPlayerCollectibleUpdate;
+	UPROPERTY(BlueprintAssignable)
+		FPlayerAdvancementUpdateEvent OnPlayerLogEntryUpdate;
+
     //Player Tutorial Events
     UPROPERTY(BlueprintAssignable)
         FPlayerTutorialEvent OnPlayerBeginTutorial;

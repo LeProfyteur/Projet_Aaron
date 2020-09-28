@@ -11,12 +11,6 @@ UCLASS()
 class PROJET_AARON_API UPlayerAdvancementSubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
-private:
-	TMap<FName, bool> Objectives;
-	TMap<FName, bool> Scans;
-    TMap<FName, bool> Skills;
-    TMap<FName, bool> Collectibles;
-	TMap<FName, bool> LogEntries;
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -43,4 +37,17 @@ public:
 		bool GetCollectibleStatus(FName CollectibleID) const;
 	UFUNCTION(BlueprintCallable)
 		bool GetLogEntryStatus(FName LogEntryID) const;
+
+protected:
+	UPROPERTY(BlueprintReadOnly)
+		TMap<FName, bool> Objectives;
+	UPROPERTY(BlueprintReadOnly)
+		TMap<FName, bool> Scans;
+	UPROPERTY(BlueprintReadOnly)
+		TMap<FName, bool> Skills;
+	UPROPERTY(BlueprintReadOnly)
+		TMap<FName, bool> Collectibles;
+	UPROPERTY(BlueprintReadOnly)
+		TMap<FName, bool> LogEntries;
+
 };

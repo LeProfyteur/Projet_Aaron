@@ -3,6 +3,32 @@
 
 #include "GameplayEventsSubsystem.h"
 
+//Player Advancement Update Signals
+void UGameplayEventsSubsystem::SignalPlayerObjectiveUpdate(FName ObjectiveID)
+{
+	OnPlayerObjectiveUpdate.Broadcast(ObjectiveID);
+}
+
+void UGameplayEventsSubsystem::SignalPlayerScanUpdate(FName ScanID)
+{
+	OnPlayerScanUpdate.Broadcast(ScanID);
+}
+
+void UGameplayEventsSubsystem::SignalPlayerSkillUpdate(FName SkillID)
+{
+	OnPlayerSkillUpdate.Broadcast(SkillID);
+}
+
+void UGameplayEventsSubsystem::SignalPlayerCollectibleUpdate(FName CollectibleID)
+{
+	OnPlayerCollectibleUpdate.Broadcast(CollectibleID);
+}
+
+void UGameplayEventsSubsystem::SignalPlayerLogEntryUpdate(FName LogEntryID)
+{
+	OnPlayerLogEntryUpdate.Broadcast(LogEntryID);
+}
+
 //Player Tutorial Signals
 void UGameplayEventsSubsystem::SignalPlayerBeginTutorial()
 {
