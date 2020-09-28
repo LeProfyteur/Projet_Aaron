@@ -36,9 +36,6 @@ public:
 	// Sets default values for this character's properties
 	AAaronCharacter();
 
-	/*UPROPERTY(VisibleAnywhere, BluePrintReadOnly)
-		USceneComponent* VRComponent;*/
-
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly)
 		UCameraComponent* FpsCamera;
 
@@ -196,8 +193,10 @@ protected:
 	UClass* LeftArmEquipmentClass;
 	
 public:
+
+
 	// Called every frame
-	void Tick(float DeltaTime) override;
+	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
 		void UpdateTimelineFunction(float value);
@@ -236,52 +235,56 @@ protected:
 
 	void UpdateSpeed();
 
-	void MoveForward(float Value);
-	void MoveRight(float Value);
-
-	void StartJumping();
-	void EndJumping();
+	UFUNCTION(BlueprintCallable)
+		void StartJumping();
+	UFUNCTION(BlueprintCallable)
+		void EndJumping();
+	void OnLandedCallback(const FHitResult& Hit);
     
-	void ToggleWalk();
-	void ToggleSprint();
+	UFUNCTION(BlueprintCallable)
+		void ToggleWalk();
+	UFUNCTION(BlueprintCallable)
+		void ToggleSprint();
 
 	UFUNCTION(BlueprintCallable)
-	void ToggleCrouch();
-
-	void StartSprinting();
-	void StopSprinting();
+		void ToggleCrouch();
 
 	UFUNCTION(BlueprintCallable)
-	void Dodge();
+		void StartSprinting();
 	UFUNCTION(BlueprintCallable)
-	void SetDodgeLocation(float Value);
+		void StopSprinting();
+
 	UFUNCTION(BlueprintCallable)
-	void ResetDodge();
+		void Dodge();
+	UFUNCTION(BlueprintCallable)
+		void SetDodgeLocation(float Value);
+	UFUNCTION(BlueprintCallable)
+		void ResetDodge();
 	FVector GetActorLocationAfterDodge(float Distance);
 
 	UFUNCTION(BlueprintCallable)
-	void ActivateHeadEquipment();
+		void ActivateHeadEquipment();
 
 	UFUNCTION(BlueprintCallable)
-	void ActivatePressedLeft();
+		void ActivatePressedLeft();
 
 	UFUNCTION(BlueprintCallable)
-	void ActivateReleasedLeft();
+		void ActivateReleasedLeft();
 
 	UFUNCTION(BlueprintCallable)
-	void ActivatePressedRight();
+		void ActivatePressedRight();
 
 	UFUNCTION(BlueprintCallable)
-	void ActivateReleasedRight();
+		void ActivateReleasedRight();
 
 	UFUNCTION(BlueprintCallable)
-	void EnableDisableNightVision();
+		void EnableDisableNightVision();
 
 	UFUNCTION(BlueprintCallable)
-	void EnableDisableGrapnel();
+		void EnableDisableGrapnel();
 
 	UFUNCTION(BlueprintCallable)
-	void ActivatePressedChest();
+		void ActivatePressedChest();
 
 	UFUNCTION(BlueprintCallable)
 		void AddEquipment(UChildActorComponent* PartChild, TSubclassOf<AEquipmentBase> ClassEquipment);

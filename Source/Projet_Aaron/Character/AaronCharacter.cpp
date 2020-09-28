@@ -5,10 +5,8 @@
 
 #include "Projet_Aaron/Save/AaronGameUserSettings.h"
 
-// Sets default values
 AAaronCharacter::AAaronCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	FpsCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FPS_Camera"));
@@ -49,6 +47,8 @@ AAaronCharacter::AAaronCharacter()
 	UpdateTimelineLSD.BindUFunction(this, FName("UpdateTimelineLSDFunction"));
 	UpdateDodgeTimeline.BindUFunction(this, FName("SetDodgeLocation"));
 	FinishDodgeTimeLine.BindUFunction(this, FName("ResetDodge"));
+
+	LandedDelegate.AddDynamic(this, &AAaronCharacter::OnLandedCallback);
 
 	Mutations = TArray<UUMutationBase*>();
 }
@@ -185,15 +185,6 @@ void AAaronCharacter::Tick(float DeltaTime)
 void AAaronCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	
-	PlayerInputComponent->BindAxis("MoveForward", this, &AAaronCharacter::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &AAaronCharacter::MoveRight);
-
-	PlayerInputComponent->BindAxis("Turn", this, &AAaronCharacter::AddControllerYawInput);
-	PlayerInputComponent->BindAxis("LookUp", this, &AAaronCharacter::AddControllerPitchInput);
-
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AAaronCharacter::StartJumping);
-	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AAaronCharacter::EndJumping);
 
 	PlayerInputComponent->BindAction("Walk", IE_Pressed, this, &AAaronCharacter::ToggleWalk);
 	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &AAaronCharacter::ToggleCrouch);
@@ -275,22 +266,6 @@ FVector AAaronCharacter::GetCharacterDirection() const
 	return Direction;
 }
 
-void AAaronCharacter::MoveForward(float Value)
-{
-	if (CharacterMovement->IsSwimming())
-		AddMovementInput(FpsCamera->GetForwardVector(), Value);
-	else if (MovementState != EMovementState::Slide)
-		AddMovementInput(GetActorForwardVector(), Value);
-}
-
-void AAaronCharacter::MoveRight(float Value)
-{
-	if (CharacterMovement->IsSwimming())
-		AddMovementInput(FpsCamera->GetRightVector(), Value);
-	else if (MovementState != EMovementState::Slide)
-		AddMovementInput(GetActorRightVector(), Value);
-}
-
 void AAaronCharacter::AddEquipment(UChildActorComponent* PartChild, TSubclassOf<AEquipmentBase> ClassEquipment)
 {
 	PartChild->SetChildActorClass(ClassEquipment);
@@ -336,7 +311,7 @@ void AAaronCharacter::RemoveMutation(UClass *ClassMutation)
 }
 
 void AAaronCharacter::StartJumping()
-{
+{	
 	if (GetCharacterMovement()->IsFalling())
 	{
 		//CharacterMovement->SetMovementMode(EMovementMode::MOVE_Flying);
@@ -408,6 +383,13 @@ void AAaronCharacter::EndJumping()
 		IsGliding = false;
 	}
 }
+
+void AAaronCharacter::OnLandedCallback(const FHitResult& Hit)
+{
+	isJumping = false;
+}
+
+
 
 void AAaronCharacter::ToggleCrouch()
 {

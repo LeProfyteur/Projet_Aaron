@@ -28,11 +28,11 @@ enum class VaultType : uint8
 UENUM(BlueprintType)
 enum class EMovementState : uint8
 {
-	Walk,
-	Run,
-	Sprint,
-	Climb,
-	Slide
+	Walk UMETA(DisplayName = "Walk"),
+	Run UMETA(DisplayName = "Run"),
+	Sprint UMETA(DisplayName = "Sprint"),
+	Climb UMETA(DisplayName = "Climb"),
+	Slide UMETA(DisplayName = "Slide")
 };
 
 UENUM(BlueprintType)

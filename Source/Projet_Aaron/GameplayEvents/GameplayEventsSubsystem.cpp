@@ -2,6 +2,19 @@
 
 
 #include "GameplayEventsSubsystem.h"
+
+//Player Queue Tips Signals
+void UGameplayEventsSubsystem::SignalPlayerRequestTip(FName TipsID)
+{
+	OnPlayerRequestTip.Broadcast(TipsID);
+}
+
+//Player Inventory Signals
+void UGameplayEventsSubsystem::SignalPlayerInventorySlotChanged(int SlotID, FName ItemID)
+{
+	OnPlayerInventorySlotChanged.Broadcast(SlotID, ItemID);
+}
+
 //Player Status Signals
 void UGameplayEventsSubsystem::SignalPlayerHealthChanged(float Current, float Max)
 {
