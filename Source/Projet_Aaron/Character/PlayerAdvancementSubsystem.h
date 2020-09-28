@@ -14,7 +14,8 @@ class PROJET_AARON_API UPlayerAdvancementSubsystem : public UGameInstanceSubsyst
 private:
 	TMap<FName, bool> Objectives;
 	TMap<FName, bool> Scans;
-	TMap<FName, bool> Collectibles;
+    TMap<FName, bool> Skills;
+    TMap<FName, bool> Collectibles;
 	TMap<FName, bool> LogEntries;
 
 public:
@@ -22,9 +23,11 @@ public:
 		void ClearPlayerAdvancement();
 	
 	UFUNCTION(BlueprintCallable)
-		void UpdateObjective(FName ObjectiveID, bool Status);
-	UFUNCTION(BlueprintCallable)
-		void UpdateScan(FName ScanID, bool Status);
+        void UpdateObjective(FName ObjectiveID, bool Status);
+    UFUNCTION(BlueprintCallable)
+        void UpdateScan(FName ScanID, bool Status);
+    UFUNCTION(BlueprintCallable)
+        void UpdateSkill(FName SkillID, bool Status);
 	UFUNCTION(BlueprintCallable)
 		void UpdateCollectible(FName CollectibleID, bool Status);
 	UFUNCTION(BlueprintCallable)
@@ -32,8 +35,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		bool GetObjectiveStatus(FName ObjectiveID) const;
-	UFUNCTION(BlueprintCallable)
-		bool GetScanStatus(FName ScanID) const;
+    UFUNCTION(BlueprintCallable)
+        bool GetScanStatus(FName ScanID) const;
+    UFUNCTION(BlueprintCallable)
+        bool GetSkillStatus(FName SkillID) const;
 	UFUNCTION(BlueprintCallable)
 		bool GetCollectibleStatus(FName CollectibleID) const;
 	UFUNCTION(BlueprintCallable)

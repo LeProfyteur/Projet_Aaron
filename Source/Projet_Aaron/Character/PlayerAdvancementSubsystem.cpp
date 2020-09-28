@@ -20,7 +20,12 @@ void UPlayerAdvancementSubsystem::UpdateObjective(FName ObjectiveID, bool Status
 
 void UPlayerAdvancementSubsystem::UpdateScan(FName ScanID, bool Status)
 {
-	Scans.Add(ScanID, Status);
+    Scans.Add(ScanID, Status);
+}
+
+void UPlayerAdvancementSubsystem::UpdateSkill(FName SkillID, bool Status)
+{
+    Skills.Add(SkillID, Status);
 }
 
 void UPlayerAdvancementSubsystem::UpdateCollectible(FName CollectibleID, bool Status)
@@ -41,8 +46,14 @@ bool UPlayerAdvancementSubsystem::GetObjectiveStatus(FName ObjectiveID) const
 
 bool UPlayerAdvancementSubsystem::GetScanStatus(FName ScanID) const
 {
-	const bool* Result = Scans.Find(ScanID);
-	return Result != nullptr && *Result;
+    const bool* Result = Scans.Find(ScanID);
+    return Result != nullptr && *Result;
+}
+
+bool UPlayerAdvancementSubsystem::GetSkillStatus(FName ScanID) const
+{
+    const bool* Result = Skills.Find(ScanID);
+    return Result != nullptr && *Result;
 }
 
 bool UPlayerAdvancementSubsystem::GetCollectibleStatus(FName CollectibleID) const

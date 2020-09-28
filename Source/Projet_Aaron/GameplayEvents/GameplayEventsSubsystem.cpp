@@ -3,6 +3,17 @@
 
 #include "GameplayEventsSubsystem.h"
 
+//Player Tutorial Signals
+void UGameplayEventsSubsystem::SignalPlayerBeginTutorial()
+{
+	OnPlayerBeginTutorial.Broadcast();
+}
+
+void UGameplayEventsSubsystem::SignalPlayerEndTutorial()
+{
+	OnPlayerEndTutorial.Broadcast();
+}
+
 //Player Queue Tips Signals
 void UGameplayEventsSubsystem::SignalPlayerRequestTip(FName TipsID)
 {

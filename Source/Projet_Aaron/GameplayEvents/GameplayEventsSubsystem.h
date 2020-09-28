@@ -7,6 +7,9 @@
 #include "InteractorComponent.h"
 #include "GameplayEventsSubsystem.generated.h"
 
+//Player Tutorial Events
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerTutorialEvent);
+
 //Player Tips Events
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerRequestTipEvent, FName, TipsID);
 
@@ -39,11 +42,17 @@ class PROJET_AARON_API UGameplayEventsSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
-	//Player Queue Tips Events
+    //Player Tutorial Signals
+    UFUNCTION(BlueprintCallable)
+        void SignalPlayerBeginTutorial();
+    UFUNCTION(BlueprintCallable)
+        void SignalPlayerEndTutorial();
+
+	//Player Queue Tips Signals
 	UFUNCTION(BlueprintCallable)
 		void SignalPlayerRequestTip(FName TipsID);
 	
-	//Player Inventory Events
+	//Player Inventory Signals
 	UFUNCTION(BlueprintCallable)
 		void SignalPlayerInventorySlotChanged(int SlotID, FName ItemID);
 
@@ -81,6 +90,12 @@ public:
 		void SignalPlayerCompleteAction();
 	
 protected:
+    //Player Tutorial Events
+    UPROPERTY(BlueprintAssignable)
+        FPlayerTutorialEvent OnPlayerBeginTutorial;
+    UPROPERTY(BlueprintAssignable)
+        FPlayerTutorialEvent OnPlayerEndTutorial;
+
 	//Player Tips Events
 	UPROPERTY(BlueprintAssignable)
 		FPlayerRequestTipEvent OnPlayerRequestTip;
