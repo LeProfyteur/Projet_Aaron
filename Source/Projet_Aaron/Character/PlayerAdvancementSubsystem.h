@@ -15,7 +15,15 @@ class PROJET_AARON_API UPlayerAdvancementSubsystem : public UGameInstanceSubsyst
 public:
 	UFUNCTION(BlueprintCallable)
 		void ClearPlayerAdvancement();
+
+	UFUNCTION(BlueprintCallable)
+		void SaveData();
+	UFUNCTION(BlueprintCallable)
+		void LoadData();
 	
+	UFUNCTION(BlueprintCallable)
+		void UpdateSpawnPoint(FName NewLevelName, FName NewSpawnPointName);
+
 	UFUNCTION(BlueprintCallable)
         void UpdateObjective(FName ObjectiveID, bool Status);
     UFUNCTION(BlueprintCallable)
@@ -50,4 +58,8 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 		TMap<FName, bool> LogEntries;
 
+	UPROPERTY(BlueprintReadOnly)
+		FName LevelName;
+	UPROPERTY(BlueprintReadOnly)
+		FName SpawnPointName;
 };

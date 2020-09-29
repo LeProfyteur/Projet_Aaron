@@ -2,8 +2,11 @@
 
 
 #include "PlayerAdvancementSubsystem.h"
+
+#include "PlayerAdvancementSaveGame.h"
 #include "Projet_Aaron/GameplayEvents/GameplayEventsSubsystem.h"
 #include "Engine/GameInstance.h"
+#include "Kismet/GameplayStatics.h"
 
 
 void UPlayerAdvancementSubsystem::ClearPlayerAdvancement()
@@ -13,6 +16,45 @@ void UPlayerAdvancementSubsystem::ClearPlayerAdvancement()
 	Collectibles.Empty();
 	LogEntries.Empty();
 }
+
+void UPlayerAdvancementSubsystem::SaveData()
+{
+	if (UPlayerAdvancementSaveGame* SaveGame = Cast<UPlayerAdvancementSaveGame>(UGameplayStatics::CreateSaveGameObject(UPlayerAdvancementSaveGame::StaticClass())))
+	{
+		SaveGame->Objectives = Objectives;
+		SaveGame->Scans = Scans;
+		SaveGame->Skills = Skills;
+		SaveGame->Collectibles = Collectibles;
+		SaveGame->LogEntries = LogEntries;
+
+		SaveGame->LevelName = LevelName;
+		SaveGame->SpawnPointName = SpawnPointName;
+
+		UGameplayStatics::SaveGameToSlot(SaveGame, "AaronPlayerAdvancement", 0);
+	}
+}
+
+void UPlayerAdvancementSubsystem::LoadData()
+{
+	if (UPlayerAdvancementSaveGame* SaveGame = Cast<UPlayerAdvancementSaveGame>(UGameplayStatics::LoadGameFromSlot("AaronPlayerAdvancement", 0)))
+	{
+		Objectives = SaveGame->Objectives;
+		Scans = SaveGame->Scans;
+		Skills = SaveGame->Skills;
+		Collectibles = SaveGame->Collectibles;
+		LogEntries = SaveGame->LogEntries;
+
+		LevelName = SaveGame->LevelName;
+		SpawnPointName = SaveGame->SpawnPointName;
+	}
+}
+
+void UPlayerAdvancementSubsystem::UpdateSpawnPoint(FName NewLevelName, FName NewSpawnPointName)
+{
+	LevelName = NewLevelName;
+	SpawnPointName = NewSpawnPointName;
+}
+
 
 void UPlayerAdvancementSubsystem::UpdateObjective(FName ObjectiveID, bool Status)
 {
