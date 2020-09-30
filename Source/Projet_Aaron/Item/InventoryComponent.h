@@ -36,7 +36,7 @@ protected:
 	UPROPERTY(BlueprintAssignable)
 		FInventorySlotChangedEvent OnInventorySlotChanged;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
         TArray<FName> Slots;
 		
 private:
