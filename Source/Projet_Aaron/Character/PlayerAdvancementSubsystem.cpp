@@ -55,6 +55,27 @@ void UPlayerAdvancementSubsystem::UpdateSpawnPoint(FName NewLevelName, FName New
 	SpawnPointName = NewSpawnPointName;
 }
 
+void UPlayerAdvancementSubsystem::RegisterSpawnPoint(APlayerStart* SpawnPoint)
+{
+	SpawnPoints.AddUnique(SpawnPoint);
+}
+
+void UPlayerAdvancementSubsystem::UnregisterSpawnPoint(APlayerStart* SpawnPoint)
+{
+	SpawnPoints.RemoveSwap(SpawnPoint);
+}
+
+APlayerStart* UPlayerAdvancementSubsystem::GetSpawnPoint()
+{
+	for (APlayerStart* SpawnPoint : SpawnPoints)
+	{
+		if (SpawnPoint->PlayerStartTag.IsEqual(SpawnPointName))
+		{
+			return SpawnPoint;
+		}
+	}
+	return nullptr;
+}
 
 void UPlayerAdvancementSubsystem::UpdateObjective(FName ObjectiveID, bool Status)
 {
@@ -149,4 +170,14 @@ bool UPlayerAdvancementSubsystem::GetLogEntryStatus(FName LogEntryID) const
 {
 	const bool* Result = LogEntries.Find(LogEntryID);
 	return Result != nullptr && *Result;
+}
+
+FName UPlayerAdvancementSubsystem::GetLevelName()
+{
+	return LevelName;
+}
+
+FName UPlayerAdvancementSubsystem::GetSpawnPointName()
+{
+	return SpawnPointName;
 }

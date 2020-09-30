@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
+#include "CoreMinimal.h"
 #include "Camera/CameraComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SceneComponent.h"
@@ -24,7 +25,6 @@
 #include "Kismet/KismetMathLibrary.h"
 
 #include "GameFramework/Character.h"
-#include "CoreMinimal.h"
 #include "AaronCharacter.generated.h"
 
 UCLASS()
@@ -121,22 +121,13 @@ public:
 		bool isPunctionning = false;
 
 	bool IsGliding = false;
-
-	//Game settings : mouse sensivity
-	void AddControllerYawInput(float Val) override;
-	void AddControllerPitchInput(float Val) override;
-
 protected:
 
 	TArray<UUMutationBase*> Mutations;
 	FHitResult* HitActor = nullptr;
 
-	UCharacterMovementComponent* CharacterMovement;
-
 	UAaronGameUserSettings* UserSettings;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EMovementState MovementState;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FVector2D Alignment;
@@ -210,17 +201,12 @@ public:
 	UFUNCTION()
 		void EndTimelineFunction();
 
-	/**
-	 * \brief Update binding after changing UserSettings that change how the binding works (ie. toggle sprint)
-	 */
-	UFUNCTION(BlueprintCallable)
-		void UpdateBindAction();
-
 	void OnPoisonAlteration();
 	void OnLsdAlteration(float Time);
 
 protected:
 	void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	UFUNCTION()
 	void OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -236,18 +222,16 @@ protected:
 	void UpdateSpeed();
 
 	UFUNCTION(BlueprintCallable)
-		void StartJumping();
+		void StartJumping();	
 	UFUNCTION(BlueprintCallable)
 		void EndJumping();
-	void OnLandedCallback(const FHitResult& Hit);
-    
+	UFUNCTION()
+		void OnLandedCallback(const FHitResult& Hit);
+	
 	UFUNCTION(BlueprintCallable)
-		void ToggleWalk();
+		void StartCrouching();
 	UFUNCTION(BlueprintCallable)
-		void ToggleSprint();
-
-	UFUNCTION(BlueprintCallable)
-		void ToggleCrouch();
+		void StopCrouching();
 
 	UFUNCTION(BlueprintCallable)
 		void StartSprinting();
@@ -323,5 +307,8 @@ protected:
 	FOnTimelineFloat UpdateDodgeTimeline{};
 	FOnTimelineEvent FinishDodgeTimeLine{};
 
-	AActor* LastScannedActor = nullptr;
+private:
+	void ResolveMovementMethod();
+	EMovementMethod CurrentMovementMethod = EMovementMethod::Run;
+	EMovementMethod DesiredMovementMethod = EMovementMethod::Run;
 };

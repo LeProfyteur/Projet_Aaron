@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameFramework/PlayerStart.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "PlayerAdvancementSubsystem.generated.h"
 
@@ -23,6 +24,12 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 		void UpdateSpawnPoint(FName NewLevelName, FName NewSpawnPointName);
+	UFUNCTION(BlueprintCallable)
+		void RegisterSpawnPoint(APlayerStart* SpawnPoint);
+	UFUNCTION(BlueprintCallable)
+		void UnregisterSpawnPoint(APlayerStart* SpawnPoint);
+	UFUNCTION(BlueprintCallable)
+		APlayerStart* GetSpawnPoint();
 
 	UFUNCTION(BlueprintCallable)
         void UpdateObjective(FName ObjectiveID, bool Status);
@@ -46,6 +53,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 		bool GetLogEntryStatus(FName LogEntryID) const;
 
+	UFUNCTION(BlueprintCallable)
+		FName GetLevelName();
+	UFUNCTION(BlueprintCallable)
+		FName GetSpawnPointName();
+
 protected:
 	UPROPERTY(BlueprintReadOnly)
 		TMap<FName, bool> Objectives;
@@ -59,7 +71,10 @@ protected:
 		TMap<FName, bool> LogEntries;
 
 	UPROPERTY(BlueprintReadOnly)
-		FName LevelName;
+		FName LevelName = NAME_None;
 	UPROPERTY(BlueprintReadOnly)
-		FName SpawnPointName;
+		FName SpawnPointName = NAME_None;
+
+	UPROPERTY(Transient, BlueprintReadOnly)
+		TArray<APlayerStart*> SpawnPoints;
 };

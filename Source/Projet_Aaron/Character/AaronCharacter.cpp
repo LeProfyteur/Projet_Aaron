@@ -3,8 +3,6 @@
 
 #include "AaronCharacter.h"
 
-#include "Projet_Aaron/Save/AaronGameUserSettings.h"
-
 AAaronCharacter::AAaronCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -17,9 +15,10 @@ AAaronCharacter::AAaronCharacter()
 	StatManager = CreateDefaultSubobject<UCharacterStatManager>(TEXT("StatManager"));
 	PostProcessing = CreateDefaultSubobject<UPostProcessComponent>(TEXT("Post Processing"));
 
-	CharacterMovement = GetCharacterMovement();
-	CharacterMovement->JumpZVelocity = StatManager->GetJumpForce();
-	CharacterMovement->GetNavAgentPropertiesRef().bCanCrouch = true;
+	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
+	GetCharacterMovement()->JumpZVelocity = StatManager->GetJumpForce();
+	GetCharacterMovement()->AirControl = StatManager->GetAirControl();
+	GetCharacterMovement()->GravityScale = StatManager->GetGravityScale();
 	
 	RightArmEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Right Arm Equipment"));
 	RightArmEquipment->SetupAttachment(GetMesh(), FName("RightArm"));
@@ -48,34 +47,19 @@ AAaronCharacter::AAaronCharacter()
 	UpdateDodgeTimeline.BindUFunction(this, FName("SetDodgeLocation"));
 	FinishDodgeTimeLine.BindUFunction(this, FName("ResetDodge"));
 
-	LandedDelegate.AddDynamic(this, &AAaronCharacter::OnLandedCallback);
-
 	Mutations = TArray<UUMutationBase*>();
-}
-
-void AAaronCharacter::AddControllerYawInput(float Val)
-{
-	Super::AddControllerYawInput(Val * UserSettings->GetMouseSensivity());
-}
-
-void AAaronCharacter::AddControllerPitchInput(float Val)
-{
-	Super::AddControllerPitchInput(Val * UserSettings->GetMouseSensivity());
 }
 
 // Called when the game starts or when spawned
 void AAaronCharacter::BeginPlay()
 {
-	MovementState = EMovementState::Run;
+	Super::BeginPlay();
 	VaultTimeline->AddInterpFloat(CurveFloat, UpdateTimeline);
 	VaultTimeline->SetTimelineFinishedFunc(FinishTimeLine);
 	PoisonTimeline->AddInterpFloat(CurvePoison, UpdateTimelinePoison);
 	LsdTimeline->AddInterpFloat(CurveLSD, UpdateTimelineLSD);
 	DodgeTimeline->AddInterpFloat(CurveDodge, UpdateDodgeTimeline);
 	DodgeTimeline->SetTimelineFinishedFunc(FinishDodgeTimeLine);
-
-	CharacterMovement->AirControl = StatManager->GetAirControl();
-	CharacterMovement->GravityScale = StatManager->GetGravityScale();
 
 	UserSettings = Cast<UAaronGameUserSettings>(GEngine->GetGameUserSettings());
 
@@ -84,8 +68,14 @@ void AAaronCharacter::BeginPlay()
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AAaronCharacter::OnBeginOverlap);
 	GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &AAaronCharacter::OnEndOverlap);
 
-	UpdateBindAction();
-	Super::BeginPlay();
+	LandedDelegate.AddUniqueDynamic(this, &AAaronCharacter::OnLandedCallback);
+}
+
+void AAaronCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	LandedDelegate.RemoveDynamic(this, &AAaronCharacter::OnLandedCallback);
+	
+	Super::EndPlay(EndPlayReason);
 }
 
 void AAaronCharacter::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -186,9 +176,6 @@ void AAaronCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAction("Walk", IE_Pressed, this, &AAaronCharacter::ToggleWalk);
-	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &AAaronCharacter::ToggleCrouch);
-
 	PlayerInputComponent->BindAction("Dodge", IE_Pressed, this, &AAaronCharacter::Dodge);
 
 	PlayerInputComponent->BindAction("SwitchGrapnelMod", IE_Pressed, this, &AAaronCharacter::EnableDisableGrapnel);
@@ -207,7 +194,7 @@ void AAaronCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 void AAaronCharacter::EnableDisableNightVision()
 {
-/*
+/* TODO : FIX WITH PlayerAdvancementSubsystem instead ?
 	if (UPlayerAdvancementSubsystem::GetMetroidvaniaAbilities(FString("NightVision")) && StatManager->GetNightVisionEffect() == 0.0f)
 		StatManager->SetNightVisionEffect(1.0f);
 	else
@@ -389,70 +376,42 @@ void AAaronCharacter::OnLandedCallback(const FHitResult& Hit)
 	isJumping = false;
 }
 
-
-
-void AAaronCharacter::ToggleCrouch()
+void AAaronCharacter::StartCrouching()
 {
-	if (CanCrouch() && !CharacterMovement->IsSwimming())
-	{
-		if (MovementState == EMovementState::Sprint)
-		{
-			Crouch();
-			CharacterMovement->GroundFriction = 0.f;
-			SlideRotation = GetActorRotation().Vector();
-			MovementState = EMovementState::Slide;
-		}
-		else
-			Crouch();
-	}
-	else
-	{
-		if (MovementState == EMovementState::Slide)
-		{
-			CharacterMovement->GroundFriction = 8.0f;
-			MovementState = EMovementState::Run;
-		}
-		UnCrouch();
-	}
-}
+	Crouch();
 
-void AAaronCharacter::ToggleWalk()
-{
-	if (MovementState == EMovementState::Run)
-		MovementState = EMovementState::Walk;
-	else if (MovementState == EMovementState::Walk)
-		MovementState = EMovementState::Run;
-}
-
-void AAaronCharacter::ToggleSprint()
-{
-	
+	//Transition To Slide
 	if (MovementState == EMovementState::Sprint)
-		MovementState = EMovementState::Run;
-	else if (CharacterMovement->Velocity.Size() > 0.0f)
 	{
-		if (MovementState == EMovementState::Slide)
-			CharacterMovement->GroundFriction = 8.0f;
-		
-		UnCrouch();
-		MovementState = EMovementState::Sprint;
+		CharacterMovement->GroundFriction = 0.0f;
+		SlideRotation = GetActorRotation().Vector();
+		MovementState = EMovementState::Slide;
+	}
+}
+
+void AAaronCharacter::StopCrouching()
+{
+	UnCrouch();
+	//
+	if (MovementState == EMovementState::Slide)
+	{
+		CharacterMovement->GroundFriction = 8.0f;
+		MovementState = EMovementState::Run;
 	}
 }
 
 void AAaronCharacter::StartSprinting()
 {
-	if (MovementState == EMovementState::Slide)
-		CharacterMovement->GroundFriction = 8.0f;
-	
 	UnCrouch();
 	MovementState = EMovementState::Sprint;
-	
 }
 
 void AAaronCharacter::StopSprinting()
 {
-	if (MovementState != EMovementState::Slide)
+	if (MovementState == EMovementState::Sprint)
+	{
 		MovementState = EMovementState::Run;
+	}
 }
 
 
@@ -662,6 +621,14 @@ FVector AAaronCharacter::GetCapsuleBaseLocationFromBase(FVector BaseLocation, fl
 	return FVector(BaseLocation.X, BaseLocation.Y, BaseLocation.Z + GetCapsuleComponent()->GetScaledCapsuleHalfHeight() + ZOffset);
 }
 
+void AAaronCharacter::ResolveMovementMethod()
+{
+	if (CurrentMovementMethod != DesiredMovementMethod)
+	{
+		return;
+	}
+}
+
 void AAaronCharacter::OnPoisonAlteration()
 {
 	PoisonTimeline->SetTimelineLength(4.0f);
@@ -704,23 +671,6 @@ void AAaronCharacter::EndTimelineFunction()
 {
 	CanVault = false;
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-}
-
-void AAaronCharacter::UpdateBindAction()
-{
-	auto PlayerInputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
-	if (PlayerInputComponent)
-	{
-		if (UserSettings->GetIsToggleSprint())
-		{
-			PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AAaronCharacter::ToggleSprint);
-		}
-		else
-		{
-			PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AAaronCharacter::StartSprinting);
-			PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AAaronCharacter::StopSprinting);
-		}
-	}
 }
 
 bool AAaronCharacter::VaultCheck(VaultTraceSettings TraceSettings)
