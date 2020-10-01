@@ -4,23 +4,9 @@
 #include "CoreMinimal.h"
 #include <GameFramework/Character.h>
 #include <Camera/CameraComponent.h>
-#include "../StatManager/CharacterStatManager.h"
+#include "Projet_Aaron/StatManager/CharacterStatManager.h"
+#include "Projet_Aaron/Character/AaronCharacterMovementComponent.h"
 #include "AaronCharacter.generated.h"
-
-UENUM(BlueprintType)
-enum class EMovementState : uint8
-{
-	Crouch UMETA(DisplayName = "Crouch"),
-	Walk UMETA(DisplayName = "Walk"),
-	Run UMETA(DisplayName = "Run"),
-	Dash UMETA(DisplayName = "Dash"),
-	Slide UMETA(DisplayName = "Slide"),
-	Swim UMETA(DisplayName = "Swim"),
-	Crawl UMETA(DisplayName = "Crawl"),
-	InAir UMETA(DisplayName = "InAir"),
-	Glide UMETA(DisplayName = "Glide"),
-	Climb UMETA(DisplayName = "Climb"),
-};
 
 UCLASS()
 class PROJET_AARON_API AAaronCharacter : public ACharacter
@@ -28,7 +14,7 @@ class PROJET_AARON_API AAaronCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
-	AAaronCharacter();
+	AAaronCharacter(const FObjectInitializer& ObjectInitializer);
 	virtual void Tick(float DeltaSeconds) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -56,35 +42,75 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void LookUp(float Value);
 	
-	UFUNCTION(BlueprintCallable)
-		void SetMovementState(EMovementState NewMovementMethod);
 private:
+	void TransitionToMovementState(EMovementState NewMovementState);
 	void OnEnterMovementState(EMovementState MovementState);
 	void OnExitMovementState(EMovementState MovementState);
+	void DebugMovementState();
 
+	void GroundedMovement(const FVector& Direction, float Speed);
+	void DashMovement(const FVector& Direction, float Speed);
+	void AirMovement(const FVector& Direction, float Speed);
+
+	void GroundedTransitions();
+	void DashTransitions();
+	void SlideTransitions();
+	void AirTransitions();
+
+	//Internal Storage Variables
+	float DashTimeAccumulator = 0.0f;
+	FVector DashVector;
 protected:
-	//Inputs
-	FVector InputVector = FVector::ZeroVector;
+	UPROPERTY(BlueprintReadWrite, Category = "Acquisition")
+		FVector InputVector = FVector::ZeroVector;
+	UPROPERTY(BlueprintReadWrite, Category = "Acquisition")
+		FVector LastInputDirection = FVector::ZeroVector;
+	
+	UPROPERTY(BlueprintReadWrite, Category = "Acquisition")
+		bool ShouldCrouch = false;
+	UPROPERTY(BlueprintReadWrite, Category = "Acquisition")
+		bool ShouldCrawl = false;
+	UPROPERTY(BlueprintReadWrite, Category = "Acquisition")
+		bool ShouldRun = false;
+	UPROPERTY(BlueprintReadWrite, Category = "Acquisition")
+		bool ShouldDash = false;
+	UPROPERTY(BlueprintReadWrite, Category = "Acquisition")
+		bool ShouldClimb = false;
 
 	//Movement State
 	UPROPERTY(BlueprintReadOnly)
-		EMovementState MovementMethod = EMovementState::Run;
+		EMovementState CurrentMovementState = EMovementState::Run;
 	
 	//Metrics
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Metrics")
 		float CrouchSpeed = 400;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Metrics")
 		float WalkSpeed = 600;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Metrics")
 		float RunSpeed = 1000;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float DashSpeed = 2000;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float JumpForce = 464;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float SwimSpeed = 500;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float CrawlSpeed = 700;
 
-	//TODO Dodge, Climb, Slide, Glide Metrics
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Metrics")
+		float DashSpeed = 3000;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Metrics")
+		float DashDuration = 0.20f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Metrics")
+		float DashCooldown = 0.8f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Metrics")
+		float SlideSpeed = 1000;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Metrics")
+		float SlideMinSlopeAngle = 15;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Metrics")
+		float JumpForce = 464;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Metrics")
+		float SwimSpeed = 500;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Metrics")
+		float CrawlSpeed = 700;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Metrics")
+		float InAirSpeed = 300;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Metrics")
+		float GlidingSpeed = 700;
 };

@@ -3,7 +3,8 @@
 
 #include "AaronCharacter.h"
 
-AAaronCharacter::AAaronCharacter()
+AAaronCharacter::AAaronCharacter(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<UAaronCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -12,9 +13,8 @@ AAaronCharacter::AAaronCharacter()
 	FpsCamera->SetRelativeLocation(FVector(0.0f, 0.0f, 50.0f + BaseEyeHeight));
 	FpsCamera->bUsePawnControlRotation = true;
 
-	PostProcessing = CreateDefaultSubobject<UPostProcessComponent>(TEXT("Post Processing"));
 
-	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
+	PostProcessing = CreateDefaultSubobject<UPostProcessComponent>(TEXT("Post Processing"));
 	
 	RightArmEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Right Arm Equipment"));
 	RightArmEquipment->SetupAttachment(GetMesh(), FName("RightArm"));
@@ -34,18 +34,31 @@ AAaronCharacter::AAaronCharacter()
 
 void AAaronCharacter::Tick(float DeltaSeconds)
 {
-	InputVector.Normalize();
-	switch (MovementMethod)
+	switch (CurrentMovementState)
 	{
 	case EMovementState::Crouch:
-		GetMovementComponent()->AddInputVector(InputVector * CrouchSpeed);
+		GroundedMovement(InputVector, CrouchSpeed);
+		GroundedTransitions();
 		break;
 	case EMovementState::Walk:
-		GetMovementComponent()->AddInputVector(InputVector * WalkSpeed);
+		GroundedMovement(InputVector, WalkSpeed);
+		GroundedTransitions();
 		break;
 	case EMovementState::Run:
-		GetMovementComponent()->AddInputVector(InputVector * RunSpeed);
+		GroundedMovement(InputVector, RunSpeed);
+		GroundedTransitions();
 		break;
+
+	case EMovementState::Dash:
+		LaunchCharacter(DashVector * DashSpeed, true, false);
+		DashTransitions();
+		break;
+		
+	case EMovementState::Slide:
+		GroundedMovement(LastInputDirection.IsNearlyZero() ? GetActorForwardVector() : LastInputDirection, SlideSpeed);
+		//TODO
+		break;
+		
 	case EMovementState::Swim:
 		GetMovementComponent()->AddInputVector(FpsCamera->GetForwardVector() * SwimSpeed);
 		break;
@@ -54,28 +67,29 @@ void AAaronCharacter::Tick(float DeltaSeconds)
 		break;
 	case EMovementState::Climb:
 		break;
-	case EMovementState::Slide:
-		break;
 	case EMovementState::InAir:
+		AirMovement(InputVector, InAirSpeed);
+		AirTransitions();
 		break;
 	case EMovementState::Glide:
-		break;
-	case EMovementState::Dash:
+		AirMovement(InputVector, GlidingSpeed);
+		AirTransitions();
 		break;
 	}
 
+	LastInputDirection = InputVector;
 	InputVector = FVector::ZeroVector;
+	DashTimeAccumulator += DeltaSeconds;
 }
-
 
 void AAaronCharacter::MoveForward(float Value)
 {
-	GetMovementComponent()->AddInputVector(GetActorForwardVector() * Value);
+	InputVector += GetActorForwardVector() * Value;
 }
 
 void AAaronCharacter::MoveRight(float Value)
 {
-	GetMovementComponent()->AddInputVector(GetActorRightVector() * Value);
+	InputVector += GetActorRightVector() * Value;
 }
 
 void AAaronCharacter::Turn(float Value)
@@ -88,25 +102,26 @@ void AAaronCharacter::LookUp(float Value)
 	AddControllerPitchInput(Value);
 }
 
-void AAaronCharacter::SetMovementState(EMovementState NewMovementMethod)
+void AAaronCharacter::TransitionToMovementState(EMovementState NewMovementState)
 {
-	if (MovementMethod != NewMovementMethod)
+	if (CurrentMovementState != NewMovementState)
 	{
-		OnExitMovementState(MovementMethod);
-		
-		MovementMethod = NewMovementMethod;
-		
-		OnEnterMovementState(MovementMethod);
+		//Let the Current MovementState Clean up after itself
+		OnExitMovementState(CurrentMovementState);
+		//Actual Update
+		CurrentMovementState = NewMovementState;
+		//Let the New Movement State Init
+		OnEnterMovementState(CurrentMovementState);
+		//DebugMovementState();
 	}
 }
 
 void AAaronCharacter::OnEnterMovementState(EMovementState MovementState)
-{
+{	
 	switch (MovementState)
 	{
 	case EMovementState::Crouch:
-		GetCharacterMovement()->MaxWalkSpeedCrouched = CrouchSpeed;
-		GetCharacterMovement()->Crouch();
+		GetCharacterMovement()->MaxWalkSpeed = CrouchSpeed;
 		break;
 	case EMovementState::Walk:
 		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
@@ -115,7 +130,16 @@ void AAaronCharacter::OnEnterMovementState(EMovementState MovementState)
 		GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
 		break;
 	case EMovementState::Dash:
-		GetCharacterMovement()->MaxWalkSpeed = DashSpeed;
+		DashTimeAccumulator = 0;
+		//Offset from the ground a tiny bit
+		SetActorLocation(GetActorLocation() + FVector(0, 0, 1));
+		//Prepare the Dash Vector (Horizontal in last input direction)
+		DashVector = LastInputDirection;
+		DashVector.Z = 0;
+		DashVector.Normalize();
+		break;
+	case EMovementState::Slide:
+		GetCharacterMovement()->MaxWalkSpeed = SlideSpeed;
 		break;
 	case EMovementState::Climb:
 		GetCharacterMovement()->SetMovementMode(MOVE_Custom);
@@ -123,8 +147,6 @@ void AAaronCharacter::OnEnterMovementState(EMovementState MovementState)
 	case EMovementState::Swim:
 		break;
 	case EMovementState::Crawl:
-		break;
-	case EMovementState::Slide:
 		break;
 	case EMovementState::Glide:
 		break;
@@ -138,13 +160,15 @@ void AAaronCharacter::OnExitMovementState(EMovementState MovementState)
 	switch (MovementState)
 	{
 	case EMovementState::Crouch:
-		GetCharacterMovement()->UnCrouch();
 		break;
 	case EMovementState::Walk:
 		break;
 	case EMovementState::Run:
 		break;
 	case EMovementState::Dash:
+		DashTimeAccumulator = 0;
+		GetCharacterMovement()->StopMovementImmediately();
+		GetCharacterMovement()->Launch(-GetVelocity());
 		break;
 	case EMovementState::Climb:
 		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
@@ -160,5 +184,114 @@ void AAaronCharacter::OnExitMovementState(EMovementState MovementState)
 	case EMovementState::InAir:
 		break;
 	default:;
+	}
+}
+
+void AAaronCharacter::DebugMovementState()
+{
+	FString CurrentState = "Unknown";
+	switch (CurrentMovementState)
+	{
+	case EMovementState::Crouch:	CurrentState = "Crouch"; break;
+	case EMovementState::Walk:		CurrentState = "Walk";  break;
+	case EMovementState::Run:		CurrentState = "Run"; break;
+	case EMovementState::Dash:		CurrentState = "Dash"; break;
+	case EMovementState::Slide:		CurrentState = "Slide"; break;
+	case EMovementState::Swim:		CurrentState = "Swim"; break;
+	case EMovementState::Crawl:		CurrentState = "Crawl"; break;
+	case EMovementState::InAir:		CurrentState = "InAir"; break;
+	case EMovementState::Glide:		CurrentState = "Glide"; break;
+	case EMovementState::Climb:		CurrentState = "Climb"; break;
+	}
+
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::White, "MovementState : " + CurrentState);
+}
+
+void AAaronCharacter::GroundedMovement(const FVector& Direction, float Speed)
+{
+	GetMovementComponent()->AddInputVector(Direction.GetSafeNormal() * Speed);
+}
+
+void AAaronCharacter::DashMovement(const FVector& Direction, float Speed)
+{
+	GetMovementComponent()->AddInputVector(Direction.GetSafeNormal() * Speed);
+}
+
+void AAaronCharacter::AirMovement(const FVector& Direction, float Speed)
+{
+	FVector FlatDirection = Direction * Speed;
+	FlatDirection.Z = 0;
+	GetMovementComponent()->AddInputVector(FlatDirection);
+}
+
+void AAaronCharacter::GroundedTransitions()
+{
+	if (ShouldDash && DashTimeAccumulator > DashCooldown)
+	{
+		TransitionToMovementState(EMovementState::Dash);
+	}
+	else if (GetMovementComponent()->IsFalling())
+	{
+		TransitionToMovementState(EMovementState::InAir);
+	}
+	else if (GetMovementComponent()->IsSwimming())
+	{
+		TransitionToMovementState(EMovementState::Swim);
+	}
+	else if (ShouldRun)
+	{
+		TransitionToMovementState(EMovementState::Run);
+	}
+	else if (ShouldCrouch)
+	{
+		if (GetVelocity().Size() <= WalkSpeed)
+		{
+			TransitionToMovementState(EMovementState::Crouch);
+		}
+		else
+		{
+			TransitionToMovementState(EMovementState::Slide);
+		}
+	}
+	else if (ShouldClimb)
+	{
+		TransitionToMovementState(EMovementState::Climb);
+	}
+	else
+	{
+		//By Default go back to Walking
+		TransitionToMovementState(EMovementState::Walk);
+	}
+}
+
+void AAaronCharacter::DashTransitions()
+{
+	if (DashTimeAccumulator > DashDuration)
+	{
+		GroundedTransitions();
+	}
+}
+
+void AAaronCharacter::SlideTransitions()
+{
+	if (GetVelocity().Size() < WalkSpeed)
+	{
+		TransitionToMovementState(EMovementState::Walk);
+	}
+}
+
+void AAaronCharacter::AirTransitions()
+{
+	if (GetMovementComponent()->IsFalling())
+	{
+		TransitionToMovementState(EMovementState::InAir);
+	}
+	else if (GetMovementComponent()->IsSwimming())
+	{
+		TransitionToMovementState(EMovementState::Swim);
+	}
+	else if (GetMovementComponent()->IsMovingOnGround())
+	{
+		TransitionToMovementState(EMovementState::Walk);
 	}
 }
