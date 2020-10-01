@@ -12,13 +12,9 @@ AAaronCharacter::AAaronCharacter()
 	FpsCamera->SetRelativeLocation(FVector(0.0f, 0.0f, 50.0f + BaseEyeHeight));
 	FpsCamera->bUsePawnControlRotation = true;
 
-	StatManager = CreateDefaultSubobject<UCharacterStatManager>(TEXT("StatManager"));
 	PostProcessing = CreateDefaultSubobject<UPostProcessComponent>(TEXT("Post Processing"));
 
 	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
-	GetCharacterMovement()->JumpZVelocity = StatManager->GetJumpForce();
-	GetCharacterMovement()->AirControl = StatManager->GetAirControl();
-	GetCharacterMovement()->GravityScale = StatManager->GetGravityScale();
 	
 	RightArmEquipment = CreateDefaultSubobject<UChildActorComponent>(TEXT("Right Arm Equipment"));
 	RightArmEquipment->SetupAttachment(GetMesh(), FName("RightArm"));
@@ -36,12 +32,133 @@ AAaronCharacter::AAaronCharacter()
 	LegsEquipment->SetupAttachment(FpsCamera);
 }
 
+void AAaronCharacter::Tick(float DeltaSeconds)
+{
+	InputVector.Normalize();
+	switch (MovementMethod)
+	{
+	case EMovementState::Crouch:
+		GetMovementComponent()->AddInputVector(InputVector * CrouchSpeed);
+		break;
+	case EMovementState::Walk:
+		GetMovementComponent()->AddInputVector(InputVector * WalkSpeed);
+		break;
+	case EMovementState::Run:
+		GetMovementComponent()->AddInputVector(InputVector * RunSpeed);
+		break;
+	case EMovementState::Swim:
+		GetMovementComponent()->AddInputVector(FpsCamera->GetForwardVector() * SwimSpeed);
+		break;
+	case EMovementState::Crawl:
+		GetMovementComponent()->AddInputVector(FpsCamera->GetForwardVector() * CrawlSpeed);
+		break;
+	case EMovementState::Climb:
+		break;
+	case EMovementState::Slide:
+		break;
+	case EMovementState::InAir:
+		break;
+	case EMovementState::Glide:
+		break;
+	case EMovementState::Dash:
+		break;
+	}
+
+	InputVector = FVector::ZeroVector;
+}
+
+
 void AAaronCharacter::MoveForward(float Value)
 {
-	GetCharacterMovement()->AddInputVector(GetActorForwardVector() * Value);
+	GetMovementComponent()->AddInputVector(GetActorForwardVector() * Value);
 }
 
 void AAaronCharacter::MoveRight(float Value)
 {
-	GetCharacterMovement()->AddInputVector(GetActorRightVector() * Value);
+	GetMovementComponent()->AddInputVector(GetActorRightVector() * Value);
+}
+
+void AAaronCharacter::Turn(float Value)
+{
+	AddControllerYawInput(Value);
+}
+
+void AAaronCharacter::LookUp(float Value)
+{
+	AddControllerPitchInput(Value);
+}
+
+void AAaronCharacter::SetMovementState(EMovementState NewMovementMethod)
+{
+	if (MovementMethod != NewMovementMethod)
+	{
+		OnExitMovementState(MovementMethod);
+		
+		MovementMethod = NewMovementMethod;
+		
+		OnEnterMovementState(MovementMethod);
+	}
+}
+
+void AAaronCharacter::OnEnterMovementState(EMovementState MovementState)
+{
+	switch (MovementState)
+	{
+	case EMovementState::Crouch:
+		GetCharacterMovement()->MaxWalkSpeedCrouched = CrouchSpeed;
+		GetCharacterMovement()->Crouch();
+		break;
+	case EMovementState::Walk:
+		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+		break;
+	case EMovementState::Run:
+		GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
+		break;
+	case EMovementState::Dash:
+		GetCharacterMovement()->MaxWalkSpeed = DashSpeed;
+		break;
+	case EMovementState::Climb:
+		GetCharacterMovement()->SetMovementMode(MOVE_Custom);
+		break;
+	case EMovementState::Swim:
+		break;
+	case EMovementState::Crawl:
+		break;
+	case EMovementState::Slide:
+		break;
+	case EMovementState::Glide:
+		break;
+	case EMovementState::InAir:
+		break;
+	}
+}
+
+void AAaronCharacter::OnExitMovementState(EMovementState MovementState)
+{
+	switch (MovementState)
+	{
+	case EMovementState::Crouch:
+		GetCharacterMovement()->UnCrouch();
+		break;
+	case EMovementState::Walk:
+		break;
+	case EMovementState::Run:
+		break;
+	case EMovementState::Dash:
+		break;
+	case EMovementState::Climb:
+		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		break;
+	case EMovementState::Slide:
+		break;
+	case EMovementState::Glide:
+		break;
+	case EMovementState::Swim:
+		break;
+	case EMovementState::Crawl:
+		break;
+	case EMovementState::InAir:
+		break;
+	default:;
+	}
 }

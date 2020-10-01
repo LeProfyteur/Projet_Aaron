@@ -26,17 +26,6 @@ enum class VaultType : uint8
 };
 
 UENUM(BlueprintType)
-enum class EMovementMethod : uint8
-{
-	Crouch UMETA(DisplayName = "Crouch"),
-	Run UMETA(DisplayName = "Run"),
-	Sprint UMETA(DisplayName = "Sprint"),
-	Climb UMETA(DisplayName = "Climb"),
-	Slide UMETA(DisplayName = "Slide"),
-	Glide UMETA(DisplayName = "Glide"),
-};
-
-UENUM(BlueprintType)
 enum class EEquipment : uint8
 {
 	Metroidvania,

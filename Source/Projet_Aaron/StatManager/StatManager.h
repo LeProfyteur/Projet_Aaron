@@ -32,7 +32,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
 	float HealthTechMax = 100.0f;
 
-	bool Undying = false;
+	bool Undying;
 	
 public:	
 
