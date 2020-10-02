@@ -135,9 +135,13 @@ protected:
 	UPROPERTY(BlueprintAssignable)
 		FPlayerStatChangedEvent OnPlayerHealthChanged;
 	UPROPERTY(BlueprintAssignable)
-		FPlayerStatChangedEvent OnPlayerStaminaChanged;
-	UPROPERTY(BlueprintAssignable)
-		FPlayerStatChangedEvent OnPlayerOxygenChanged;
+        FPlayerStatChangedEvent OnPlayerStaminaChanged;
+    UPROPERTY(BlueprintAssignable)
+        FPlayerStatChangedEvent OnPlayerOxygenChanged;
+    UPROPERTY(BlueprintAssignable)
+        FPlayerStatChangedEvent OnPlayerPoisonIntensityChanged;
+    UPROPERTY(BlueprintAssignable)
+        FPlayerStatChangedEvent OnPlayerHallucinationIntensityChanged;
 
 	//Player Scan Events
 	UPROPERTY(BlueprintAssignable)
