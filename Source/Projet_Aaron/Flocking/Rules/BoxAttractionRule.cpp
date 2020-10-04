@@ -15,7 +15,8 @@ UBoxComponent* UBoxAttractionRule::GetBoxComponent() const
 
 void UBoxAttractionRule::Execute_Implementation(UWorld* World, AFlockAgent* Agent)
 {
-	FVector BoxLocalAgentPosition = Box->GetOwner()->GetActorTransform().InverseTransformPosition(Agent->GetActorLocation());
+	const FVector& ActorLocation = Agent->GetActorLocation();
+	FVector BoxLocalAgentPosition = Box->GetComponentTransform().InverseTransformPosition(ActorLocation);
 	FVector Force = FVector::ZeroVector;
 	const FVector Extent = Box->GetScaledBoxExtent();
 

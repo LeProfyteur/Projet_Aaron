@@ -5,10 +5,15 @@
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "InteractorComponent.h"
+#include "Blueprint/UserWidget.h"
 #include "GameplayEventsSubsystem.generated.h"
+
+//Player Menu Request Events
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerRequestedMenuEvent, TSubclassOf<UUserWidget>, MenuType);
 
 //Player Advancement Update Events
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerAdvancementUpdateEvent, FName, AdvancementID);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerDeathEvent);
 
 //Player Tutorial Events
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerTutorialEvent);
@@ -45,6 +50,14 @@ class PROJET_AARON_API UGameplayEventsSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
+	//Player Menu Request Signals
+	UFUNCTION(BlueprintCallable)
+		void SignalPlayerRequestedMenuToOpen(TSubclassOf<UUserWidget> MenuType);
+	UFUNCTION(BlueprintCallable)
+		void SignalPlayerRequestedMenuToToggle(TSubclassOf<UUserWidget> MenuType);
+	UFUNCTION(BlueprintCallable)
+		void SignalPlayerRequestedMenuToClose(TSubclassOf<UUserWidget> MenuType);
+	
 	//Player Advancement Update Signals
 	UFUNCTION(BlueprintCallable)
 		void SignalPlayerObjectiveUpdate(FName ObjectiveID);
@@ -56,6 +69,8 @@ public:
 		void SignalPlayerCollectibleUpdate(FName CollectibleID);
 	UFUNCTION(BlueprintCallable)
 		void SignalPlayerLogEntryUpdate(FName LogEntryID);
+	UFUNCTION(BlueprintCallable)
+		void SignalPlayerDeath();
 	
     //Player Tutorial Signals
     UFUNCTION(BlueprintCallable)
@@ -70,7 +85,7 @@ public:
 	//Player Inventory Signals
 	UFUNCTION(BlueprintCallable)
 		void SignalPlayerInventorySlotChanged(int SlotID, FName ItemID);
-
+		void SignalPlayerUsableItemSelectionChanged(int SlotID, FName ItemID);
 	//Player Status Signals
 	UFUNCTION(BlueprintCallable)
 		void SignalPlayerHealthChanged(float Current, float Max);
@@ -91,7 +106,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void SignalPlayerCompleteScan();
 
-
 	//Action Signals
 	UFUNCTION(BlueprintCallable)
 		void SignalPlayerSelectActionInteractor(UInteractorComponent* Interactor);
@@ -103,8 +117,17 @@ public:
 		void SignalPlayerCancelAction();
 	UFUNCTION(BlueprintCallable)
 		void SignalPlayerCompleteAction();
+
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+	//Player Menu Requests Events
+	UPROPERTY(BlueprintAssignable)
+		FPlayerRequestedMenuEvent OnPlayerRequestedMenuToOpen;
+	UPROPERTY(BlueprintAssignable)
+		FPlayerRequestedMenuEvent OnPlayerRequestedMenuToToggle;
+	UPROPERTY(BlueprintAssignable)
+		FPlayerRequestedMenuEvent OnPlayerRequestedMenuToClose;
 	
-protected:
 	//Player Advancement Update Events
 	UPROPERTY(BlueprintAssignable)
 		FPlayerAdvancementUpdateEvent OnPlayerObjectiveUpdate;
@@ -116,7 +139,9 @@ protected:
 		FPlayerAdvancementUpdateEvent OnPlayerCollectibleUpdate;
 	UPROPERTY(BlueprintAssignable)
 		FPlayerAdvancementUpdateEvent OnPlayerLogEntryUpdate;
-
+	UPROPERTY(BlueprintAssignable)
+		FPlayerDeathEvent OnPlayerDeath;
+	
     //Player Tutorial Events
     UPROPERTY(BlueprintAssignable)
         FPlayerTutorialEvent OnPlayerBeginTutorial;
@@ -130,6 +155,8 @@ protected:
 	//Player Inventory Events
 	UPROPERTY(BlueprintAssignable)
 		FPlayerInventorySlotChangedEvent OnPlayerInventorySlotChanged;
+	UPROPERTY(BlueprintAssignable)
+		FPlayerInventorySlotChangedEvent OnPlayerUsableItemSelectionChanged;
 	
 	//Player Status Events
 	UPROPERTY(BlueprintAssignable)

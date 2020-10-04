@@ -3,6 +3,11 @@
 
 #include "AaronCharacter.h"
 
+#include "Math/UnitConversion.h"
+
+//Chaining ifs is boring. That's just a one liner implementation for a transition selector
+#define MAKE_TRANSITION(Condition, MovementState) if (!!(Condition)) { TransitionToMovementState(MovementState); return; }
+
 AAaronCharacter::AAaronCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UAaronCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
@@ -55,22 +60,30 @@ void AAaronCharacter::Tick(float DeltaSeconds)
 		break;
 		
 	case EMovementState::Slide:
-		GroundedMovement(LastInputDirection.IsNearlyZero() ? GetActorForwardVector() : LastInputDirection, SlideSpeed);
-		//TODO
+		SlideMovement();
+		SlideTransitions();
 		break;
 		
 	case EMovementState::Swim:
 		GetMovementComponent()->AddInputVector(FpsCamera->GetForwardVector() * SwimSpeed);
+		SwimTransitions();
 		break;
+
 	case EMovementState::Crawl:
 		GetMovementComponent()->AddInputVector(FpsCamera->GetForwardVector() * CrawlSpeed);
+		SwimTransitions();
 		break;
+		
 	case EMovementState::Climb:
+		ClimbMovement();
+		ClimbTransitions();
 		break;
+
 	case EMovementState::InAir:
 		AirMovement(InputVector, InAirSpeed);
 		AirTransitions();
 		break;
+
 	case EMovementState::Glide:
 		AirMovement(InputVector, GlidingSpeed);
 		AirTransitions();
@@ -102,6 +115,33 @@ void AAaronCharacter::LookUp(float Value)
 	AddControllerPitchInput(Value);
 }
 
+void AAaronCharacter::StartClimbingWithLeftHand(const FVector& WorldPosition)
+{
+	UsingLeftGripPoint = true;
+	LeftGripPoint = WorldPosition;
+	UpdateShouldClimb();
+}
+
+void AAaronCharacter::StopClimbingWithLeftHand()
+{
+	UsingLeftGripPoint = false;
+	UpdateShouldClimb();
+}
+
+
+void AAaronCharacter::StartClimbingWithRightHand(const FVector& WorldPosition)
+{
+	UsingRightGripPoint = true;
+	RightGripPoint = WorldPosition;
+	UpdateShouldClimb();
+}
+
+void AAaronCharacter::StopClimbingWithRightHand()
+{
+	UsingRightGripPoint = false;
+	UpdateShouldClimb();
+}
+
 void AAaronCharacter::TransitionToMovementState(EMovementState NewMovementState)
 {
 	if (CurrentMovementState != NewMovementState)
@@ -112,7 +152,7 @@ void AAaronCharacter::TransitionToMovementState(EMovementState NewMovementState)
 		CurrentMovementState = NewMovementState;
 		//Let the New Movement State Init
 		OnEnterMovementState(CurrentMovementState);
-		//DebugMovementState();
+		DebugMovementState();
 	}
 }
 
@@ -140,6 +180,8 @@ void AAaronCharacter::OnEnterMovementState(EMovementState MovementState)
 		break;
 	case EMovementState::Slide:
 		GetCharacterMovement()->MaxWalkSpeed = SlideSpeed;
+		SlideMomentum = FMath::Min(SlideSpeed, GetVelocity().Size());
+		LastActorLocation = GetActorLocation();
 		break;
 	case EMovementState::Climb:
 		GetCharacterMovement()->SetMovementMode(MOVE_Custom);
@@ -171,7 +213,7 @@ void AAaronCharacter::OnExitMovementState(EMovementState MovementState)
 		GetCharacterMovement()->Launch(-GetVelocity());
 		break;
 	case EMovementState::Climb:
-		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		GetCharacterMovement()->SetMovementMode(MOVE_Falling);
 		break;
 	case EMovementState::Slide:
 		break;
@@ -224,48 +266,74 @@ void AAaronCharacter::AirMovement(const FVector& Direction, float Speed)
 	GetMovementComponent()->AddInputVector(FlatDirection);
 }
 
+void AAaronCharacter::ClimbMovement()
+{
+	FVector TargetGripPoint(FVector::ZeroVector);
+
+	if (UsingLeftGripPoint || UsingRightGripPoint)
+	{
+
+		if (UsingLeftGripPoint)
+		{
+			TargetGripPoint += LeftGripPoint;
+		}
+
+		if (UsingRightGripPoint)
+		{
+			TargetGripPoint += RightGripPoint;
+		}
+
+		//Average the two GripPoints if both are being used
+		if (UsingLeftGripPoint && UsingRightGripPoint)
+		{
+			TargetGripPoint /= 2;
+		}
+
+		FVector DesiredLocation = FMath::Lerp(GetActorLocation(), TargetGripPoint, 0.1f);
+		SetActorLocation(DesiredLocation);
+	}
+}
+
+void AAaronCharacter::SlideMovement()
+{
+	const FVector ActorVelocity = GetActorLocation() - LastActorLocation;
+	LastActorLocation = GetActorLocation();
+
+	if (ActorVelocity.IsNearlyZero()) // Likely Stopping/Blocked
+	{
+		SlideMomentum = 0;
+	}
+
+	const FVector Direction = ActorVelocity.GetSafeNormal();
+
+	if (ActorVelocity.Z >= 0) // Sliding up-hill
+	{
+		const float MomentumLoss = FVector::DotProduct(Direction, GetActorForwardVector());
+		SlideMomentum = SlideMomentum * (MomentumLoss * MomentumLoss);
+	}
+
+	GetCharacterMovement()->AddInputVector(Direction * SlideMomentum);
+}
+
+
 void AAaronCharacter::GroundedTransitions()
 {
-	if (ShouldDash && DashTimeAccumulator > DashCooldown)
-	{
-		TransitionToMovementState(EMovementState::Dash);
-	}
-	else if (GetMovementComponent()->IsFalling())
-	{
-		TransitionToMovementState(EMovementState::InAir);
-	}
-	else if (GetMovementComponent()->IsSwimming())
-	{
-		TransitionToMovementState(EMovementState::Swim);
-	}
-	else if (ShouldRun)
-	{
-		TransitionToMovementState(EMovementState::Run);
-	}
-	else if (ShouldCrouch)
-	{
-		if (GetVelocity().Size() <= WalkSpeed)
-		{
-			TransitionToMovementState(EMovementState::Crouch);
-		}
-		else
-		{
-			TransitionToMovementState(EMovementState::Slide);
-		}
-	}
-	else if (ShouldClimb)
-	{
-		TransitionToMovementState(EMovementState::Climb);
-	}
-	else
-	{
-		//By Default go back to Walking
-		TransitionToMovementState(EMovementState::Walk);
-	}
+	const float Speed = GetVelocity().Size();
+	//Hard Transitions (Different locomotion mode)
+	MAKE_TRANSITION(ShouldDash && DashTimeAccumulator > DashCooldown,	EMovementState::Dash);
+	MAKE_TRANSITION(GetMovementComponent()->IsFalling(),				EMovementState::InAir);
+	MAKE_TRANSITION(GetMovementComponent()->IsInWater(),				EMovementState::Swim);
+	MAKE_TRANSITION(ShouldCrouch && Speed > SlideInitialRequiredSpeed,	EMovementState::Slide);
+	MAKE_TRANSITION(ShouldClimb,										EMovementState::Climb);
+	//Soft Transitions (speed changes)
+	MAKE_TRANSITION(ShouldRun,											EMovementState::Run);
+	MAKE_TRANSITION(ShouldCrouch && Speed <= WalkSpeed,					EMovementState::Crouch);
+	MAKE_TRANSITION(true,												EMovementState::Walk);
 }
 
 void AAaronCharacter::DashTransitions()
 {
+	//Grounded Transitions only after the Dash is finished
 	if (DashTimeAccumulator > DashDuration)
 	{
 		GroundedTransitions();
@@ -274,24 +342,31 @@ void AAaronCharacter::DashTransitions()
 
 void AAaronCharacter::SlideTransitions()
 {
-	if (GetVelocity().Size() < WalkSpeed)
-	{
-		TransitionToMovementState(EMovementState::Walk);
-	}
+	MAKE_TRANSITION(GetMovementComponent()->IsFalling(),				EMovementState::InAir);
+	MAKE_TRANSITION(GetMovementComponent()->IsInWater(),				EMovementState::Swim);
+	MAKE_TRANSITION(ShouldClimb,										EMovementState::Climb);
+	MAKE_TRANSITION(ShouldDash && DashTimeAccumulator > DashCooldown,	EMovementState::Dash);
+	MAKE_TRANSITION(SlideMomentum <= CrouchSpeed,						EMovementState::Crouch);
 }
 
 void AAaronCharacter::AirTransitions()
 {
-	if (GetMovementComponent()->IsFalling())
-	{
-		TransitionToMovementState(EMovementState::InAir);
-	}
-	else if (GetMovementComponent()->IsSwimming())
-	{
-		TransitionToMovementState(EMovementState::Swim);
-	}
-	else if (GetMovementComponent()->IsMovingOnGround())
-	{
-		TransitionToMovementState(EMovementState::Walk);
-	}
+	MAKE_TRANSITION(GetMovementComponent()->IsInWater(),				EMovementState::Swim);
+	MAKE_TRANSITION(GetMovementComponent()->IsMovingOnGround(),			EMovementState::Walk);
+}
+
+void AAaronCharacter::SwimTransitions()
+{
+	MAKE_TRANSITION(ShouldClimb,							EMovementState::Climb);
+	MAKE_TRANSITION(!GetMovementComponent()->IsInWater(),	EMovementState::Walk);
+}
+
+void AAaronCharacter::ClimbTransitions()
+{
+	MAKE_TRANSITION(!ShouldClimb, EMovementState::InAir);
+}
+
+void AAaronCharacter::UpdateShouldClimb()
+{
+	ShouldClimb = UsingLeftGripPoint || UsingRightGripPoint;
 }

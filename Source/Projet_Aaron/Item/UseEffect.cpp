@@ -8,17 +8,3 @@ void UUseEffect::OnUse_Implementation(AActor* Instigator, UInventoryComponent* U
 {
 
 }
-
-void UUseEffect::Execute(const TSubclassOf<UUseEffect>& Effect, AActor* Instigator, UInventoryComponent* UsedInventory, int UsedSlotID, const FName& UsedItemID)
-{
-    UUseEffect* Instance = NewObject<UUseEffect>(GetTransientPackage(), Effect);
-    Instance->OnUse(Instigator, UsedInventory, UsedSlotID, UsedItemID);
-}
-
-void UUseEffect::ExecuteSequence(const TArray<TSubclassOf<UUseEffect>>& Effects, AActor* Instigator, UInventoryComponent* UsedInventory, int UsedSlotID, const FName& UsedItemID)
-{
-    for (const TSubclassOf<UUseEffect>& Effect : Effects)
-    {
-        Execute(Effect, Instigator, UsedInventory, UsedSlotID, UsedItemID);
-    }
-}

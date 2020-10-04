@@ -3,6 +3,21 @@
 
 #include "GameplayEventsSubsystem.h"
 
+void UGameplayEventsSubsystem::SignalPlayerRequestedMenuToOpen(TSubclassOf<UUserWidget> MenuType)
+{
+	OnPlayerRequestedMenuToOpen.Broadcast(MenuType);
+}
+
+void UGameplayEventsSubsystem::SignalPlayerRequestedMenuToToggle(TSubclassOf<UUserWidget> MenuType)
+{
+	OnPlayerRequestedMenuToToggle.Broadcast(MenuType);
+}
+
+void UGameplayEventsSubsystem::SignalPlayerRequestedMenuToClose(TSubclassOf<UUserWidget> MenuType)
+{
+	OnPlayerRequestedMenuToClose.Broadcast(MenuType);
+}
+
 //Player Advancement Update Signals
 void UGameplayEventsSubsystem::SignalPlayerObjectiveUpdate(FName ObjectiveID)
 {
@@ -29,6 +44,11 @@ void UGameplayEventsSubsystem::SignalPlayerLogEntryUpdate(FName LogEntryID)
 	OnPlayerLogEntryUpdate.Broadcast(LogEntryID);
 }
 
+void UGameplayEventsSubsystem::SignalPlayerDeath()
+{
+	OnPlayerDeath.Broadcast();
+}
+
 //Player Tutorial Signals
 void UGameplayEventsSubsystem::SignalPlayerBeginTutorial()
 {
@@ -50,6 +70,11 @@ void UGameplayEventsSubsystem::SignalPlayerRequestTip(FName TipsID)
 void UGameplayEventsSubsystem::SignalPlayerInventorySlotChanged(int SlotID, FName ItemID)
 {
 	OnPlayerInventorySlotChanged.Broadcast(SlotID, ItemID);
+}
+
+void UGameplayEventsSubsystem::SignalPlayerUsableItemSelectionChanged(int SlotID, FName ItemID)
+{
+	OnPlayerUsableItemSelectionChanged.Broadcast(SlotID, ItemID);
 }
 
 //Player Status Signals

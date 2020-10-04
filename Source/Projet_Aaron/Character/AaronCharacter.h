@@ -42,6 +42,16 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void LookUp(float Value);
 	
+	UFUNCTION(BlueprintCallable)
+		void StartClimbingWithLeftHand(const FVector& WorldPosition);
+	UFUNCTION(BlueprintCallable)
+		void StopClimbingWithLeftHand();
+	
+	UFUNCTION(BlueprintCallable)
+		void StartClimbingWithRightHand(const FVector& WorldPosition);
+	UFUNCTION(BlueprintCallable)
+		void StopClimbingWithRightHand();
+
 private:
 	void TransitionToMovementState(EMovementState NewMovementState);
 	void OnEnterMovementState(EMovementState MovementState);
@@ -51,21 +61,36 @@ private:
 	void GroundedMovement(const FVector& Direction, float Speed);
 	void DashMovement(const FVector& Direction, float Speed);
 	void AirMovement(const FVector& Direction, float Speed);
+	void ClimbMovement();
+	void SlideMovement();
 
 	void GroundedTransitions();
 	void DashTransitions();
 	void SlideTransitions();
 	void AirTransitions();
+	void SwimTransitions();
+	void ClimbTransitions();
 
-	//Internal Storage Variables
+	void UpdateShouldClimb();
+
+	//Dash Internal Variables
 	float DashTimeAccumulator = 0.0f;
 	FVector DashVector;
+
+	//Slide Internal Variables
+	float SlideMomentum;
+	FVector LastActorLocation;
+
+	//Climb Internal Variables
+	bool UsingLeftGripPoint;
+	FVector LeftGripPoint;
+	bool UsingRightGripPoint;
+	FVector RightGripPoint;
 protected:
 	UPROPERTY(BlueprintReadWrite, Category = "Acquisition")
 		FVector InputVector = FVector::ZeroVector;
-	UPROPERTY(BlueprintReadWrite, Category = "Acquisition")
-		FVector LastInputDirection = FVector::ZeroVector;
-	
+	FVector LastInputDirection = FVector::ZeroVector;
+
 	UPROPERTY(BlueprintReadWrite, Category = "Acquisition")
 		bool ShouldCrouch = false;
 	UPROPERTY(BlueprintReadWrite, Category = "Acquisition")
@@ -96,6 +121,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Metrics")
 		float DashCooldown = 0.8f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Metrics")
+		float SlideInitialRequiredSpeed = 800;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Metrics")
 		float SlideSpeed = 1000;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Metrics")

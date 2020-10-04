@@ -46,6 +46,8 @@ void UPlayerAdvancementSubsystem::LoadData()
 
 		LevelName = SaveGame->LevelName;
 		SpawnPointName = SaveGame->SpawnPointName;
+
+		//TODO : Spawn a custom AaronSpawnPoint on Saved SpawnLocation once we support that
 	}
 }
 
