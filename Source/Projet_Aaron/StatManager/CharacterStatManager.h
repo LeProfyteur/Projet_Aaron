@@ -7,6 +7,7 @@
 #include "Materials/MaterialParameterCollectionInstance.h"
 #include "CoreMinimal.h"
 #include "CreatureStatManager.h"
+#include <Engine/EngineTypes.h>
 #include "CharacterStatManager.generated.h"
 
 /**
@@ -67,7 +68,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		UMaterialParameterCollection* ParameterCollection;
 
-	virtual void BeginPlay() override;
+    void BeginPlay() override;
+    void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+private:
+    void OnHealthBioChangedEvent(float Current, float Max);
+    void OnHealthTechChangedEvent(float Current, float Max);
+    void OnOxygenChangedEvent(float Current, float Max);
+    void OnStaminaChangedEvent(float Current, float Max);
 
 public:
 

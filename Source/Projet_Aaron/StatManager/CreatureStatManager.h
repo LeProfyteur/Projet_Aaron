@@ -15,6 +15,10 @@ class PROJET_AARON_API UCreatureStatManager : public UStatManager
 {
 	GENERATED_BODY()
 
+public:
+	UPROPERTY(BlueprintAssignable)
+		FOnStatChangedEvent OnStaminaChanged;
+
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Walking)
@@ -25,9 +29,9 @@ protected:
 		float SpeedMultiplier = 1.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Jumping)
 		float JumpForce = 600.0f;
-	UPROPERTY(BlueprintReadWrite, Category = Stamina)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stamina, BlueprintGetter = "GetStamina", BlueprintSetter = "SetStamina")
 		float Stamina;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stamina)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stamina, BlueprintGetter = "GetStaminaMax", BlueprintSetter = "SetStaminaMax")
 		float StaminaMax = 100.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stamina)
 		float StaminaRecovery = 5.0f;
@@ -66,10 +70,10 @@ public:
 		float GetWalkSpeed() const { return WalkSpeed; }
 	UFUNCTION(BlueprintCallable)
 		float GetSpeedMultiplier() const { return SpeedMultiplier; }
-	UFUNCTION(BlueprintCallable)
-		float GetStamina() const { return Stamina; }
-	UFUNCTION(BlueprintCallable)
-		float GetStaminaMax() const { return StaminaMax; }
+	UFUNCTION(BlueprintGetter)
+		float GetStamina() const;
+	UFUNCTION(BlueprintGetter)
+		float GetStaminaMax() const;
 	UFUNCTION(BlueprintCallable)
 		float GetStaminaRecovery() const { return StaminaRecovery; }
 	UFUNCTION(BlueprintCallable)
@@ -97,12 +101,12 @@ public:
 		bool GetSpeedAlteration() const { return HasSpeedAlteration; }
 
 	/*Setters*/
-	UFUNCTION(BlueprintCallable)
-		void SetStamina(const float NewStamina) { Stamina = NewStamina; }
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintSetter)
+		void SetStamina(const float NewStamina);
+    UFUNCTION(BlueprintSetter)
+		void SetStaminaMax(const float NewStaminaMax);
+    UFUNCTION(BlueprintCallable)
 		void SetStaminaRecovery(const float NewStaminaRecovery) { StaminaRecovery = NewStaminaRecovery; }
-	UFUNCTION(BlueprintCallable)
-		void SetStaminaMax(const float NewStaminaMax) { StaminaMax = NewStaminaMax; }
 	/**
 	 * \brief setup value of bAdrenalineBoost : true if the character don't use any stamina, false otherwise
 	 * \param newbAdrenaline new value of bAdrenalineBoost

@@ -18,19 +18,53 @@ void UCharacterStatManager::BeginPlay()
 {
 	Super::BeginPlay();
 	ParameterCollectionInstance = GetWorld()->GetParameterCollectionInstance(ParameterCollection);
+    OnHealthBioChanged.AddUniqueDynamic(this, &UCharacterStatManager::OnHealthBioChangedEvent);
+    OnHealthTechChanged.AddUniqueDynamic(this, &UCharacterStatManager::OnHealthTechChangedEvent);
+	OnStaminaChanged.AddUniqueDynamic(this, &UCharacterStatManager::OnStaminaChangedEvent);
+	//TODO : Oxygene Changed
 }
 
+
+void UCharacterStatManager::EndPlay(const EEndPlayReason::Type Reason)
+{
+    OnHealthBioChanged.RemoveDynamic(this, &UCharacterStatManager::OnHealthBioChangedEvent);
+    OnHealthTechChanged.RemoveDynamic(this, &UCharacterStatManager::OnHealthTechChangedEvent);
+    OnStaminaChanged.RemoveDynamic(this, &UCharacterStatManager::OnStaminaChangedEvent);
+}
+
+void UCharacterStatManager::OnHealthBioChangedEvent(float Current, float Max)
+{
+	if (UGameplayEventsSubsystem* GameplayEvents = GetOwner()->GetGameInstance()->GetSubsystem<UGameplayEventsSubsystem>())
+	{
+		GameplayEvents->SignalPlayerHealthChanged(Current, Max);
+	}
+}
+
+void UCharacterStatManager::OnHealthTechChangedEvent(float Current, float Max)
+{
+	//No gameplay events for that yet
+}
+
+void UCharacterStatManager::OnOxygenChangedEvent(float Current, float Max)
+{
+    if (UGameplayEventsSubsystem* GameplayEvents = GetOwner()->GetGameInstance()->GetSubsystem<UGameplayEventsSubsystem>())
+    {
+        GameplayEvents->SignalPlayerOxygenChanged(Current, Max);
+    }
+}
+
+void UCharacterStatManager::OnStaminaChangedEvent(float Current, float Max)
+{
+    if (UGameplayEventsSubsystem* GameplayEvents = GetOwner()->GetGameInstance()->GetSubsystem<UGameplayEventsSubsystem>())
+    {
+        GameplayEvents->SignalPlayerStaminaChanged(Current, Max);
+    }
+}
 
 void UCharacterStatManager::TakeDamage(float BioDamage, float TechDamage)
 {
 	if (!Skills.HardBark)
 		Super::TakeDamage(BioDamage, TechDamage);
-
-	
-	float RateHealth = GetHealthBioRate();
-	ParameterCollectionInstance->SetScalarParameterValue(FName(TEXT("Damage")), 1.0f - RateHealth);
-	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UCharacterStatManager::ResetDamagePP, 0.45f, false);
 	
 	if (UGameplayEventsSubsystem* GameplayEvents = GetOwner()->GetGameInstance()->GetSubsystem<UGameplayEventsSubsystem>())
 	{
@@ -70,15 +104,6 @@ void UCharacterStatManager::RecoveryOxygene(float DeltaTime)
 void UCharacterStatManager::Heal(float BioHeal, float TechHeal)
 {
 	Super::Heal(BioHeal, TechHeal);
-	//remove des post process
-	float RateHealth = (HealthBio + HealthTech) / (HealthBioMax + HealthTechMax);
-	if (RateHealth <= 0.5f)
-	{
-		ParameterCollectionInstance->SetScalarParameterValue(FName(TEXT("Damage")), 1.0f - RateHealth);
-	}else
-	{
-		ParameterCollectionInstance->SetScalarParameterValue(FName(TEXT("Damage")), 0.0f);
-	}
 
 	if (UGameplayEventsSubsystem* GameplayEvents = GetOwner()->GetGameInstance()->GetSubsystem<UGameplayEventsSubsystem>())
 	{

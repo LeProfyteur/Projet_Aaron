@@ -8,6 +8,16 @@ UCreatureStatManager::UCreatureStatManager() : Super()
 	
 }
 
+float UCreatureStatManager::GetStamina() const
+{
+	return Stamina;
+}
+
+float UCreatureStatManager::GetStaminaMax() const
+{
+	return StaminaMax;
+}
+
 void UCreatureStatManager::BeginPlay()
 {
 	Super::BeginPlay();
@@ -42,33 +52,37 @@ bool UCreatureStatManager::ConsumeStamina(float value)
 	{
 		return true;
 	}
-	if (Stamina - value < 0)
+	else if (Stamina > 0)
 	{
-		return false;
-	}
-	else
-	{
-		Stamina -= value;
+        Stamina = FMath::Max(0.0f, Stamina - value);
+        OnStaminaChanged.Broadcast(Stamina, StaminaMax);
 		return true;
 	}
+	return false;
 }
 
 void UCreatureStatManager::RecoveryStamina(float DeltaTime)
 {
-	if(Stamina + StaminaRecovery * DeltaTime > StaminaMax)
-	{
-		Stamina = StaminaMax;
-	}
-	else
-	{
-		Stamina += StaminaRecovery * DeltaTime;
-	}
+	Stamina = FMath::Min(StaminaMax, Stamina + StaminaRecovery);
+	OnStaminaChanged.Broadcast(Stamina, StaminaMax);
 }
 
 FString UCreatureStatManager::GetStaminaRateText() const
 {
 	TArray<FStringFormatArg> StringArgs{ static_cast<int>(Stamina), static_cast<int>(StaminaMax) };
 	return FString::Format(TEXT("{0} / {1}"), StringArgs);
+}
+
+void UCreatureStatManager::SetStamina(const float NewStamina)
+{
+	Stamina = NewStamina;
+	OnStaminaChanged.Broadcast(Stamina, StaminaMax);
+}
+
+void UCreatureStatManager::SetStaminaMax(const float NewStaminaMax)
+{
+    StaminaMax = NewStaminaMax;
+	OnStaminaChanged.Broadcast(Stamina, StaminaMax);
 }
 
 void UCreatureStatManager::SetJumpForce(const float NewJumpForce)

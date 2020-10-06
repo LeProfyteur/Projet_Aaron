@@ -3,16 +3,49 @@
 
 #include "StatManager.h"
 
-
-
-// Sets default values for this component's properties
-UStatManager::UStatManager()
+float UStatManager::GetHealthBio() const
 {
-	PrimaryComponentTick.bCanEverTick = false;
+	return HealthBio;
 }
 
+float UStatManager::GetHealthBioMax() const
+{
+	return HealthBioMax;
+}
+float UStatManager::GetHealthTech() const
+{
+	return HealthTech;
+}
 
-// Called when the game starts
+float UStatManager::GetHealthTechMax() const
+{
+	return HealthTechMax;
+}
+
+void UStatManager::SetHealthBio(float NewHealthBio)
+{
+	HealthBio = NewHealthBio;
+	OnHealthBioChanged.Broadcast(HealthBio, HealthBioMax);
+}
+
+void UStatManager::SetHealthBioMax(float NewHealthBioMax)
+{
+	HealthBioMax = NewHealthBioMax;
+    OnHealthBioChanged.Broadcast(HealthBio, HealthBioMax);
+}
+
+void UStatManager::SetHealthTech(float NewHealthTech)
+{
+	HealthTech = NewHealthTech;
+    OnHealthTechChanged.Broadcast(HealthTech, HealthTechMax);
+}
+
+void UStatManager::SetHealthTechMax(float NewHealthTechMax)
+{
+    HealthTechMax = NewHealthTechMax;
+    OnHealthTechChanged.Broadcast(HealthTech, HealthTechMax);
+}
+
 void UStatManager::BeginPlay()
 {
 	Super::BeginPlay();
@@ -20,66 +53,43 @@ void UStatManager::BeginPlay()
 	HealthTech = HealthTechMax;
 }
 
-FString UStatManager::GetHealthBioRateText() const
-{
-	TArray<FStringFormatArg> StringArgs {static_cast<int>(HealthBio), static_cast<int>(HealthBioMax)};
-	return FString::Format(TEXT("{0} / {1}"), StringArgs);
-}
-
-FString UStatManager::GetHealthTechRateText() const
-{
-	TArray<FStringFormatArg> StringArgs{ static_cast<int>(HealthTech), static_cast<int>(HealthTechMax) };
-	return FString::Format(TEXT("{0} / {1}"), StringArgs);
-}
-
 void UStatManager::TakeDamage(float BioDamage, float TechDamage)
 {
-	HealthBio -= BioDamage;
-	HealthTech -= TechDamage;
+    if (TechDamage > 0)
+    {
+        HealthTech = FMath::Max(0.0f, HealthTech - TechDamage);
+        OnHealthTechChanged.Broadcast(HealthTech, HealthTechMax);
+    }
 
-
-	if(HealthTech <= 0)
+	if (BioDamage > 0)
 	{
-		HealthTech = 0;
-	}
-	
-	if(HealthBio <= 0)
-	{
-		HealthBio = 0;
+		HealthBio = FMath::Max(0.0f, HealthBio - BioDamage);
+		
+		if (Invinvible && HealthBio < 1)
+		{
+			HealthBio = 1;
+		}
 
-		Die();
-	}
+		OnHealthBioChanged.Broadcast(HealthBio, HealthBioMax);
 
-	
+		if (DestroyOwnerOnDeath && HealthBio == 0.0f)
+		{
+			GetOwner()->Destroy();
+		}
+	}
 }
 
 void UStatManager::Heal(float BioHeal, float TechHeal)
 {
-	HealthBio += BioHeal;
+    if (BioHeal > 0)
+    {
+        HealthBio = FMath::Min(HealthBioMax, HealthBio + BioHeal);
+        OnHealthBioChanged.Broadcast(HealthBio, HealthBioMax);
+    }
 
-	if (HealthBio > HealthBioMax)
-	{
-		HealthBio = HealthBioMax;
-	}
-	
-	HealthTech += TechHeal;
-
-	if(HealthTech > HealthTechMax)
-	{
-		HealthTech = HealthTechMax;
-	}
-
-	
+    if (TechHeal > 0)
+    {
+        HealthTech = FMath::Min(HealthTechMax, HealthTech + TechHeal);
+        OnHealthTechChanged.Broadcast(HealthTech, HealthTechMax);
+    }
 }
-
-void UStatManager::Die()
-{
-	if (Undying)
-	{
-		HealthBio = 1.0f;
-	}  else
-	{
-		GetOwner()->Destroy();
-	}
-}
-

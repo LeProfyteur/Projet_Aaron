@@ -8,76 +8,63 @@
 #include "Components/ActorComponent.h"
 #include "StatManager.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStatChangedEvent, float, Current, float, Max);
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+
+UCLASS( meta=(BlueprintSpawnableComponent) )
 class PROJET_AARON_API UStatManager : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
-	// Sets default values for this component's properties
-	UStatManager();
+public:
+	/* Events */
+	UPROPERTY(BlueprintAssignable)
+		FOnStatChangedEvent OnHealthBioChanged;
+    UPROPERTY(BlueprintAssignable)
+        FOnStatChangedEvent OnHealthTechChanged;
 
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
-	//Life Stat
-	UPROPERTY(BlueprintReadWrite, Category = Health)
-	float HealthBio;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
-	float HealthBioMax = 100.0f;
-	UPROPERTY(BlueprintReadWrite, Category = Health)
-	float HealthTech;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health)
-	float HealthTechMax = 100.0f;
-
-	bool Undying;
-	
-public:	
+public:
+    UFUNCTION(BlueprintCallable, Category = "Damage")
+        virtual void TakeDamage(float BioDamage, float TechDamage);
+    UFUNCTION(BlueprintCallable, Category = "Damage")
+        virtual void Heal(float BioHeal, float TechHeal);
 
 	/*Getters*/
-	UFUNCTION(BlueprintCallable)
-		float GetHealthBio() const { return HealthBio; }
-	UFUNCTION(BlueprintCallable)
-		float GetHealthBioMax() const { return HealthBioMax; }
-	UFUNCTION(BlueprintCallable)
-		float GetHealthTech() const { return HealthTech; }
-	UFUNCTION(BlueprintCallable)
-		float GetHealthTechMax() const { return HealthTechMax; }
-	UFUNCTION(BlueprintCallable)
-		float GetHealthBioRate() const { return HealthBio / HealthBioMax; }
-	UFUNCTION(BlueprintCallable)
-		FString GetHealthBioRateText() const;
-	UFUNCTION(BlueprintCallable)
-		float GetHealthTechRate() const { return HealthTech / HealthTechMax; }
-
-	UFUNCTION(BlueprintCallable)
-		float GetHealthRate() const { return (HealthBio + HealthTech) / (HealthBioMax + HealthTechMax); }
-	UFUNCTION(BlueprintCallable)
-		FString GetHealthTechRateText() const;
-	
-
+	UFUNCTION(BlueprintGetter)
+		float GetHealthBio() const;
+	UFUNCTION(BlueprintGetter)
+		float GetHealthBioMax() const;
+	UFUNCTION(BlueprintGetter)
+		float GetHealthTech() const;
+	UFUNCTION(BlueprintGetter)
+		float GetHealthTechMax() const;	
 
 	/*Setters*/
-	UFUNCTION(BlueprintCallable)
-		void SetHealthBio(float NewHealthBio) { HealthBio = NewHealthBio; }
-	UFUNCTION(BlueprintCallable)
-		void SetHealthBioMax(float NewHealthBioMax) { HealthBioMax = NewHealthBioMax; }
-	UFUNCTION(BlueprintCallable)
-		void SetHealthTech(float NewHealthTech) { HealthTech = NewHealthTech; }
-	UFUNCTION(BlueprintCallable)
-		void SetHealthTechMax(float NewHealthTechMax) { HealthBio = NewHealthTechMax; }
-	UFUNCTION(BlueprintCallable)
-		void SetUndying(bool NewUndying) { Undying = NewUndying; }
-	
-	//Called when you take damage
-	UFUNCTION(BlueprintCallable, Category = "Damage")
-	virtual void TakeDamage(float BioDamage, float TechDamage);
+	UFUNCTION(BlueprintSetter)
+		void SetHealthBio(float NewHealthBio);
+	UFUNCTION(BlueprintSetter)
+		void SetHealthBioMax(float NewHealthBioMax);
+	UFUNCTION(BlueprintSetter)
+		void SetHealthTech(float NewHealthTech);
+	UFUNCTION(BlueprintSetter)
+		void SetHealthTechMax(float NewHealthTechMax);
 
-	UFUNCTION(BlueprintCallable, Category = "Damage")
-	virtual void Heal(float BioHeal, float TechHeal);
+public:
+    UPROPERTY(EditAnywhere, Category = "Health")
+        bool DestroyOwnerOnDeath;
+    UPROPERTY(EditAnywhere, Category = "Health")
+		bool Invinvible;
 
-	UFUNCTION(BlueprintCallable, Category = "Damage")
-	void Die();
+protected:
+    void BeginPlay() override;
+
+    //Life Stat
+    UPROPERTY(EditAnywhere, Category = "Health", BlueprintGetter = "GetHealthBio", BlueprintSetter = "SetHealthBio")
+        float HealthBio;
+    UPROPERTY(EditAnywhere, Category = "Health", BlueprintGetter = "GetHealthBioMax", BlueprintSetter = "SetHealthBioMax")
+        float HealthBioMax = 100.0f;
+    UPROPERTY(EditAnywhere, Category = "Health", BlueprintGetter = "GetHealthTech", BlueprintSetter = "SetHealthTech")
+        float HealthTech;
+    UPROPERTY(EditAnywhere, Category = "Health", BlueprintGetter = "GetHealthTechMax", BlueprintSetter = "SetHealthTechMax")
+        float HealthTechMax = 100.0f;
 };
