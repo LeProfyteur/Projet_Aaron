@@ -26,8 +26,10 @@ public:
 public:
     UFUNCTION(BlueprintCallable, Category = "Damage")
         virtual void TakeDamage(float BioDamage, float TechDamage);
-    UFUNCTION(BlueprintCallable, Category = "Damage")
-        virtual void Heal(float BioHeal, float TechHeal);
+	UFUNCTION(BlueprintCallable, Category = "Damage")
+		virtual void Heal(float BioHeal, float TechHeal);
+	UFUNCTION(BlueprintCallable, Category = "Damage")
+		virtual void Kill();
 
 	/*Getters*/
 	UFUNCTION(BlueprintGetter)
@@ -51,9 +53,9 @@ public:
 
 public:
     UPROPERTY(EditAnywhere, Category = "Health")
-        bool DestroyOwnerOnDeath;
+        bool DestroyOwnerOnDeath = false;
     UPROPERTY(EditAnywhere, Category = "Health")
-		bool Invinvible;
+		bool Invincible = false;
 
 protected:
     void BeginPlay() override;

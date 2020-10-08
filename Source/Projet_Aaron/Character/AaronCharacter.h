@@ -20,6 +20,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		UCameraComponent* FpsCamera;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		UCharacterStatManager* StatManager;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		UPostProcessComponent* PostProcessing;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UChildActorComponent* LeftArmEquipment;
@@ -43,12 +46,12 @@ public:
 		void LookUp(float Value);
 	
 	UFUNCTION(BlueprintCallable)
-		void StartClimbingWithLeftHand(const FVector& WorldPosition);
+		void StartClimbingWithLeftHand();
 	UFUNCTION(BlueprintCallable)
 		void StopClimbingWithLeftHand();
 	
 	UFUNCTION(BlueprintCallable)
-		void StartClimbingWithRightHand(const FVector& WorldPosition);
+		void StartClimbingWithRightHand();
 	UFUNCTION(BlueprintCallable)
 		void StopClimbingWithRightHand();
 
@@ -140,4 +143,7 @@ protected:
 		float InAirSpeed = 300;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Metrics")
 		float GlidingSpeed = 700;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Metrics")
+		float ClimbRange = 400;
 };

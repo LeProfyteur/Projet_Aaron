@@ -24,8 +24,19 @@ float UStatManager::GetHealthTechMax() const
 
 void UStatManager::SetHealthBio(float NewHealthBio)
 {
-	HealthBio = NewHealthBio;
+	HealthBio = FMath::Clamp(NewHealthBio, 0.0f, HealthBioMax);
+
+	if (Invincible && HealthBio <= 0.0f)
+	{
+		HealthBio = 1;
+	}
+	
 	OnHealthBioChanged.Broadcast(HealthBio, HealthBioMax);
+
+	if (DestroyOwnerOnDeath && HealthBio <= 0.0f)
+	{
+		GetOwner()->Destroy();
+	}
 }
 
 void UStatManager::SetHealthBioMax(float NewHealthBioMax)
@@ -36,8 +47,8 @@ void UStatManager::SetHealthBioMax(float NewHealthBioMax)
 
 void UStatManager::SetHealthTech(float NewHealthTech)
 {
-	HealthTech = NewHealthTech;
-    OnHealthTechChanged.Broadcast(HealthTech, HealthTechMax);
+	HealthTech = FMath::Clamp(NewHealthTech, 0.0f, HealthTechMax);
+	OnHealthTechChanged.Broadcast(HealthTech, HealthTechMax);
 }
 
 void UStatManager::SetHealthTechMax(float NewHealthTechMax)
@@ -55,41 +66,31 @@ void UStatManager::BeginPlay()
 
 void UStatManager::TakeDamage(float BioDamage, float TechDamage)
 {
-    if (TechDamage > 0)
-    {
-        HealthTech = FMath::Max(0.0f, HealthTech - TechDamage);
-        OnHealthTechChanged.Broadcast(HealthTech, HealthTechMax);
-    }
-
 	if (BioDamage > 0)
 	{
-		HealthBio = FMath::Max(0.0f, HealthBio - BioDamage);
-		
-		if (Invinvible && HealthBio < 1)
-		{
-			HealthBio = 1;
-		}
-
-		OnHealthBioChanged.Broadcast(HealthBio, HealthBioMax);
-
-		if (DestroyOwnerOnDeath && HealthBio == 0.0f)
-		{
-			GetOwner()->Destroy();
-		}
+		SetHealthBio(HealthBio - BioDamage);
 	}
+
+	if (TechDamage > 0)
+    {
+		SetHealthTech(HealthTech - TechDamage);
+    }
 }
 
 void UStatManager::Heal(float BioHeal, float TechHeal)
 {
-    if (BioHeal > 0)
-    {
-        HealthBio = FMath::Min(HealthBioMax, HealthBio + BioHeal);
-        OnHealthBioChanged.Broadcast(HealthBio, HealthBioMax);
-    }
+	if (BioHeal > 0)
+	{
+		SetHealthBio(HealthBio + BioHeal);
+	}
 
-    if (TechHeal > 0)
-    {
-        HealthTech = FMath::Min(HealthTechMax, HealthTech + TechHeal);
-        OnHealthTechChanged.Broadcast(HealthTech, HealthTechMax);
-    }
+	if (TechHeal > 0)
+	{
+		SetHealthTech(HealthTech + TechHeal);
+	}
+}
+
+void UStatManager::Kill()
+{
+	SetHealthBio(0);
 }

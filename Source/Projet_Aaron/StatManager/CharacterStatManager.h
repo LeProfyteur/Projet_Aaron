@@ -71,11 +71,15 @@ protected:
     void BeginPlay() override;
     void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-private:
-    void OnHealthBioChangedEvent(float Current, float Max);
-    void OnHealthTechChangedEvent(float Current, float Max);
-    void OnOxygenChangedEvent(float Current, float Max);
-    void OnStaminaChangedEvent(float Current, float Max);
+protected:
+	UFUNCTION()
+		void OnHealthBioChangedEvent(float Current, float Max);
+	UFUNCTION()
+		void OnHealthTechChangedEvent(float Current, float Max);
+	UFUNCTION()
+		void OnOxygenChangedEvent(float Current, float Max);
+	UFUNCTION()
+		void OnStaminaChangedEvent(float Current, float Max);
 
 public:
 

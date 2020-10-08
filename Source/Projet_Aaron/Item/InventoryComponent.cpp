@@ -3,6 +3,11 @@
 
 #include "InventoryComponent.h"
 
+UInventoryComponent::UInventoryComponent()
+{
+    Slots.SetNum(4);
+}
+
 bool UInventoryComponent::IsSlotEmpty(int SlotID)
 {
     return Slots.IsValidIndex(SlotID) || Slots[SlotID] == NAME_None;

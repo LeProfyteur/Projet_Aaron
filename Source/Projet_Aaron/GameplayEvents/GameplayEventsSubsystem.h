@@ -8,6 +8,10 @@
 #include "Blueprint/UserWidget.h"
 #include "GameplayEventsSubsystem.generated.h"
 
+//Player Dialog Events
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDialogEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FDisplayLineEvent, const FText&, DisplayText, const UTexture2D*, DisplayImage);
+
 //Player Menu Request Events
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerRequestedMenuEvent, TSubclassOf<UUserWidget>, MenuType);
 
@@ -50,6 +54,14 @@ class PROJET_AARON_API UGameplayEventsSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
+	//Dialog Signals
+	UFUNCTION(BlueprintCallable)
+		void SignalBeginDialog();
+	UFUNCTION(BlueprintCallable)
+		void SignalDialogDisplayLine(const FText& DisplayText, const UTexture2D* DisplayImage);
+	UFUNCTION(BlueprintCallable)
+		void SignalEndDialog();
+	
 	//Player Menu Request Signals
 	UFUNCTION(BlueprintCallable)
 		void SignalPlayerRequestedMenuToOpen(TSubclassOf<UUserWidget> MenuType);
@@ -85,7 +97,9 @@ public:
 	//Player Inventory Signals
 	UFUNCTION(BlueprintCallable)
 		void SignalPlayerInventorySlotChanged(int SlotID, FName ItemID);
+	UFUNCTION(BlueprintCallable)
 		void SignalPlayerUsableItemSelectionChanged(int SlotID, FName ItemID);
+
 	//Player Status Signals
 	UFUNCTION(BlueprintCallable)
 		void SignalPlayerHealthChanged(float Current, float Max);
@@ -120,6 +134,14 @@ public:
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+	//Dialog Events
+	UPROPERTY(BlueprintAssignable)
+		FDialogEvent OnBeginDialog;
+	UPROPERTY(BlueprintAssignable)
+		FDisplayLineEvent OnDialogDisplayLine;
+	UPROPERTY(BlueprintAssignable)
+		FDialogEvent OnEndDialog;
+	
 	//Player Menu Requests Events
 	UPROPERTY(BlueprintAssignable)
 		FPlayerRequestedMenuEvent OnPlayerRequestedMenuToOpen;

@@ -14,6 +14,8 @@ class PROJET_AARON_API UInventoryComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
+	UInventoryComponent();
+	
 	UFUNCTION(BlueprintCallable)
 		bool IsSlotEmpty(int SlotID);
 

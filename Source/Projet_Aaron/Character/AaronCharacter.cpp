@@ -3,6 +3,8 @@
 
 #include "AaronCharacter.h"
 
+
+#include "GripPointComponent.h"
 #include "Math/UnitConversion.h"
 
 //Chaining ifs is boring. That's just a one liner implementation for a transition selector
@@ -18,6 +20,8 @@ AAaronCharacter::AAaronCharacter(const FObjectInitializer& ObjectInitializer)
 	FpsCamera->SetRelativeLocation(FVector(0.0f, 0.0f, 50.0f + BaseEyeHeight));
 	FpsCamera->bUsePawnControlRotation = true;
 
+	StatManager = CreateDefaultSubobject<UCharacterStatManager>(TEXT("StatManager"));
+	StatManager->DestroyOwnerOnDeath = true;
 
 	PostProcessing = CreateDefaultSubobject<UPostProcessComponent>(TEXT("Post Processing"));
 	
@@ -115,11 +119,22 @@ void AAaronCharacter::LookUp(float Value)
 	AddControllerPitchInput(Value);
 }
 
-void AAaronCharacter::StartClimbingWithLeftHand(const FVector& WorldPosition)
+void AAaronCharacter::StartClimbingWithLeftHand()
 {
-	UsingLeftGripPoint = true;
-	LeftGripPoint = WorldPosition;
-	UpdateShouldClimb();
+	FHitResult Hit;
+	
+	const FVector Start = FpsCamera->GetComponentLocation();
+	const FVector End = Start + FpsCamera->GetForwardVector() * ClimbRange;
+
+	if (GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility))
+	{
+		if (UGripPointComponent* GripPoint = Hit.GetActor()->FindComponentByClass<UGripPointComponent>())
+		{
+			UsingLeftGripPoint = true;
+			LeftGripPoint = GripPoint->GetComponentLocation();
+			UpdateShouldClimb();
+		}
+	}
 }
 
 void AAaronCharacter::StopClimbingWithLeftHand()
@@ -129,11 +144,22 @@ void AAaronCharacter::StopClimbingWithLeftHand()
 }
 
 
-void AAaronCharacter::StartClimbingWithRightHand(const FVector& WorldPosition)
+void AAaronCharacter::StartClimbingWithRightHand()
 {
-	UsingRightGripPoint = true;
-	RightGripPoint = WorldPosition;
-	UpdateShouldClimb();
+	FHitResult Hit;
+
+	const FVector Start = FpsCamera->GetComponentLocation();
+	const FVector End = Start + FpsCamera->GetForwardVector() * ClimbRange;
+
+	if (GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility))
+	{
+		if (UGripPointComponent* GripPoint = Hit.GetActor()->FindComponentByClass<UGripPointComponent>())
+		{
+			UsingRightGripPoint = true;
+			RightGripPoint = GripPoint->GetComponentLocation();
+			UpdateShouldClimb();
+		}
+	}
 }
 
 void AAaronCharacter::StopClimbingWithRightHand()
@@ -270,25 +296,23 @@ void AAaronCharacter::ClimbMovement()
 {
 	FVector TargetGripPoint(FVector::ZeroVector);
 
-	if (UsingLeftGripPoint || UsingRightGripPoint)
+	
+	if (UsingLeftGripPoint && UsingRightGripPoint)
 	{
+		TargetGripPoint = (LeftGripPoint + RightGripPoint) / 2.0f;
+	}
+	else if (UsingLeftGripPoint)
+	{
+		TargetGripPoint = LeftGripPoint;
+	}
+	else if (UsingRightGripPoint)
+	{
+		TargetGripPoint = RightGripPoint;
+	}
+	//Average the two GripPoints if both are being used
 
-		if (UsingLeftGripPoint)
-		{
-			TargetGripPoint += LeftGripPoint;
-		}
-
-		if (UsingRightGripPoint)
-		{
-			TargetGripPoint += RightGripPoint;
-		}
-
-		//Average the two GripPoints if both are being used
-		if (UsingLeftGripPoint && UsingRightGripPoint)
-		{
-			TargetGripPoint /= 2;
-		}
-
+	if (!TargetGripPoint.IsNearlyZero())
+	{
 		FVector DesiredLocation = FMath::Lerp(GetActorLocation(), TargetGripPoint, 0.1f);
 		SetActorLocation(DesiredLocation);
 	}

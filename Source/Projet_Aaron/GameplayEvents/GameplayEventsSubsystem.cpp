@@ -3,6 +3,21 @@
 
 #include "GameplayEventsSubsystem.h"
 
+void UGameplayEventsSubsystem::SignalBeginDialog()
+{
+	OnBeginDialog.Broadcast();
+}
+
+void UGameplayEventsSubsystem::SignalDialogDisplayLine(const FText& DisplayText, const UTexture2D* DisplayImage)
+{
+	OnDialogDisplayLine.Broadcast(DisplayText, DisplayImage);
+}
+
+void UGameplayEventsSubsystem::SignalEndDialog()
+{
+	OnEndDialog.Broadcast();
+}
+
 void UGameplayEventsSubsystem::SignalPlayerRequestedMenuToOpen(TSubclassOf<UUserWidget> MenuType)
 {
 	OnPlayerRequestedMenuToOpen.Broadcast(MenuType);
